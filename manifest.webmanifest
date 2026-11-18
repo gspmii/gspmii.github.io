@@ -1,0 +1,26 @@
+{
+  "id": "/",
+  "name": "GSPMII APP | PUK SAT Cikokol Raya",
+  "short_name": "GSPMII APP",
+  "description": "Portal Keanggotaan Digital GSPMII PUK SAT Cikokol Raya",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#050a18",
+  "theme_color": "#070d1d",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

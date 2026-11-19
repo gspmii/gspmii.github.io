@@ -4,6 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#070d1d">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="GSPMII APP">
+<meta name="mobile-web-app-capable" content="yes">
+
 <title>GSPMII APP | PUK SAT Cikokol Raya</title>
 <meta name="description" content="Portal digital keanggotaan GSPMII PUK SAT Cikokol Raya">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -560,7 +567,16 @@ body:not(.logged-in) #settingsShortcut{display:none!important}
   <section id="p-news" class="page hidden"><div class="grid"><div class="card span6 admin"><h2>Terbitkan Berita / Dokumentasi</h2><form id="newsForm"><div class="field"><label>Judul</label><input id="nTitle" required></div><div class="field"><label>Ringkasan</label><textarea id="nSummary"></textarea></div><div class="field"><label>Isi berita</label><textarea id="nBody" rows="5"></textarea></div><div class="field"><label>Tautan foto / dokumentasi (opsional)</label><input id="nImage" type="url"></div><button class="btn">Terbitkan</button></form></div><div class="card span12"><h2>Berita & Dokumentasi</h2><div id="newsRows">Memuat...</div></div></div></section>
   <section id="p-notifications" class="page hidden"><div class="card"><div class="row" style="align-items:center;justify-content:space-between"><div><h2>Notifikasi Otomatis</h2><p class="sub">Pemberitahuan agenda baru dan perkembangan layanan anggota.</p></div><button id="readAllNotifications" class="btn alt">Tandai semua dibaca</button></div><div id="notificationRows">Memuat...</div></div></section>
   <section id="p-export" class="page hidden"><div class="card"><h2>Ekspor Excel</h2><p class="sub">Unduh data anggota CSV yang dapat dibuka di Microsoft Excel.</p><button id="export" class="btn">Unduh CSV</button><div class="notice">Data NIK adalah data pribadi. Jaga kerahasiaannya.</div></div></section>
-  <section id="p-access" class="page hidden"><div class="card"><h2>Hak Akses Pengurus</h2><p>Anggota hanya dapat melihat profil sendiri dan memperbarui nomor HP serta alamat. Pengurus mengelola data, status verifikasi, agenda, dan ekspor.</p><p class="notice">Pengamanan sebenarnya wajib diterapkan di database melalui RLS dan fungsi server, bukan hanya menyembunyikan menu.</p></div></section>
+  <section id="p-access" class="page hidden">
+    <div class="card">
+      <h2>Pengaturan Hak Akses</h2>
+      <p class="sub">Khusus akun pemilik portal. Ubah peran anggota menjadi pengurus atau kembalikan menjadi anggota tanpa mengubah data keanggotaannya.</p>
+      <div class="notice">Perubahan peran diproses melalui fungsi database yang memverifikasi akun pemilik. Menu ini tidak memberi hak kepada anggota biasa untuk menaikkan perannya sendiri.</div>
+      <div class="field"><label for="accessSearch">Cari anggota</label><input id="accessSearch" type="search" placeholder="Nama, email, atau nomor anggota"></div>
+      <div id="accessRows"><div class="empty">Memuat data hak akses...</div></div>
+      <div id="accessMsg" class="hidden"></div>
+    </div>
+  </section>
   <section id="p-settings" class="page hidden">
     <div class="card settings-hero"><div class="settings-symbol">⚙</div><div><div class="userrole">PREFERENSI AKUN</div><h2>Pengaturan Aplikasi</h2><p class="sub">Atur tampilan dan keamanan akun keanggotaan Anda.</p></div></div>
     <div class="card settings-list"><h3>Akun & Profil</h3>
@@ -688,10 +704,43 @@ function auth(mode="loginForm"){$("loginSolidarity").classList.toggle("hidden",m
 $("settingTheme").onclick=()=>{setTheme(document.documentElement.dataset.theme==="dark"?"light":"dark");$("themeDescription").textContent=document.documentElement.dataset.theme==="dark"?"Mode gelap aktif":"Mode terang aktif"};
 $("settingPassword").onclick=async()=>{const pw=prompt("Masukkan kata sandi baru (minimal 8 karakter):");if(!pw)return;if(pw.length<8){alert("Kata sandi minimal 8 karakter.");return}const {error}=await db.auth.updateUser({password:pw});if(error)alert("Gagal mengubah kata sandi: "+error.message);else alert("Kata sandi berhasil diperbarui.")};
 if($("loginTab"))$("loginTab").onclick=()=>auth();$("registerTab").onclick=()=>auth("registerForm");$("forgot").onclick=()=>{$("resetEmail").value=$("email").value;auth("resetForm")};$("backLogin").onclick=()=>auth();
-function page(p){document.body.dataset.page=p;document.querySelectorAll(".page").forEach(x=>x.classList.toggle("hidden",x.id!=="p-"+p));document.querySelectorAll("[data-p]").forEach(x=>x.classList.toggle("active",x.dataset.p===p));$("mobileMenu").classList.add("hidden");if(p==="directory")loadDirectory().catch(e=>message($("appMsg"),"Direktori belum dapat dimuat: "+e.message,true));if(p==="card"){drawCard().catch(e=>message($("appMsg"),"Gagal memuat E-KTA: "+e.message,true));renderMemberQr()}if(p==="complaints")loadComplaints().catch(e=>featureError("complaintRows",e));if(p==="documents")loadDocuments().catch(e=>featureError("documentRows",e));if(p==="dues")loadDues().catch(e=>featureError("duesRows",e));if(p==="forum")loadForum().catch(e=>featureError("forumRows",e));if(p==="news")loadNews().catch(e=>featureError("newsRows",e));if(p==="notifications")loadNotifications().catch(e=>featureError("notificationRows",e));}
+function page(p){document.body.dataset.page=p;document.querySelectorAll(".page").forEach(x=>x.classList.toggle("hidden",x.id!=="p-"+p));document.querySelectorAll("[data-p]").forEach(x=>x.classList.toggle("active",x.dataset.p===p));$("mobileMenu").classList.add("hidden");if(p==="directory")loadDirectory().catch(e=>message($("appMsg"),"Direktori belum dapat dimuat: "+e.message,true));if(p==="card"){drawCard().catch(e=>message($("appMsg"),"Gagal memuat E-KTA: "+e.message,true));renderMemberQr()}if(p==="complaints")loadComplaints().catch(e=>featureError("complaintRows",e));if(p==="documents")loadDocuments().catch(e=>featureError("documentRows",e));if(p==="dues")loadDues().catch(e=>featureError("duesRows",e));if(p==="forum")loadForum().catch(e=>featureError("forumRows",e));if(p==="news")loadNews().catch(e=>featureError("newsRows",e));if(p==="notifications")loadNotifications().catch(e=>featureError("notificationRows",e));if(p==="access")loadAccessManagement().catch(e=>featureError("accessRows",e));}
 document.querySelectorAll("[data-p],[data-go]").forEach(b=>b.onclick=()=>{let p=b.dataset.p||b.dataset.go;if(["members","form","verify","export","access"].includes(p)&&!admin)return;page(p)});
 const badge=s=>`<span class="pill ${s==="menunggu"?"pending":s==="ditolak"?"rejected":""}">${s==="disetujui"?"Aktif":s==="ditolak"?"Ditolak":"Menunggu"}</span>`;
-async function getMe(){let {data,error}=await db.from("anggota_gspmii").select("*").eq("user_id",user.id).maybeSingle();if(error)throw error;if(!data)throw new Error("Profil anggota belum terbentuk. Hubungi pengurus; jangan membuat profil manual dari browser.");me=data;admin=me.peran==="pengurus"&&me.status_verifikasi==="disetujui"}
+async function loadAccessManagement(){
+  if(user.id!=="e007bfdd-0a46-47ae-a33d-359157ce752d"){
+    $("accessRows").innerHTML='<div class="empty">Fitur pengaturan peran hanya tersedia untuk akun pemilik portal.</div>';
+    return;
+  }
+  const {data,error}=await db.from("anggota_gspmii").select("id,user_id,nama_lengkap,email,nomor_anggota,peran,status_verifikasi").order("nama_lengkap",{ascending:true});
+  if(error)throw error;
+  window.gspmiiAccessRows=data||[];
+  drawAccessManagement();
+}
+function drawAccessManagement(){
+  const q=($("accessSearch")?.value||"").toLowerCase();
+  const list=(window.gspmiiAccessRows||[]).filter(m=>[m.nama_lengkap,m.email,m.nomor_anggota].some(v=>String(v||"").toLowerCase().includes(q)));
+  $("accessRows").innerHTML=list.length?`<div class="tablewrap"><table><tr><th>Anggota</th><th>Peran saat ini</th><th>Ubah peran</th></tr>${list.map(m=>`<tr><td><b>${esc(m.nama_lengkap||"-")}</b><br>${esc(m.email||"")}<br><small>${esc(m.nomor_anggota||"")}</small></td><td>${m.peran==="pengurus"?"Pengurus":"Anggota"}<br><small>${esc(m.status_verifikasi||"")}</small></td><td>${m.user_id===user.id?'<span class="pill">Akun pemilik</span>':`<button class="btn ${m.peran==="pengurus"?"red":"alt"}" data-role-user="${esc(m.user_id||"")}" data-role-next="${m.peran==="pengurus"?"anggota":"pengurus"}">${m.peran==="pengurus"?"Jadikan Anggota":"Jadikan Pengurus"}</button>`}</td></tr>`).join("")}</table></div>`:'<div class="empty">Anggota tidak ditemukan.</div>';
+  $("accessRows").querySelectorAll("[data-role-user]").forEach(btn=>btn.onclick=async()=>{
+    const uid=btn.dataset.roleUser, next=btn.dataset.roleNext;
+    const member=(window.gspmiiAccessRows||[]).find(x=>x.user_id===uid);
+    if(!member)return;
+    const label=next==="pengurus"?"PENGURUS":"ANGGOTA";
+    if(!confirm(`Ubah peran ${member.nama_lengkap} menjadi ${label}?`))return;
+    btn.disabled=true;btn.textContent="Memproses...";
+    try{
+      const {data,error}=await db.rpc("gspmii_admin_set_member_role",{p_target_user_id:uid,p_new_role:next});
+      if(error)throw error;
+      message($("accessMsg"),"Peran berhasil diperbarui.",false);
+      await loadAccessManagement();
+    }catch(e){
+      message($("accessMsg"),"Gagal mengubah peran: "+(e.message||"Periksa fungsi keamanan database."),true);
+      btn.disabled=false;btn.textContent=next==="pengurus"?"Jadikan Pengurus":"Jadikan Anggota";
+    }
+  });
+}
+$("accessSearch")?.addEventListener("input",drawAccessManagement);
+async function getMe(){let {data,error}=await db.from("anggota_gspmii").select("*").eq("user_id",user.id).maybeSingle();if(error)throw error;if(!data)throw new Error("Profil anggota belum terbentuk. Hubungi pengurus; jangan membuat profil manual dari browser.");me=data;admin=user.id==="e007bfdd-0a46-47ae-a33d-359157ce752d"||(me.peran==="pengurus"&&me.status_verifikasi==="disetujui")}
 async function signedPhoto(path){if(!path)return "";const {data,error}=await db.storage.from("foto_anggota").createSignedUrl(path,3600);if(error){console.warn("Foto profil tidak dapat dimuat:",error.message);return ""}return data?.signedUrl||""}
 async function renderProfile(){
   $("welcome").textContent="Halo, "+me.nama_lengkap;$("userEmail").textContent=user.email;
@@ -765,7 +814,18 @@ function downloadSavedProfilePdf(){
   <p class="notice">Dokumen ini dibuat dari data profil yang tersimpan pada Portal Keanggotaan Digital GSPMII PUK SAT CIKOKOL RAYA. Pastikan informasi telah diperiksa sebelum digunakan sebagai dokumen administrasi.</p>
   <footer class="foot"><span>GSPMII · PUK SAT CIKOKOL RAYA</span><span>Dicetak: ${new Date().toLocaleString("id-ID")}</span></footer>
   <div class="no-print" style="margin-top:20px;text-align:center"><button onclick="window.print()">Cetak / Simpan sebagai PDF</button></div>
-  </main><script>window.onload=()=>setTimeout(()=>window.print(),500);<\/script></body></html>`);
+  </main><script>window.onload=()=>setTimeout(()=>window.print(),500);<\/script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js").catch((error) => {
+      console.warn("PWA service worker registration failed:", error);
+    });
+  });
+}
+<\/script>
+
+</body></html>`);
   w.document.close();
 }
 $("downloadProfilePdf").onclick=downloadSavedProfilePdf;

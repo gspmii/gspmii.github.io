@@ -876,7 +876,7 @@ function page(p,fromBack=false){
  if(!fromBack&&p!==current&&p!=="home"){gspmiiPageHistory.push(current);if(gspmiiPageHistory.length>30)gspmiiPageHistory.shift();}
  const loader=document.getElementById("gspmiiPageLoader");
  if(loader){loader.classList.add("show");loader.setAttribute("aria-hidden","false");}
- window.setTimeout(()=>{_pageNow(p);if(loader){loader.classList.remove("show");loader.setAttribute("aria-hidden","true");}window.scrollTo({top:0,behavior:"smooth"});},220);
+ window.setTimeout(()=>{try{_pageNow(p);}finally{if(loader){loader.classList.remove("show");loader.setAttribute("aria-hidden","true");}window.scrollTo({top:0,behavior:"smooth"});}},550);
 }
 document.addEventListener("click",e=>{const back=e.target.closest("[data-page-back]");if(!back)return;const previous=gspmiiPageHistory.pop()||"home";page(previous,true);});
 
@@ -1119,7 +1119,7 @@ if ("serviceWorker" in navigator) {
 }
 <\/script>
 
-<div id="gspmiiPageLoader" class="gspmii-page-loader" aria-hidden="true"><div class="loader-orbit"></div><b>Memuat halaman...</b><small>GSPMII · PUK SAT CIKOKOL RAYA</small></div>
+
 </body></html>`);
   w.document.close();
 }
@@ -1282,5 +1282,6 @@ init().catch(e=>message($("authMsg"),e.message,true));
   </svg>
 </a>
 
+<div id="gspmiiPageLoader" class="gspmii-page-loader" aria-hidden="true"><div class="loader-orbit"></div><b>Memuat halaman...</b><small>GSPMII · PUK SAT CIKOKOL RAYA</small></div>
 </body>
 </html>

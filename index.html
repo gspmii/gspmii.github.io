@@ -466,6 +466,38 @@ body:not(.logged-in) #settingsShortcut{display:none!important}
 #myStatus .home-kta-actions .btn{padding:8px 10px;font-size:12px}
 @media(max-width:680px){#myStatus .home-kta-preview{grid-template-columns:minmax(0,1fr)}#myStatus .home-kta-mini{width:100%}#myStatus .home-kta-details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}#myStatus .home-kta-actions{grid-column:1/-1}}
 </style>
+<style id="home-kta-original-proportion">
+/* KTA beranda: proporsi landscape mengikuti kartu E-KTA asli (85.6 x 54 mm) */
+#myStatus{min-width:0;overflow:hidden}
+#myStatus .home-kta-preview{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(135px,.75fr);gap:12px;align-items:center;width:100%;min-width:0}
+#myStatus .home-kta-mini{width:100%;max-width:440px;aspect-ratio:85.6/54;box-sizing:border-box;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;position:relative;border-radius:12px;padding:0;background:#fff;color:#17213a;border:1px solid #c9d3e4;box-shadow:0 5px 16px #0002}
+#myStatus .home-kta-mini:before,#myStatus .home-kta-mini:after{content:"";height:5px;flex:0 0 5px;background:#c51f26}
+#myStatus .home-kta-mini-head{display:flex;align-items:center;gap:9px;padding:7px 10px 5px;background:#c51f26;color:#fff;min-height:0}
+#myStatus .home-kta-logo{width:34px;height:34px;flex:0 0 34px;object-fit:contain;background:#fff;border-radius:50%;padding:2px}
+#myStatus .home-kta-seal{width:30px;height:30px;flex:0 0 30px;border:2px solid #d8bd76;border-radius:50%;display:grid;place-items:center;font-weight:900;color:#fff}
+#myStatus .home-kta-mini-head b{display:block;font-size:clamp(10px,1.4vw,14px);letter-spacing:.5px;line-height:1.1}
+#myStatus .home-kta-mini-head small{display:block;font-size:clamp(6px,.8vw,8px);line-height:1.15;color:#fff;opacity:.94;margin-top:2px}
+#myStatus .home-kta-mini-body{display:flex;align-items:center;gap:10px;padding:6px 12px;min-width:0;flex:1}
+#myStatus img.home-kta-photo{display:block!important;width:clamp(42px,7vw,66px)!important;height:clamp(52px,8vw,82px)!important;max-width:66px!important;max-height:82px!important;min-width:42px!important;object-fit:cover!important;object-position:center!important;border-radius:3px;border:1px solid #aaa;flex:0 0 auto!important}
+#myStatus .home-kta-initials{width:54px;height:66px;flex:0 0 54px;display:grid;place-items:center;background:#1b3764;color:#fff;font-weight:800;font-size:18px;border-radius:4px}
+#myStatus .home-kta-mini-info{min-width:0;display:flex;flex-direction:column;gap:3px;overflow:hidden}
+#myStatus .home-kta-mini-info b{font-size:clamp(10px,1.3vw,14px);line-height:1.15;overflow-wrap:anywhere;text-transform:uppercase;color:#151515}
+#myStatus .home-kta-mini-info small{font-size:clamp(7px,.9vw,10px);line-height:1.15;color:#303b50;overflow-wrap:anywhere}
+#myStatus .home-kta-ribbon{display:inline-block;align-self:flex-start;background:#c51f26;color:#fff;padding:3px 7px;border-radius:3px;font-size:clamp(7px,.9vw,9px);letter-spacing:.3px}
+#myStatus .home-kta-details{display:flex;flex-direction:column;justify-content:center;gap:9px;min-width:0}
+#myStatus .home-kta-details>div{display:flex;flex-direction:column;gap:3px}
+#myStatus .home-kta-details small{font-size:11px;color:var(--muted)}
+#myStatus .home-kta-details b{overflow-wrap:anywhere}
+#myStatus .home-kta-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px}
+#myStatus .home-kta-actions .btn{padding:8px 10px;font-size:12px}
+@media(max-width:680px){
+ #myStatus .home-kta-preview{grid-template-columns:minmax(0,1fr);gap:12px}
+ #myStatus .home-kta-mini{width:100%;max-width:100%;aspect-ratio:85.6/54}
+ #myStatus .home-kta-details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+ #myStatus .home-kta-actions{grid-column:1/-1}
+ #myStatus img.home-kta-photo{width:clamp(54px,16vw,76px)!important;height:clamp(66px,20vw,94px)!important;max-width:76px!important;max-height:94px!important}
+}
+</style>
 </head>
 <body>
 <header class="topbar">
@@ -865,9 +897,14 @@ async function renderProfile(){
   const statusPhoto=await signedPhoto(me.foto_url);
   const statusInitials=String(me.nama_lengkap||"G").trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase();
   const statusPhotoHtml=statusPhoto?`<img class="home-kta-photo" src="${esc(statusPhoto)}" alt="Foto anggota">`:`<div class="home-kta-photo home-kta-initials">${esc(statusInitials||"G")}</div>`;
+  const statusLogoSrc=document.querySelector(".ekta-head img")?.src||"";
+  const statusLogoHtml=statusLogoSrc?`<img class="home-kta-logo" src="${statusLogoSrc}" alt="Logo GSPMII">`:`<span class="home-kta-seal">G</span>`;
   const statusLabel=me.status_verifikasi==="disetujui"?"Aktif":me.status_verifikasi==="ditolak"?"Ditolak":"Menunggu verifikasi";
   $("myStatus").innerHTML=`<div class="home-kta-preview" role="group" aria-label="Ringkasan kartu anggota">
-    <div class="home-kta-mini"><div class="home-kta-mini-head"><span class="home-kta-seal">G</span><span><b>GSPMII</b><small>PUK SAT CIKOKOL RAYA</small></span></div><div class="home-kta-mini-body">${statusPhotoHtml}<div class="home-kta-mini-info"><b>${esc(me.nama_lengkap||"Anggota GSPMII")}</b><small>No. Anggota: ${esc(me.nomor_anggota||"Belum diterbitkan")}</small><strong>E-KTA ANGGOTA</strong></div></div></div>
+    <div class="home-kta-mini">
+      <div class="home-kta-mini-head">${statusLogoHtml}<span><b>GSPMII</b><small>Gabungan Serikat Pekerja Manufaktur Independen Indonesia</small></span></div>
+      <div class="home-kta-mini-body">${statusPhotoHtml}<div class="home-kta-mini-info"><strong class="home-kta-ribbon">E-KTA ANGGOTA</strong><b>${esc(me.nama_lengkap||"Anggota GSPMII")}</b><small>No. Anggota: ${esc(me.nomor_anggota||"Belum diterbitkan")}</small><small>PUK: SAT CIKOKOL RAYA</small></div></div>
+    </div>
     <div class="home-kta-details"><div><small>Nomor anggota</small><b>${esc(me.nomor_anggota||"Belum diterbitkan")}</b></div><div><small>Status keanggotaan</small>${badge(me.status_verifikasi)}</div><div><small>Unit kerja</small><b>${esc(me.unit_kerja||"Belum diisi")}</b></div><div class="home-kta-actions"><button type="button" class="btn" id="homeViewKta">Lihat E-KTA</button></div></div>
   </div>`;
   $("homeViewKta")?.addEventListener("click",()=>page("card"));

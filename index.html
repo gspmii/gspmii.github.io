@@ -527,6 +527,7 @@ body:not(.logged-in) #settingsShortcut{display:none!important}
 @media(max-width:780px){#wa-float-puk{min-width:56px;padding:0 13px}#wa-float-puk .wa-join-label{font-size:11px}}
 </style>
 
+
 </head>
 <body>
 <header class="topbar">
@@ -620,7 +621,6 @@ body:not(.logged-in) #settingsShortcut{display:none!important}
     <button data-p="directory"><span class="menu-icon">♧</span><span><b>Direktori Anggota</b><small>Kenali rekan seperjuangan</small></span><i>›</i></button>
     <div class="menu-group-title">ADMINISTRASI KEANGGOTAAN</div>
     <button data-p="members" class="admin hidden"><span class="menu-icon">▤</span><span><b>Data Anggota</b><small>Kelola data keanggotaan</small></span><i>›</i></button>
-    <button data-p="form" class="admin hidden"><span class="menu-icon">✎</span><span><b>Formulir Anggota</b><small>Tambah atau perbarui data</small></span><i>›</i></button>
     <button data-p="verify" class="admin hidden"><span class="menu-icon">✓</span><span><b>Verifikasi</b><small>Periksa pendaftaran anggota</small></span><i>›</i></button>
     <button data-p="card"><span class="menu-icon">▣</span><span><b>Kartu Digital</b><small>E-KTA dan identitas anggota</small></span><i>›</i></button>
     <div class="menu-group-title">LAYANAN & INFORMASI</div>
@@ -636,7 +636,7 @@ body:not(.logged-in) #settingsShortcut{display:none!important}
     <button data-p="access" class="admin owner-only hidden"><span class="menu-icon">⚙</span><span><b>Hak Akses</b><small>Pengaturan peran dan kewenangan</small></span><i>›</i></button>
     <div class="menu-group-title">PENGUATAN & PERLINDUNGAN ANGGOTA</div>
     <button data-p="rights"><span class="menu-icon">⚖</span><span><b>Kalkulator Hak Pekerja</b><small>Simulasi estimasi hak ketenagakerjaan</small></span><i>›</i></button>
-    <button data-p="cases"><span class="menu-icon">▣</span><span><b>Monitoring Kasus PHK</b><small>Pencatatan dan pemantauan perkara</small></span><i>›</i></button>
+    <button data-p="dpc"><span class="menu-icon">📍</span><span><b>Lokasi Kantor DPC</b><small>Alamat dan petunjuk arah kantor DPC</small></span><i>›</i></button>
     <button data-p="aspirations"><span class="menu-icon">✉</span><span><b>Kotak Aspirasi</b><small>Masukan dan usulan anggota</small></span><i>›</i></button>
     <button data-p="regulations"><span class="menu-icon">§</span><span><b>Pusat Regulasi</b><small>Referensi aturan ketenagakerjaan</small></span><i>›</i></button>
     <button data-p="academy"><span class="menu-icon">▤</span><span><b>Pendidikan Serikat</b><small>Materi belajar hak pekerja</small></span><i>›</i></button>
@@ -688,7 +688,21 @@ body:not(.logged-in) #settingsShortcut{display:none!important}
       <p class="krw-legal-note">Catatan hukum: simulasi menggunakan ketentuan UU No. 27 Tahun 2026 dan ketentuan PP No. 35 Tahun 2021 sepanjang masih berlaku serta tidak bertentangan dengan UU tersebut. Hasil bukan penetapan resmi. Periksa surat PHK, Perjanjian Kerja, Peraturan Perusahaan/PKB, putusan, dan peraturan pelaksana terbaru sebelum menyepakati pembayaran.</p>
     </div>
   </section>
-  <section id="p-cases" class="page hidden"><div class="card"><h2>Monitoring Kasus PHK</h2><p class="sub">Ruang pencatatan kasus secara terbatas. Data kasus bersifat rahasia dan tidak boleh ditampilkan ke seluruh anggota.</p><div class="message">Modul ini disiapkan sebagai tampilan awal. Penyimpanan, nomor perkara, penugasan pendamping, dan riwayat status harus dihubungkan ke tabel Supabase dengan kebijakan RLS khusus sebelum digunakan.</div><ul><li>Nomor laporan dan tanggal penerimaan</li><li>Kronologi dan dokumen pendukung</li><li>Pendamping atau pengurus penanggung jawab</li><li>Status: diterima, verifikasi, bipartit, Disnaker, PHI, selesai</li></ul></div></section>
+  <section id="p-dpc" class="page hidden">
+  <div class="card">
+    <h2>Lokasi Kantor DPC GSPMII</h2>
+    <p class="sub">Temukan lokasi kantor DPC dan buka petunjuk arah melalui Google Maps.</p>
+    <div id="dpcMapStatus" class="message">Memuat tautan lokasi kantor DPC...</div>
+    <div id="dpcMapActions" class="actions" style="margin:12px 0"></div>
+    <div id="dpcMapAdmin" class="notice hidden" style="margin-top:18px">
+      <h3>Pengaturan Lokasi DPC (Khusus Owner)</h3>
+      <p class="sub">Tempel tautan berbagi Google Maps di bawah ini, lalu simpan. Tautan akan tersedia bagi seluruh pengguna portal.</p>
+      <label class="field">Tautan Google Maps<input id="dpcMapsUrl" type="url" inputmode="url" placeholder="https://maps.app.goo.gl/..." autocomplete="url"></label>
+      <button class="btn" type="button" id="saveDpcMaps">Simpan Tautan Maps</button>
+      <span id="dpcMapSaveStatus" class="sub" aria-live="polite"></span>
+    </div>
+  </div>
+</section>
   <section id="p-aspirations" class="page hidden"><div class="card"><h2>Kotak Aspirasi Anggota</h2><p class="sub">Sampaikan masukan untuk penguatan organisasi. Jangan masukkan NIK, data kesehatan, atau informasi pribadi sensitif pada formulir uji coba ini.</p><label class="field">Topik<input id="aspTopic" maxlength="120" placeholder="Contoh: Pendidikan hak pekerja"></label><label class="field">Aspirasi<textarea id="aspBody" rows="5" maxlength="2000" placeholder="Tuliskan aspirasi atau usulan..."></textarea></label><button class="btn" id="aspSend" type="button">Periksa isian</button><div id="aspResult" class="message hidden"></div><p class="sub">Formulir ini belum mengirim atau menyimpan data. Integrasi penyimpanan privat perlu disiapkan terlebih dahulu.</p></div></section>
   <section id="p-regulations" class="page hidden"><div class="card"><h2>Pusat Regulasi Ketenagakerjaan</h2><p class="sub">Daftar referensi untuk bahan belajar. Pastikan selalu memeriksa perubahan peraturan dan status keberlakuannya.</p><ul><li>UU No. 13 Tahun 2003 tentang Ketenagakerjaan sebagaimana telah diubah.</li><li>UU No. 6 Tahun 2023 tentang Penetapan Perppu Cipta Kerja menjadi Undang-Undang.</li><li>PP No. 35 Tahun 2021 tentang PKWT, alih daya, waktu kerja dan waktu istirahat, serta PHK.</li><li>Peraturan Perusahaan dan/atau Perjanjian Kerja Bersama yang berlaku di tempat kerja.</li></ul><p class="sub">Dokumen PDF resmi dan fitur pencarian regulasi dapat ditambahkan setelah sumber dokumen diverifikasi.</p></div></section>
   <section id="p-academy" class="page hidden"><div class="card"><h2>Pendidikan Serikat Pekerja</h2><p class="sub">Materi pembelajaran bertahap untuk anggota.</p><div class="grid"><article class="card span6"><h3>Modul 1 — Dasar Berserikat</h3><p>Tujuan serikat pekerja, hak berserikat, dan peran anggota.</p></article><article class="card span6"><h3>Modul 2 — Hubungan Kerja</h3><p>PKWT, PKWTT, peraturan perusahaan, dan PKB.</p></article><article class="card span6"><h3>Modul 3 — Perselisihan Hubungan Industrial</h3><p>Perundingan bipartit, mediasi, dan proses penyelesaian perselisihan.</p></article><article class="card span6"><h3>Modul 4 — Hak Saat PHK</h3><p>Komponen hak dan cara memeriksa perhitungan sesuai dasar hukum.</p></article></div><p class="sub">Materi ini merupakan kerangka awal, belum menyediakan ujian atau sertifikat digital.</p></div></section>
@@ -711,16 +725,16 @@ body:not(.logged-in) #settingsShortcut{display:none!important}
 <div class="field"><label>Nama lengkap</label><input id="myName" required></div>
 <div class="field"><label>Email terdaftar</label><input id="myEmail" type="email" readonly></div>
 <div class="row"><div class="field"><label>Tempat lahir</label><input id="myBirthPlace"></div><div class="field"><label>Tanggal lahir</label><input id="myBirthDate" type="date"></div></div>
-<div class="row"><div class="field"><label>Jenis kelamin</label><select id="myGender"><option value="">Pilih</option><option value="Laki-laki">Laki-laki</option><option value="Perempuan">Perempuan</option></select></div><div class="field"><label>Agama</label><input id="myReligion"></div></div>
-<div class="field"><label>NIK</label><input id="myNik" inputmode="numeric" maxlength="16"></div>
+<div class="row"><div class="field"><label>Jenis kelamin</label><select id="myGender"><option value="">Pilih jenis kelamin</option><option value="Laki-laki">Laki-laki</option><option value="Perempuan">Perempuan</option></select></div><div class="field"><label>Agama</label><select id="myReligion"><option value="">Pilih agama</option><option>Islam</option><option>Kristen</option><option>Katolik</option><option>Hindu</option><option>Buddha</option><option>Konghucu</option><option>Kepercayaan terhadap Tuhan YME</option><option>Lainnya</option></select></div></div>
+<div class="field"><label>NIK KTP (16 digit)</label><input id="myNik" inputmode="numeric" autocomplete="off" maxlength="16" pattern="[0-9]{16}" placeholder="Masukkan 16 digit sesuai KTP"><small class="sub">Berbeda dari Nomor Induk Karyawan perusahaan.</small></div>
 <div class="field"><label>Alamat lengkap</label><textarea id="myAddress"></textarea></div>
 <div class="field"><label>Nomor HP / WhatsApp</label><input id="myPhone" type="tel"></div>
 <hr><h3>Data Pekerjaan</h3>
 <div class="field"><label>Nama perusahaan</label><input id="myCompany"></div>
 <div class="field"><label>Alamat perusahaan</label><textarea id="myCompanyAddress"></textarea></div>
 <div class="row"><div class="field"><label>Nomor induk karyawan</label><input id="myEmployeeNo"></div><div class="field"><label>Tanggal masuk kerja</label><input id="myWorkStart" type="date"></div></div>
-<div class="row"><div class="field"><label>Unit kerja / departemen</label><input id="myUnit"></div><div class="field"><label>Jabatan</label><input id="myPosition"></div></div>
-<div class="field"><label>Status pekerja</label><select id="myWorkerStatus"><option value="">Pilih status</option><option value="PKWT">PKWT</option><option value="PKWTT">PKWTT</option></select></div>
+<div class="row"><div class="field"><label>Unit kerja / departemen</label><select id="myUnit"><option value="">Pilih unit kerja</option><option>SAT CIKOKOL RAYA</option><option>TOKO</option><option>DC</option><option>KANTOR CABANG</option><option>AREA</option><option>GUDANG</option><option>LAINNYA</option></select></div><div class="field"><label>Jabatan</label><select id="myPosition"><option value="">Pilih jabatan</option><option>ANGGOTA</option><option>PENGURUS</option><option>KETUA PUK</option><option>WAKIL KETUA</option><option>SEKRETARIS</option><option>BENDAHARA</option><option>KOORDINATOR</option><option>STAFF</option><option>LAINNYA</option></select></div></div>
+<div class="field"><label>Status pekerja</label><select id="myWorkerStatus"><option value="">Pilih status pekerja</option><option value="PKWT">PKWT</option><option value="PKWTT">PKWTT</option><option value="Harian Lepas">Harian Lepas</option><option value="Borongan">Borongan</option><option value="Outsourcing">Outsourcing</option><option value="Lainnya">Lainnya</option></select></div>
 <div class="notice">Nomor anggota, status verifikasi, dan hak akses ditetapkan oleh pengurus. Data tersebut tidak dapat diubah melalui formulir ini.</div>
 <div class="actions profile-actions"><button class="btn" id="saveProfile">Simpan perubahan</button><button class="btn alt" type="button" id="downloadProfilePdf">Unduh Profil PDF</button></div></form></div></section>
   <section id="p-owner-profile" class="page hidden"><div class="card">
@@ -795,8 +809,7 @@ body:not(.logged-in) #settingsShortcut{display:none!important}
 <div id="mobileMenu" class="mobile-menu hidden no-print" aria-label="Semua menu">
   <div class="mobile-menu-head"><b>Semua Menu</b><small>Pilih layanan yang ingin dibuka</small></div>
   <button data-p="home"><span class="menu-icon">⌂</span>Beranda</button><button data-p="profile"><span class="menu-icon">♙</span>Profil Saya</button>
-  <button data-p="directory"><span class="menu-icon">♧</span>Direktori Anggota</button><button data-p="members" class="admin hidden"><span class="menu-icon">▤</span>Data Anggota</button>
-  <button data-p="form" class="admin hidden"><span class="menu-icon">✎</span>Formulir Anggota</button><button data-p="verify" class="admin hidden"><span class="menu-icon">✓</span>Verifikasi</button>
+  <button data-p="directory"><span class="menu-icon">♧</span>Direktori Anggota</button><button data-p="members" class="admin hidden"><span class="menu-icon">▤</span>Data Anggota</button><button data-p="verify" class="admin hidden"><span class="menu-icon">✓</span>Verifikasi</button>
   <button data-p="card"><span class="menu-icon">▣</span>Kartu Digital</button><button data-p="agenda"><span class="menu-icon">▦</span>Kalender & Agenda</button>
   <button data-p="complaints"><span class="menu-icon">⚑</span>Layanan Pengaduan</button><button data-p="documents"><span class="menu-icon">▧</span>Pusat Dokumen</button>
   <button data-p="dues"><span class="menu-icon">Rp</span>Transparansi Keuangan</button><button data-p="forum"><span class="menu-icon">☷</span>Forum Diskusi</button>
@@ -815,7 +828,7 @@ const langText={
   menuGroups:["RUANG UTAMA","ADMINISTRASI KEANGGOTAAN","LAYANAN & INFORMASI","PENGELOLAAN PORTAL"],
   menus:[
    ["Beranda","Ringkasan portal dan aktivitas"],["Profil Saya","Informasi akun dan keanggotaan"],["Direktori Anggota","Kenali rekan seperjuangan"],
-   ["Data Anggota","Kelola data keanggotaan"],["Formulir Anggota","Tambah atau perbarui data"],["Verifikasi","Periksa pendaftaran anggota"],
+   ["Data Anggota","Kelola data keanggotaan"],,["Verifikasi","Periksa pendaftaran anggota"],
    ["Kartu Digital","E-KTA dan identitas anggota"],["Kalender & Agenda","Jadwal kegiatan organisasi"],["Layanan Pengaduan","Sampaikan aspirasi dan laporan"],
    ["Pusat Dokumen","Arsip dan dokumen organisasi"],["Transparansi Keuangan","Laporan kas masuk dan keluar"],["Forum Diskusi","Ruang diskusi antaranggota"],
    ["Berita & Dokumentasi","Kabar dan dokumentasi kegiatan"],["Notifikasi","Pemberitahuan portal"],["Ekspor Excel","Unduh laporan administrasi"],["Hak Akses","Pengaturan peran dan kewenangan"]
@@ -890,7 +903,7 @@ function page(p,fromBack=false){
  if(!fromBack&&p!==current&&p!=="home"){gspmiiPageHistory.push(current);if(gspmiiPageHistory.length>30)gspmiiPageHistory.shift();}
  const loader=document.getElementById("gspmiiPageLoader");
  if(loader){loader.classList.add("show");loader.setAttribute("aria-hidden","false");}
- window.setTimeout(()=>{try{_pageNow(p);}finally{if(loader){loader.classList.remove("show");loader.setAttribute("aria-hidden","true");}window.scrollTo({top:0,behavior:"smooth"});}},550);
+ window.setTimeout(()=>{try{_pageNow(p);if(p==="dpc"){if(user?.id===GSPMII_OWNER_UID)$("dpcMapAdmin")?.classList.remove("hidden");loadDpcMaps();}}finally{if(loader){loader.classList.remove("show");loader.setAttribute("aria-hidden","true");}window.scrollTo({top:0,behavior:"smooth"});}},550);
 }
 document.addEventListener("click",e=>{const back=e.target.closest("[data-page-back]");if(!back)return;const previous=gspmiiPageHistory.pop()||"home";page(previous,true);});
 
@@ -947,7 +960,13 @@ async function renderProfile(){
   $("welcome").textContent="Halo, "+me.nama_lengkap;$("userEmail").textContent=user.email;
   $("profileInfo").innerHTML=`<p><b>Nomor anggota:</b> ${esc(me.nomor_anggota||"Belum diterbitkan")}</p><p><b>Status keanggotaan:</b> ${badge(me.status_verifikasi)}</p>`;
   const fields={myName:me.nama_lengkap,myEmail:user.email,myBirthPlace:me.tempat_lahir,myBirthDate:me.tanggal_lahir,myGender:me.jenis_kelamin,myReligion:me.agama,myNik:me.nik,myAddress:me.alamat,myPhone:me.no_hp,myCompany:me.nama_perusahaan,myCompanyAddress:me.alamat_perusahaan,myEmployeeNo:me.no_induk_karyawan,myWorkStart:me.tanggal_masuk_kerja,myUnit:me.unit_kerja,myPosition:me.jabatan,myWorkerStatus:me.status_pekerja};
-  Object.entries(fields).forEach(([id,value])=>{if($(id))$(id).value=value||""});
+  Object.entries(fields).forEach(([id,value])=>{
+    const el=$(id);if(!el)return;const v=value||"";
+    if(el.tagName==="SELECT"&&v&&!Array.from(el.options).some(o=>o.value===v)){
+      const opt=document.createElement("option");opt.value=v;opt.textContent=v+" (data tersimpan)";el.insertBefore(opt,el.options[1]||null);
+    }
+    el.value=v;
+  });
   const url=await signedPhoto(me.foto_url);$("myPhotoPreview").src=url||"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='60' fill='%2315233d'/%3E%3Ccircle cx='60' cy='43' r='22' fill='%23b69a5a'/%3E%3Cpath d='M20 112c3-25 18-38 40-38s37 13 40 38' fill='%23b69a5a'/%3E%3C/svg%3E";
   $("myStatus").innerHTML=`<div class="edu-home-content">
     <p>Kenali hak, pahami aturan, dan ketahui langkah yang tepat saat menghadapi persoalan di tempat kerja.</p>
@@ -993,9 +1012,9 @@ async function showOwnerMemberProfile(memberId){
     ["Nomor anggota",m.nomor_anggota],["Peran portal",m.peran],
     ["Status verifikasi",m.status_verifikasi],["Tempat lahir",m.tempat_lahir],
     ["Tanggal lahir",m.tanggal_lahir],["Jenis kelamin",m.jenis_kelamin],
-    ["Agama",m.agama],["NIK",m.nik],["Alamat lengkap",m.alamat],
+    ["Agama",m.agama],["NIK KTP (16 digit)",m.nik],["Alamat lengkap",m.alamat],
     ["Nomor HP / WhatsApp",m.no_hp],["Nama perusahaan",m.nama_perusahaan],
-    ["Alamat perusahaan",m.alamat_perusahaan],["Nomor induk karyawan",m.no_induk_karyawan],
+    ["Alamat perusahaan",m.alamat_perusahaan],["Nomor Induk Karyawan (Perusahaan)",m.no_induk_karyawan],
     ["Tanggal masuk kerja",m.tanggal_masuk_kerja],["Unit kerja",m.unit_kerja],
     ["Jabatan",m.jabatan],["Status pekerja",m.status_pekerja]
   ];
@@ -1063,9 +1082,9 @@ function downloadSavedProfilePdf(){
   const rows=[
     ["Nama lengkap",me.nama_lengkap],["Email",user?.email],["Nomor anggota",me.nomor_anggota],
     ["Status keanggotaan",me.status_verifikasi],["Tempat lahir",me.tempat_lahir],["Tanggal lahir",date(me.tanggal_lahir)],
-    ["Jenis kelamin",me.jenis_kelamin],["Agama",me.agama],["NIK",me.nik],["Nomor HP / WhatsApp",me.no_hp],
+    ["Jenis kelamin",me.jenis_kelamin],["Agama",me.agama],["NIK KTP (16 digit)",me.nik],["Nomor HP / WhatsApp",me.no_hp],
     ["Alamat lengkap",me.alamat],["Nama perusahaan",me.nama_perusahaan],["Alamat perusahaan",me.alamat_perusahaan],
-    ["Nomor induk karyawan",me.no_induk_karyawan],["Tanggal masuk kerja",date(me.tanggal_masuk_kerja)],
+    ["Nomor Induk Karyawan (Perusahaan)",me.no_induk_karyawan],["Tanggal masuk kerja",date(me.tanggal_masuk_kerja)],
     ["Unit kerja / departemen",me.unit_kerja],["Jabatan",me.jabatan],["Status pekerja",me.status_pekerja]
   ];
   const safe=v=>String(v??"-").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -1090,7 +1109,8 @@ function downloadSavedProfilePdf(){
   .foot{margin-top:26px;padding-top:14px;border-top:1px solid #dce2ec;display:flex;justify-content:space-between;gap:12px;color:#68758a;font-size:10px}
   .notice{margin-top:16px;font-size:10px;color:#68758a;line-height:1.5}
   @page{size:A4;margin:14mm}@media print{body{background:#fff}.sheet{border:0;margin:0;padding:0;max-width:none}.no-print{display:none}}
-  </style></head><body><main class="sheet">
+  </style><style id="gspmii-profile-dropdown-style">#myNik{letter-spacing:.5px}#myNik:invalid{border-color:#d97706}</style>
+</head><body><main class="sheet">
   <header class="head"><div class="logo"><img src="${logoData}" alt="Logo resmi GSPMII"></div><div class="brand"><h1>GABUNGAN SERIKAT PEKERJA MANUFAKTUR INDEPENDEN INDONESIA</h1><p>PUK SAT CIKOKOL RAYA · PORTAL KEANGGOTAAN DIGITAL</p></div></header>
   <div class="title"><h2>PROFIL ANGGOTA</h2><small>Dokumen data keanggotaan</small></div>
   <section class="person">${photo?`<img src="${safe(photo)}" alt="Foto anggota">`:""}<div><b>${safe(me.nama_lengkap||"-")}</b><span>Nomor Anggota: ${safe(me.nomor_anggota||"Belum diterbitkan")}</span><span>Status: ${safe(me.status_verifikasi||"-")}</span></div></section>
@@ -1134,14 +1154,57 @@ if ("serviceWorker" in navigator) {
 <\/script>
 
 
+
 </body></html>`);
   w.document.close();
 }
 $("downloadProfilePdf").onclick=downloadSavedProfilePdf;
 
+// === LOKASI DPC: URL Maps disimpan di Supabase agar tampil untuk semua akun ===
+async function loadDpcMaps(){
+  const status=$("dpcMapStatus"),actions=$("dpcMapActions"),field=$("dpcMapsUrl");
+  if(status)status.textContent="Memuat tautan lokasi kantor DPC...";
+  try{
+    const {data,error}=await db.from("gspmii_portal_settings").select("dpc_maps_url").eq("id",1).maybeSingle();
+    if(error)throw error;
+    const url=(data?.dpc_maps_url||"").trim();
+    if(field)field.value=url;
+    if(url&&/^https:\/\/(maps\.app\.goo\.gl|www\.google\.com\/maps|google\.com\/maps)/i.test(url)){
+      if(status)status.textContent="Tautan lokasi DPC tersedia. Tekan tombol untuk membuka Google Maps.";
+      if(actions)actions.innerHTML='<a class="btn" href="'+esc(url)+'" target="_blank" rel="noopener">📍 Buka Petunjuk Arah Google Maps</a>';
+    }else{
+      if(status)status.textContent="Tautan lokasi DPC belum diisi oleh pemilik portal.";
+      if(actions)actions.innerHTML="";
+    }
+  }catch(err){
+    console.warn("Lokasi DPC belum dapat dimuat:",err.message);
+    if(status)status.textContent="Pengaturan lokasi belum terhubung. Owner perlu memasang SQL pengaturan lokasi DPC.";
+  }
+}
+$("saveDpcMaps")?.addEventListener("click",async()=>{
+  const input=$("dpcMapsUrl"),note=$("dpcMapSaveStatus"),btn=$("saveDpcMaps");
+  const url=(input?.value||"").trim();
+  if(user?.id!==GSPMII_OWNER_UID){if(note)note.textContent="Hanya owner yang dapat mengubah tautan.";return;}
+  if(!/^https:\/\/(maps\.app\.goo\.gl|www\.google\.com\/maps|google\.com\/maps)/i.test(url)){
+    if(note)note.textContent="Tempel tautan Google Maps yang valid (https://maps.app.goo.gl/...).";return;
+  }
+  btn.disabled=true;btn.textContent="Menyimpan...";
+  try{
+    const {error}=await db.from("gspmii_portal_settings").upsert({id:1,dpc_maps_url:url,updated_by:user.id,updated_at:new Date().toISOString()},{onConflict:"id"});
+    if(error)throw error;
+    if(note)note.textContent="Tautan Maps berhasil disimpan dan tersedia untuk semua pengguna.";
+    await loadDpcMaps();
+  }catch(err){if(note)note.textContent="Gagal menyimpan: "+err.message;}
+  finally{btn.disabled=false;btn.textContent="Simpan Tautan Maps";}
+});
+
+
 $("profileForm").onsubmit=async e=>{e.preventDefault();const btn=$("saveProfile");btn.disabled=true;btn.textContent="Menyimpan...";try{
  let photoPath=me.foto_url||null;
  if(selectedProfilePhoto){const ext=selectedProfilePhoto.type==="image/png"?"png":selectedProfilePhoto.type==="image/webp"?"webp":"jpg";photoPath=`${user.id}/profil-${Date.now()}.${ext}`;const {error:upErr}=await db.storage.from("foto_anggota").upload(photoPath,selectedProfilePhoto,{contentType:selectedProfilePhoto.type,upsert:false});if(upErr)throw upErr;}
+ const nikValue=$("myNik").value.replace(/\D/g,"");
+ if(nikValue&& !/^\d{16}$/.test(nikValue))throw new Error("NIK KTP harus tepat 16 digit. Jangan mengisi dengan Nomor Induk Karyawan.");
+ $("myNik").value=nikValue;
  const args={p_nama_lengkap:$("myName").value.trim(),p_tempat_lahir:$("myBirthPlace").value.trim()||null,p_tanggal_lahir:$("myBirthDate").value||null,p_jenis_kelamin:$("myGender").value||null,p_agama:$("myReligion").value.trim()||null,p_nik:$("myNik").value.trim()||null,p_no_hp:$("myPhone").value.trim()||null,p_alamat:$("myAddress").value.trim()||null,p_tanggal_masuk_kerja:$("myWorkStart").value||null,p_no_induk_karyawan:$("myEmployeeNo").value.trim()||null,p_unit_kerja:$("myUnit").value.trim()||null,p_jabatan:$("myPosition").value.trim()||null,p_status_pekerja:$("myWorkerStatus").value||null,p_nama_perusahaan:$("myCompany").value.trim()||null,p_alamat_perusahaan:$("myCompanyAddress").value.trim()||null,p_foto_url:photoPath};
  const {error}=await db.rpc("gspmii_update_my_profile",args);if(error)throw error;
  await getMe();selectedProfilePhoto=null;$("myPhoto").value="";await renderProfile();await drawCard();if(document.getElementById("directoryRows"))await loadDirectory().catch(e=>console.warn("Direktori belum dapat diperbarui:",e.message));message($("appMsg"),"Profil dan foto berhasil disimpan. Data anggota mengikuti perubahan profil.");
@@ -1366,5 +1429,6 @@ init().catch(e=>message($("authMsg"),e.message,true));
 </a>
 
 <div id="gspmiiPageLoader" class="gspmii-page-loader" aria-hidden="true"><div class="loader-orbit"></div><b>Memuat halaman...</b><small>GSPMII · PUK SAT CIKOKOL RAYA</small></div>
+<script id="gspmii-nik-input-helper">document.addEventListener("input",e=>{if(e.target&&e.target.id==="myNik")e.target.value=e.target.value.replace(/\D/g,"").slice(0,16)});</script>
 </body>
 </html>

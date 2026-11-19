@@ -375,6 +375,19 @@ body:not(.logged-in) #settingsShortcut{display:none!important}
 .directory-person small{font-size:11px;color:var(--muted);overflow-wrap:anywhere}
 .directory-avatar{width:42px;height:42px;min-width:42px;border-radius:50%;object-fit:cover;border:2px solid var(--line);display:grid;place-items:center}
 .directory-initials{background:linear-gradient(145deg,#18365b,#294e78);color:#f0d58b;font-size:13px;font-weight:900;letter-spacing:.5px}
+
+/* GSPMII live notification UI */
+.topbar .head{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.top-actions{display:none;align-items:center;gap:10px}body.logged-in .top-actions{display:flex}
+.notif-bell{position:relative;width:54px;height:54px;border:1px solid rgba(241,189,78,.35);border-radius:17px;background:linear-gradient(145deg,#15294a,#0b1428);color:#fff;font-size:25px;box-shadow:0 0 22px rgba(241,189,78,.12);display:grid;place-items:center}
+.notif-bell:hover,.notif-bell[aria-expanded="true"]{border-color:var(--gold);box-shadow:0 0 24px rgba(241,189,78,.28)}
+.notif-badge{position:absolute;right:-6px;top:-7px;min-width:22px;height:22px;padding:0 6px;border-radius:99px;background:#e52d3b;color:white;font-size:12px;line-height:22px;text-align:center;border:2px solid var(--bg);font-weight:800}
+.notif-popover{position:fixed;z-index:9999;right:18px;top:100px;width:min(430px,calc(100vw - 28px));background:linear-gradient(145deg,#101d35,#081226);border:1px solid #294368;border-radius:18px;box-shadow:0 22px 65px rgba(0,0,0,.48);overflow:hidden}
+.notif-pop-head,.notif-pop-foot{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.08)}
+.notif-pop-head strong{font-size:16px}.notif-pop-head button,.notif-pop-foot button{border:0;background:none;color:#49a5ff;font-weight:700}
+.notif-quick-rows{max-height:360px;overflow:auto}.notif-quick-item{display:flex;gap:12px;padding:13px 15px;border-bottom:1px solid rgba(255,255,255,.07);color:#f4f6fb;text-align:left;width:100%;background:transparent;border-top:0;border-left:0;border-right:0}.notif-quick-item.unread{background:rgba(28,93,157,.16)}.notif-quick-icon{width:40px;height:40px;flex:0 0 40px;border-radius:50%;display:grid;place-items:center;background:#16477b;font-size:19px}.notif-quick-copy{min-width:0;display:block;flex:1}.notif-quick-copy b{display:block;font-size:13px}.notif-quick-copy small{display:block;color:#aab8cc;font-size:12px;line-height:1.4}.notif-unread-dot{width:9px;height:9px;flex:0 0 9px;border-radius:50%;background:#ef3445;margin:7px 2px}.notif-pop-foot{border-top:1px solid rgba(255,255,255,.08);border-bottom:0;justify-content:flex-end}.notif-toast{position:fixed;z-index:10000;right:18px;top:170px;width:min(390px,calc(100vw - 36px));display:flex;align-items:center;gap:12px;padding:14px 15px;border:1px solid #37628f;border-radius:16px;background:linear-gradient(140deg,#142846,#091427);box-shadow:0 18px 50px rgba(0,0,0,.45);animation:notifIn .22s ease-out}.notif-toast-icon{font-size:24px}.notif-toast b,.notif-toast small{display:block}.notif-toast small{color:#b5c3d8;font-size:12px}.notif-toast button{margin-left:auto;border:0;background:none;color:white;font-size:22px}.hidden{display:none!important}@keyframes notifIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:640px){.topbar .head{gap:8px}.brand-logo{max-width:54px}.notif-bell{width:43px;height:43px;border-radius:14px;font-size:21px}.notif-popover{top:82px;right:10px}.notif-toast{top:145px;right:10px}}
+
 </style>
 <style>
 
@@ -440,10 +453,21 @@ body:not(.logged-in) #settingsShortcut{display:none!important}
         <h1>PUK SAT CIKOKOL RAYA</h1>
         <p>Gabungan Serikat Pekerja Manufaktur Independen Indonesia</p>
       </div>
+      <div class="top-actions no-print">
+        <button id="notifBell" class="notif-bell" type="button" aria-label="Buka notifikasi" aria-expanded="false" title="Notifikasi">
+          <span aria-hidden="true">🔔</span><b id="notifBadge" class="notif-badge hidden">0</b>
+        </button>
+      </div>
     </div>
     
   </div>
 </header>
+<div id="notifPopover" class="notif-popover hidden no-print" role="dialog" aria-label="Notifikasi terbaru">
+  <div class="notif-pop-head"><strong>Notifikasi Terbaru</strong><button id="notifOpenAll" type="button">Lihat semua</button></div>
+  <div id="notifQuickRows" class="notif-quick-rows"><div class="empty">Belum ada notifikasi.</div></div>
+  <div class="notif-pop-foot"><button id="notifReadAll" type="button">Tandai semua dibaca</button></div>
+</div>
+<div id="notifToast" class="notif-toast hidden no-print" role="status" aria-live="polite"><span class="notif-toast-icon">🔔</span><span><b id="notifToastTitle">Notifikasi baru</b><small id="notifToastText"></small></span><button id="notifToastClose" type="button" aria-label="Tutup">×</button></div>
 <div class="login-tools"><button id="settingsShortcut" data-p="settings" class="settings-shortcut hidden" type="button" aria-label="Buka Pengaturan" title="Pengaturan">⚙</button><select id="languageSelect" aria-label="Bahasa aplikasi"><option value="id">ID</option><option value="en">EN</option></select><button id="themeBtn" class="theme-fab" type="button" aria-label="Aktifkan mode terang" title="Mode terang">☀️</button></div>
 <main class="wrap">
 <section id="publicIntro" class="landing-grid">
@@ -758,7 +782,7 @@ function auth(mode="loginForm"){$("loginSolidarity").classList.toggle("hidden",m
 $("settingTheme").onclick=()=>{setTheme(document.documentElement.dataset.theme==="dark"?"light":"dark");$("themeDescription").textContent=document.documentElement.dataset.theme==="dark"?"Mode gelap aktif":"Mode terang aktif"};
 $("settingPassword").onclick=async()=>{const pw=prompt("Masukkan kata sandi baru (minimal 8 karakter):");if(!pw)return;if(pw.length<8){alert("Kata sandi minimal 8 karakter.");return}const {error}=await db.auth.updateUser({password:pw});if(error)alert("Gagal mengubah kata sandi: "+error.message);else alert("Kata sandi berhasil diperbarui.")};
 if($("loginTab"))$("loginTab").onclick=()=>auth();$("registerTab").onclick=()=>auth("registerForm");$("forgot").onclick=()=>{$("resetEmail").value=$("email").value;auth("resetForm")};$("backLogin").onclick=()=>auth();
-function page(p){document.body.dataset.page=p;if(p==="access"){if(user?.id!==GSPMII_OWNER_UID){alert("Akses khusus pemilik portal.");page("home");return}loadAccessMembers().catch(e=>message($("accessMsg"),"Gagal memuat data anggota: "+e.message,true));}document.querySelectorAll(".page").forEach(x=>x.classList.toggle("hidden",x.id!=="p-"+p));document.querySelectorAll("[data-p]").forEach(x=>x.classList.toggle("active",x.dataset.p===p));$("mobileMenu").classList.add("hidden");if(p==="directory")loadDirectory().catch(e=>message($("appMsg"),"Direktori belum dapat dimuat: "+e.message,true));if(p==="card"){drawCard().then(()=>renderMemberQr()).catch(e=>message($("appMsg"),"Gagal memuat E-KTA: "+e.message,true))}if(p==="complaints")loadComplaints().catch(e=>featureError("complaintRows",e));if(p==="documents")loadDocuments().catch(e=>featureError("documentRows",e));if(p==="dues")loadDues().catch(e=>featureError("duesRows",e));if(p==="forum")loadForum().catch(e=>featureError("forumRows",e));if(p==="news")loadNews().catch(e=>featureError("newsRows",e));if(p==="notifications")loadNotifications().catch(e=>featureError("notificationRows",e));}
+function page(p){document.body.dataset.page=p;if(p==="notifications"){loadNotifications().catch(e=>featureError("notificationRows",e));}if(p==="access"){if(user?.id!==GSPMII_OWNER_UID){alert("Akses khusus pemilik portal.");page("home");return}loadAccessMembers().catch(e=>message($("accessMsg"),"Gagal memuat data anggota: "+e.message,true));}document.querySelectorAll(".page").forEach(x=>x.classList.toggle("hidden",x.id!=="p-"+p));document.querySelectorAll("[data-p]").forEach(x=>x.classList.toggle("active",x.dataset.p===p));$("mobileMenu").classList.add("hidden");if(p==="directory")loadDirectory().catch(e=>message($("appMsg"),"Direktori belum dapat dimuat: "+e.message,true));if(p==="card"){drawCard().then(()=>renderMemberQr()).catch(e=>message($("appMsg"),"Gagal memuat E-KTA: "+e.message,true))}if(p==="complaints")loadComplaints().catch(e=>featureError("complaintRows",e));if(p==="documents")loadDocuments().catch(e=>featureError("documentRows",e));if(p==="dues")loadDues().catch(e=>featureError("duesRows",e));if(p==="forum")loadForum().catch(e=>featureError("forumRows",e));if(p==="news")loadNews().catch(e=>featureError("newsRows",e));if(p==="notifications")loadNotifications().catch(e=>featureError("notificationRows",e));}
 document.querySelectorAll("[data-p],[data-go]").forEach(b=>b.onclick=()=>{let p=b.dataset.p||b.dataset.go;if(["members","form","verify","export"].includes(p)&&!admin)return;if(p==="access"&&user?.id!==GSPMII_OWNER_UID)return;page(p)});
 async function loadAccessMembers(){
   if(user?.id!==GSPMII_OWNER_UID)throw new Error("Akses khusus pemilik portal.");
@@ -814,7 +838,16 @@ async function renderProfile(){
   const fields={myName:me.nama_lengkap,myEmail:user.email,myBirthPlace:me.tempat_lahir,myBirthDate:me.tanggal_lahir,myGender:me.jenis_kelamin,myReligion:me.agama,myNik:me.nik,myAddress:me.alamat,myPhone:me.no_hp,myCompany:me.nama_perusahaan,myCompanyAddress:me.alamat_perusahaan,myEmployeeNo:me.no_induk_karyawan,myWorkStart:me.tanggal_masuk_kerja,myUnit:me.unit_kerja,myPosition:me.jabatan,myWorkerStatus:me.status_pekerja};
   Object.entries(fields).forEach(([id,value])=>{if($(id))$(id).value=value||""});
   const url=await signedPhoto(me.foto_url);$("myPhotoPreview").src=url||"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='60' fill='%2315233d'/%3E%3Ccircle cx='60' cy='43' r='22' fill='%23b69a5a'/%3E%3Cpath d='M20 112c3-25 18-38 40-38s37 13 40 38' fill='%23b69a5a'/%3E%3C/svg%3E";
-  $("myStatus").innerHTML=`<p>Nomor anggota: ${esc(me.nomor_anggota||"Belum diterbitkan")}</p><p>Status: ${badge(me.status_verifikasi)}</p>`;
+  const statusPhoto=await signedPhoto(me.foto_url);
+  const statusInitials=String(me.nama_lengkap||"G").trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase();
+  const statusPhotoHtml=statusPhoto?`<img class="home-kta-photo" src="${esc(statusPhoto)}" alt="Foto anggota">`:`<div class="home-kta-photo home-kta-initials">${esc(statusInitials||"G")}</div>`;
+  const statusLabel=me.status_verifikasi==="disetujui"?"Aktif":me.status_verifikasi==="ditolak"?"Ditolak":"Menunggu verifikasi";
+  $("myStatus").innerHTML=`<div class="home-kta-preview" role="group" aria-label="Ringkasan kartu anggota">
+    <div class="home-kta-mini"><div class="home-kta-mini-head"><span class="home-kta-seal">G</span><span><b>GSPMII</b><small>PUK SAT CIKOKOL RAYA</small></span></div><div class="home-kta-mini-body">${statusPhotoHtml}<div class="home-kta-mini-info"><b>${esc(me.nama_lengkap||"Anggota GSPMII")}</b><small>No. Anggota: ${esc(me.nomor_anggota||"Belum diterbitkan")}</small><strong>E-KTA ANGGOTA</strong></div></div></div>
+    <div class="home-kta-details"><div><small>Nomor anggota</small><b>${esc(me.nomor_anggota||"Belum diterbitkan")}</b></div><div><small>Status keanggotaan</small>${badge(me.status_verifikasi)}</div><div><small>Unit kerja</small><b>${esc(me.unit_kerja||"Belum diisi")}</b></div><div class="home-kta-actions"><button type="button" class="btn" id="homeViewKta">Lihat E-KTA</button></div></div>
+  </div>`;
+  $("homeViewKta")?.addEventListener("click",()=>page("card"));
+  $("homeDownloadKta")?.addEventListener("click",async()=>{try{await drawCard();await renderMemberQr();const b=$("downloadCard");if(b)b.click();else page("card")}catch(e){message($("appMsg"),"KTA belum dapat diunduh: "+e.message,true)}});
 }
 
 
@@ -960,6 +993,29 @@ function downloadSavedProfilePdf(){
   <footer class="foot"><span>GSPMII · PUK SAT CIKOKOL RAYA</span><span>Dicetak: ${new Date().toLocaleString("id-ID")}</span></footer>
   <div class="no-print" style="margin-top:20px;text-align:center"><button onclick="window.print()">Cetak / Simpan sebagai PDF</button></div>
   </main><script>window.onload=()=>setTimeout(()=>window.print(),500);<\/script>
+<style>
+/* Ringkasan E-KTA pada beranda */
+#myStatus .home-kta-preview{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(150px,.8fr);gap:14px;align-items:stretch}
+#myStatus .home-kta-mini{border-radius:13px;padding:12px;background:linear-gradient(125deg,#f7f8fb 0%,#e7edf7 60%,#fff 100%);color:#15213a;border:1px solid #c9d3e4;box-shadow:0 5px 16px #0002;min-width:0}
+#myStatus .home-kta-mini-head{display:flex;align-items:center;gap:8px;border-bottom:1px solid #cbd4e2;padding-bottom:8px;color:#172c62}
+#myStatus .home-kta-seal{width:28px;height:28px;border:2px solid #bd9a42;border-radius:50%;display:grid;place-items:center;font-weight:900;color:#17346d}
+#myStatus .home-kta-mini-head b{display:block;font-size:13px;letter-spacing:.6px}
+#myStatus .home-kta-mini-head small{display:block;font-size:9px;color:#53627c}
+#myStatus .home-kta-mini-body{display:flex;align-items:center;gap:10px;padding-top:10px}
+#myStatus .home-kta-photo{width:54px;height:66px;object-fit:cover;border-radius:7px;border:2px solid #fff;box-shadow:0 2px 7px #0002;flex:0 0 auto}
+#myStatus .home-kta-initials{display:grid;place-items:center;background:#1b3764;color:#fff;font-weight:800;font-size:18px}
+#myStatus .home-kta-mini-info{min-width:0;display:flex;flex-direction:column;gap:5px}
+#myStatus .home-kta-mini-info b{font-size:12px;line-height:1.25;overflow-wrap:anywhere}
+#myStatus .home-kta-mini-info small{font-size:10px;color:#46546b;overflow-wrap:anywhere}
+#myStatus .home-kta-mini-info strong{font-size:9px;letter-spacing:.5px;color:#a51e2b}
+#myStatus .home-kta-details{display:flex;flex-direction:column;justify-content:center;gap:9px;min-width:0}
+#myStatus .home-kta-details>div:not(.home-kta-actions){display:flex;flex-direction:column;gap:2px}
+#myStatus .home-kta-details small{font-size:11px;color:var(--muted)}
+#myStatus .home-kta-details b{font-size:13px;overflow-wrap:anywhere}
+#myStatus .home-kta-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px}
+#myStatus .home-kta-actions .btn{padding:8px 10px;font-size:12px}
+@media(max-width:600px){#myStatus .home-kta-preview{grid-template-columns:1fr}#myStatus .home-kta-mini{max-width:100%}#myStatus .home-kta-details{display:grid;grid-template-columns:1fr 1fr}#myStatus .home-kta-actions{grid-column:1/-1}}
+</style>
 <script>
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
@@ -1065,11 +1121,24 @@ $("forumForm").onsubmit=async e=>{e.preventDefault();const {error}=await db.from
 $("forumRows").onsubmit=async e=>{const form=e.target.closest("form[data-reply-form]");if(!form)return;e.preventDefault();const {error}=await db.from("gspmii_forum_balasan").insert({topik_id:form.dataset.replyForm,user_id:user.id,isi:form.elements.reply.value.trim()});if(error){alert(error.message);return}await loadForum()};
 async function loadNews(){let {data,error}=await db.from("gspmii_berita").select("*").order("created_at",{ascending:false});if(error)throw error;$("newsRows").innerHTML=(data||[]).map(x=>itemCard(x.judul,(x.ringkasan||"")+"\n"+(x.isi||""),new Date(x.created_at).toLocaleString("id-ID"),x.url_gambar?`<a href="${esc(x.url_gambar)}" target="_blank" rel="noopener">Lihat dokumentasi ↗</a>`:"")).join("")||'<div class="empty">Belum ada berita atau dokumentasi.</div>'}
 $("newsForm").onsubmit=async e=>{e.preventDefault();if($("nImage").value.trim()&&!/^https:\/\//i.test($("nImage").value.trim())){alert("Tautan dokumentasi harus menggunakan HTTPS.");return}const {error}=await db.from("gspmii_berita").insert({judul:$("nTitle").value.trim(),ringkasan:$("nSummary").value.trim(),isi:$("nBody").value.trim(),url_gambar:$("nImage").value.trim()||null,created_by:user.id});if(error){alert(error.message);return}e.target.reset();await loadNews();alert("Berita berhasil diterbitkan.")};
-async function loadNotifications(){let {data,error}=await db.from("gspmii_notifikasi").select("*").eq("user_id",user.id).order("created_at",{ascending:false}).limit(100);if(error)throw error;$("notificationRows").innerHTML=(data||[]).map(x=>itemCard(x.judul,x.pesan,new Date(x.created_at).toLocaleString("id-ID"),x.dibaca?"Sudah dibaca":`<button class="btn alt" data-notif-read="${x.id}">Tandai dibaca</button>`)).join("")||'<div class="empty">Belum ada notifikasi.</div>'}
+let gspmiiNotifChannel=null,gspmiiLastNotifId=null,gspmiiAudioReady=false;
+function notifSound(){try{if(!gspmiiAudioReady)return;const C=window.AudioContext||window.webkitAudioContext;if(!C)return;const c=new C(),o=c.createOscillator(),g=c.createGain();o.type="sine";o.frequency.setValueAtTime(880,c.currentTime);o.frequency.setValueAtTime(1175,c.currentTime+.12);g.gain.setValueAtTime(.0001,c.currentTime);g.gain.exponentialRampToValueAtTime(.12,c.currentTime+.02);g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+.32);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.34);o.onended=()=>c.close()}catch(e){console.debug("Suara notifikasi tidak tersedia",e)}}
+function notifToast(title,msg){$("notifToastTitle").textContent=title||"Notifikasi baru";$("notifToastText").textContent=msg||"Ada pemberitahuan baru di portal.";$("notifToast").classList.remove("hidden");notifSound();clearTimeout(window.gspmiiToastTimer);window.gspmiiToastTimer=setTimeout(()=>$(("notifToast")).classList.add("hidden"),6500)}
+function renderNotifBell(rows){const unread=(rows||[]).filter(x=>!x.dibaca).length;const b=$("notifBadge");if(b){b.textContent=unread>99?"99+":String(unread);b.classList.toggle("hidden",unread===0)}const q=$("notifQuickRows");if(q)q.innerHTML=(rows||[]).slice(0,6).map(x=>`<button type="button" class="notif-quick-item ${x.dibaca?"":"unread"}" data-notif-open="${esc(String(x.id))}"><span class="notif-quick-icon">${/anggota|daftar|registr/i.test(x.judul||"")?"👤":/pengadu|pesan|aspir/i.test(x.judul||"")?"💬":"🔔"}</span><span class="notif-quick-copy"><b>${esc(x.judul||"Pemberitahuan")}</b><small>${esc(x.pesan||"")}</small><small>${x.created_at?new Date(x.created_at).toLocaleString("id-ID"):""}</small></span>${x.dibaca?"":"<i class=\"notif-unread-dot\"></i>"}</button>`).join("")||'<div class="empty" style="padding:18px">Belum ada notifikasi.</div>'}
+async function loadNotifications(){let {data,error}=await db.from("gspmii_notifikasi").select("*").eq("user_id",user.id).order("created_at",{ascending:false}).limit(100);if(error)throw error;data=data||[];$("notificationRows").innerHTML=data.map(x=>itemCard(x.judul,x.pesan,new Date(x.created_at).toLocaleString("id-ID"),x.dibaca?"Sudah dibaca":`<button class="btn alt" data-notif-read="${x.id}">Tandai dibaca</button>`)).join("")||'<div class="empty">Belum ada notifikasi.</div>';renderNotifBell(data);gspmiiLastNotifId=data[0]?.id||gspmiiLastNotifId}
+function startNotifRealtime(){if(!db||!user?.id||gspmiiNotifChannel)return;gspmiiNotifChannel=db.channel("gspmii-notif-"+user.id).on("postgres_changes",{event:"INSERT",schema:"public",table:"gspmii_notifikasi",filter:"user_id=eq."+user.id},payload=>{const n=payload.new||{};if(n.id===gspmiiLastNotifId)return;gspmiiLastNotifId=n.id||gspmiiLastNotifId;notifToast(n.judul||"Notifikasi baru",n.pesan||"Ada pemberitahuan baru.");loadNotifications().catch(e=>console.warn("Gagal memperbarui notifikasi",e))}).subscribe();}
+function stopNotifRealtime(){if(db&&gspmiiNotifChannel){db.removeChannel(gspmiiNotifChannel);gspmiiNotifChannel=null}}
+$("notifBell")?.addEventListener("click",()=>{gspmiiAudioReady=true;const p=$("notifPopover"),open=p.classList.contains("hidden");p.classList.toggle("hidden",!open);$("notifBell").setAttribute("aria-expanded",String(open));if(open)loadNotifications().catch(e=>console.warn(e))});
+$("notifOpenAll")?.addEventListener("click",()=>{ $("notifPopover").classList.add("hidden");page("notifications")});
+$("notifToastClose")?.addEventListener("click",()=>$("notifToast").classList.add("hidden"));
+$("notifReadAll")?.addEventListener("click",async()=>{const {error}=await db.from("gspmii_notifikasi").update({dibaca:true}).eq("user_id",user.id);if(error){alert(error.message);return}await loadNotifications()});
+$("notifQuickRows")?.addEventListener("click",async e=>{const b=e.target.closest("[data-notif-open]");if(!b)return;const id=b.dataset.notifOpen;const {error}=await db.from("gspmii_notifikasi").update({dibaca:true}).eq("id",id).eq("user_id",user.id);if(error){console.warn(error);return}$("notifPopover").classList.add("hidden");await loadNotifications();page("notifications")});
+document.addEventListener("pointerdown",e=>{if(!e.target.closest("#notifPopover")&&!e.target.closest("#notifBell")){$("notifPopover")?.classList.add("hidden");$("notifBell")?.setAttribute("aria-expanded","false")}});
+document.addEventListener("pointerdown",()=>{gspmiiAudioReady=true},{once:true});
 $("notificationRows").onclick=async e=>{const id=e.target.dataset.notifRead;if(!id)return;const {error}=await db.from("gspmii_notifikasi").update({dibaca:true}).eq("id",id);if(error){alert(error.message);return}await loadNotifications()};
 $("readAllNotifications").onclick=async()=>{const {error}=await db.from("gspmii_notifikasi").update({dibaca:true}).eq("user_id",user.id);if(error){alert(error.message);return}await loadNotifications()};
 
-async function enter(){ $("publicIntro").classList.add("hidden");$("landingNote").classList.add("hidden");$("auth").classList.add("hidden");$("app").classList.remove("hidden");document.body.classList.add("logged-in");$("mobileDock").classList.remove("hidden");try{await getMe();document.querySelectorAll(".admin").forEach(x=>x.classList.toggle("hidden",!admin));document.querySelectorAll(".owner-only").forEach(x=>x.classList.toggle("hidden",user.id!==GSPMII_OWNER_UID));document.querySelectorAll(".member-only").forEach(x=>x.classList.toggle("hidden",admin));await renderProfile();await drawCard();await loadAgenda();await loadPublicStats();if(admin)await loadAdmin();page("home")}catch(e){message($("appMsg"),"Gagal memuat data: "+e.message,true)}}
+async function enter(){ $("publicIntro").classList.add("hidden");$("landingNote").classList.add("hidden");$("auth").classList.add("hidden");$("app").classList.remove("hidden");document.body.classList.add("logged-in");$("mobileDock").classList.remove("hidden");try{await getMe();document.querySelectorAll(".admin").forEach(x=>x.classList.toggle("hidden",!admin));document.querySelectorAll(".owner-only").forEach(x=>x.classList.toggle("hidden",user.id!==GSPMII_OWNER_UID));document.querySelectorAll(".member-only").forEach(x=>x.classList.toggle("hidden",admin));await renderProfile();await drawCard();await loadAgenda();await loadPublicStats();try{await loadNotifications()}catch(ne){console.warn("Notifikasi belum dapat dimuat:",ne)}startNotifRealtime();if(admin)await loadAdmin();page("home")}catch(e){message($("appMsg"),"Gagal memuat data: "+e.message,true)}}
 $("loginForm").onsubmit=async e=>{
  e.preventDefault();
  const btn=$("loginForm").querySelector('button[type="submit"]');
@@ -1094,7 +1163,7 @@ $("loginForm").onsubmit=async e=>{
 $("registerForm").onsubmit=async e=>{e.preventDefault();let email=$("rEmail").value.trim().toLowerCase(),{data,error}=await db.auth.signUp({email,password:$("rPass").value,options:{data:{nama_lengkap:$("rName").value.trim(),no_hp:$("rPhone").value.trim(),alamat:$("rAddress").value.trim()}}});if(error){message($("authMsg"),error.message,true);return}if(data.session){user=data.user;await enter()}else{auth();$("email").value=email;message($("authMsg"),"Pendaftaran diterima. Konfirmasi email terlebih dahulu, lalu masuk. Profil anggota dibuat otomatis oleh database.")}};
 $("resetForm").onsubmit=async e=>{e.preventDefault();let {error}=await db.auth.resetPasswordForEmail($("resetEmail").value.trim(),{redirectTo:location.origin+location.pathname});message($("authMsg"),error?error.message:"Tautan reset diminta. Periksa email dan folder Spam.",!!error)};
 $("newPassForm").onsubmit=async e=>{e.preventDefault();if($("newPass").value.length<8||$("newPass").value!==$("newPass2").value){message($("authMsg"),"Kata sandi harus sama dan minimal 8 karakter.",true);return}let {error}=await db.auth.updateUser({password:$("newPass").value});if(error){message($("authMsg"),error.message,true);return}await db.auth.signOut();auth();message($("authMsg"),"Kata sandi berhasil diubah. Silakan masuk.")};
-$("logout").onclick=async()=>{await db.auth.signOut();user=me=null;admin=false;auth()};
+$("logout").onclick=async()=>{stopNotifRealtime();await db.auth.signOut();user=me=null;admin=false;auth()};
 async function init(){db=window.supabase.createClient(SB,KEY);if(location.hash.includes("type=recovery"))auth("newPassForm");let {data}=await db.auth.getSession();if(data.session){user=data.session.user;await enter()}db.auth.onAuthStateChange((ev,s)=>{if(ev==="PASSWORD_RECOVERY")auth("newPassForm");if(ev==="SIGNED_OUT"){user=me=null;admin=false;auth()}})}
 const _idr=n=>new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(Math.round(Number(n)||0));
 const _krwDigits=v=>String(v??"").replace(/[^0-9]/g,"");

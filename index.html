@@ -513,6 +513,20 @@ body:not(.logged-in) #settingsShortcut{display:none!important}
 .gspmii-page-loader{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:rgba(4,11,20,.76);backdrop-filter:blur(7px);color:#f5f7fa;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .16s ease,visibility .16s ease}.gspmii-page-loader.show{opacity:1;visibility:visible;pointer-events:auto}.gspmii-page-loader b{font-size:14px}.gspmii-page-loader small{font-size:10px;color:#a9bbc9;letter-spacing:1px}.loader-orbit{width:38px;height:38px;border:3px solid rgba(232,189,104,.2);border-top-color:#e8bd68;border-right-color:#087f83;border-radius:50%;animation:gspSpin .7s linear infinite}@keyframes gspSpin{to{transform:rotate(360deg)}}
 @media(max-width:680px){.edu-grid{grid-template-columns:1fr}.edu-page-card{padding:12px}.edu-topic{padding:13px}.page-backbar{margin-bottom:10px}}
 </style>
+
+<style id="gspmii-session-and-join-style">
+.gspmii-idle-dialog{position:fixed;inset:0;z-index:100500;background:rgba(2,8,20,.76);display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(5px)}
+.gspmii-idle-dialog.show{display:flex}
+.gspmii-idle-card{width:min(100%,360px);padding:25px;border:1px solid rgba(215,193,139,.55);border-radius:20px;background:linear-gradient(145deg,#12223a,#081323);color:#f4f7fb;text-align:center;box-shadow:0 22px 70px #0008}
+.gspmii-idle-icon{font-size:35px;margin-bottom:8px;color:#e5c16f}
+.gspmii-idle-card b{font-size:19px;color:#e5c16f}
+.gspmii-idle-card p{font-size:14px;line-height:1.55;color:#c5cfdd}
+#gspmiiStayButton{border:0;border-radius:11px;padding:12px 22px;background:#087f83;color:#fff;font-weight:800;cursor:pointer}
+#wa-float-puk{width:auto!important;min-width:60px;padding:0 16px;gap:9px;border-radius:999px!important}
+#wa-float-puk .wa-join-label{font-size:12px;font-weight:800;color:#fff;white-space:nowrap}
+@media(max-width:780px){#wa-float-puk{min-width:56px;padding:0 13px}#wa-float-puk .wa-join-label{font-size:11px}}
+</style>
+
 </head>
 <body>
 <header class="topbar">
@@ -1232,7 +1246,76 @@ document.addEventListener("pointerdown",()=>{gspmiiAudioReady=true},{once:true})
 $("notificationRows").onclick=async e=>{const id=e.target.dataset.notifRead;if(!id)return;const {error}=await db.from("gspmii_notifikasi").update({dibaca:true}).eq("id",id);if(error){alert(error.message);return}await loadNotifications()};
 $("readAllNotifications").onclick=async()=>{const {error}=await db.from("gspmii_notifikasi").update({dibaca:true}).eq("user_id",user.id);if(error){alert(error.message);return}await loadNotifications()};
 
-async function enter(){ $("publicIntro").classList.add("hidden");$("landingNote").classList.add("hidden");$("auth").classList.add("hidden");$("app").classList.remove("hidden");document.body.classList.add("logged-in");$("mobileDock").classList.remove("hidden");try{await getMe();document.querySelectorAll(".admin").forEach(x=>x.classList.toggle("hidden",!admin));document.querySelectorAll(".owner-only").forEach(x=>x.classList.toggle("hidden",user.id!==GSPMII_OWNER_UID));document.querySelectorAll(".member-only").forEach(x=>x.classList.toggle("hidden",admin));await renderProfile();await drawCard();await loadAgenda();await loadPublicStats();try{await loadNotifications()}catch(ne){console.warn("Notifikasi belum dapat dimuat:",ne)}startNotifRealtime();if(admin)await loadAdmin();page("home")}catch(e){message($("appMsg"),"Gagal memuat data: "+e.message,true)}}
+
+// === KEAMANAN SESI GSPMII: satu perangkat + logout otomatis ===
+const GSPMII_DEVICE_TOKEN_KEY="gspmii_device_session_token";
+let gspmiiDeviceToken=localStorage.getItem(GSPMII_DEVICE_TOKEN_KEY);
+if(!gspmiiDeviceToken){
+  gspmiiDeviceToken=(crypto?.randomUUID?crypto.randomUUID():("dev-"+Date.now()+"-"+Math.random().toString(36).slice(2)));
+  localStorage.setItem(GSPMII_DEVICE_TOKEN_KEY,gspmiiDeviceToken);
+}
+let gspmiiIdleTimer=null,gspmiiWarningTimer=null,gspmiiHeartbeat=null,gspmiiLastActivity=Date.now(),gspmiiSessionClaimed=false;
+const GSPMII_IDLE_WARNING_MS=14*60*1000;
+const GSPMII_IDLE_LOGOUT_MS=15*60*1000;
+async function claimGspmiiDeviceSession(){
+  const {data,error}=await db.rpc("gspmii_claim_device_session",{p_session_token:gspmiiDeviceToken});
+  if(error)throw new Error("Pengamanan satu perangkat belum siap. Pengurus perlu memasang SQL pengamanan sesi terlebih dahulu. Detail: "+error.message);
+  if(data!==true)throw new Error("Akun ini sedang digunakan di perangkat lain. Keluar dari perangkat tersebut atau hubungi pengurus untuk membuka sesi.");
+  gspmiiSessionClaimed=true;
+  startGspmiiSessionHeartbeat();
+}
+async function releaseGspmiiDeviceSession(){
+  if(!db||!user||!gspmiiSessionClaimed)return;
+  try{await db.rpc("gspmii_release_device_session",{p_session_token:gspmiiDeviceToken});}catch(e){console.warn("Sesi perangkat belum dapat dilepas:",e)}
+  gspmiiSessionClaimed=false;
+  if(gspmiiHeartbeat){clearInterval(gspmiiHeartbeat);gspmiiHeartbeat=null;}
+}
+function startGspmiiSessionHeartbeat(){
+  if(gspmiiHeartbeat)clearInterval(gspmiiHeartbeat);
+  gspmiiHeartbeat=setInterval(async()=>{
+    if(!user||!gspmiiSessionClaimed)return;
+    const {data,error}=await db.rpc("gspmii_touch_device_session",{p_session_token:gspmiiDeviceToken});
+    if(!error&&data===false){
+      alert("Sesi akun ini telah berpindah ke perangkat lain. Anda akan keluar demi keamanan.");
+      await secureGspmiiSignOut(false);
+    }
+  },20000);
+}
+function ensureGspmiiIdleDialog(){
+  if(document.getElementById("gspmiiIdleDialog"))return;
+  const el=document.createElement("div");
+  el.id="gspmiiIdleDialog";el.className="gspmii-idle-dialog";
+  el.innerHTML='<div class="gspmii-idle-card"><div class="gspmii-idle-icon">⌛</div><b>Sesi akan berakhir</b><p>Anda tidak terdeteksi beraktivitas. Sesi akan otomatis keluar dalam 1 menit.</p><button type="button" id="gspmiiStayButton">Tetap Masuk</button></div>';
+  document.body.appendChild(el);
+  document.getElementById("gspmiiStayButton").addEventListener("click",resetGspmiiIdleTimer);
+}
+function resetGspmiiIdleTimer(){
+  gspmiiLastActivity=Date.now();
+  if(gspmiiIdleTimer)clearTimeout(gspmiiIdleTimer);
+  if(gspmiiWarningTimer)clearTimeout(gspmiiWarningTimer);
+  document.getElementById("gspmiiIdleDialog")?.classList.remove("show");
+  if(!user)return;
+  gspmiiIdleTimer=setTimeout(()=>{
+    ensureGspmiiIdleDialog();
+    document.getElementById("gspmiiIdleDialog")?.classList.add("show");
+    gspmiiWarningTimer=setTimeout(()=>secureGspmiiSignOut(true),GSPMII_IDLE_LOGOUT_MS-GSPMII_IDLE_WARNING_MS);
+  },GSPMII_IDLE_WARNING_MS);
+}
+async function secureGspmiiSignOut(release=true){
+  if(gspmiiIdleTimer)clearTimeout(gspmiiIdleTimer);
+  if(gspmiiWarningTimer)clearTimeout(gspmiiWarningTimer);
+  if(gspmiiHeartbeat){clearInterval(gspmiiHeartbeat);gspmiiHeartbeat=null;}
+  stopNotifRealtime();
+  if(release)await releaseGspmiiDeviceSession();
+  gspmiiSessionClaimed=false;
+  await db.auth.signOut();
+  user=me=null;admin=false;auth();
+}
+["pointerdown","keydown","touchstart","scroll","click"].forEach(evt=>document.addEventListener(evt,()=>{if(user)resetGspmiiIdleTimer();},{passive:true}));
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&user)resetGspmiiIdleTimer()});
+window.addEventListener("pagehide",()=>{if(user&&gspmiiSessionClaimed){db.rpc("gspmii_release_device_session",{p_session_token:gspmiiDeviceToken});}});
+
+async function enter(){ try{await claimGspmiiDeviceSession();}catch(sessionErr){console.error("Sesi perangkat GSPMII:",sessionErr);await db.auth.signOut();message($("authMsg"),sessionErr.message,true);return;} resetGspmiiIdleTimer(); $("publicIntro").classList.add("hidden");$("landingNote").classList.add("hidden");$("auth").classList.add("hidden");$("app").classList.remove("hidden");document.body.classList.add("logged-in");$("mobileDock").classList.remove("hidden");try{await getMe();document.querySelectorAll(".admin").forEach(x=>x.classList.toggle("hidden",!admin));document.querySelectorAll(".owner-only").forEach(x=>x.classList.toggle("hidden",user.id!==GSPMII_OWNER_UID));document.querySelectorAll(".member-only").forEach(x=>x.classList.toggle("hidden",admin));await renderProfile();await drawCard();await loadAgenda();await loadPublicStats();try{await loadNotifications()}catch(ne){console.warn("Notifikasi belum dapat dimuat:",ne)}startNotifRealtime();if(admin)await loadAdmin();page("home")}catch(e){message($("appMsg"),"Gagal memuat data: "+e.message,true)}}
 $("loginForm").onsubmit=async e=>{
  e.preventDefault();
  const btn=$("loginForm").querySelector('button[type="submit"]');
@@ -1257,7 +1340,7 @@ $("loginForm").onsubmit=async e=>{
 $("registerForm").onsubmit=async e=>{e.preventDefault();let email=$("rEmail").value.trim().toLowerCase(),{data,error}=await db.auth.signUp({email,password:$("rPass").value,options:{data:{nama_lengkap:$("rName").value.trim(),no_hp:$("rPhone").value.trim(),alamat:$("rAddress").value.trim()}}});if(error){message($("authMsg"),error.message,true);return}if(data.session){user=data.user;await enter()}else{auth();$("email").value=email;message($("authMsg"),"Pendaftaran diterima. Konfirmasi email terlebih dahulu, lalu masuk. Profil anggota dibuat otomatis oleh database.")}};
 $("resetForm").onsubmit=async e=>{e.preventDefault();let {error}=await db.auth.resetPasswordForEmail($("resetEmail").value.trim(),{redirectTo:location.origin+location.pathname});message($("authMsg"),error?error.message:"Tautan reset diminta. Periksa email dan folder Spam.",!!error)};
 $("newPassForm").onsubmit=async e=>{e.preventDefault();if($("newPass").value.length<8||$("newPass").value!==$("newPass2").value){message($("authMsg"),"Kata sandi harus sama dan minimal 8 karakter.",true);return}let {error}=await db.auth.updateUser({password:$("newPass").value});if(error){message($("authMsg"),error.message,true);return}await db.auth.signOut();auth();message($("authMsg"),"Kata sandi berhasil diubah. Silakan masuk.")};
-$("logout").onclick=async()=>{stopNotifRealtime();await db.auth.signOut();user=me=null;admin=false;auth()};
+$("logout").onclick=async()=>{await secureGspmiiSignOut(true)};
 async function init(){db=window.supabase.createClient(SB,KEY);if(location.hash.includes("type=recovery"))auth("newPassForm");let {data}=await db.auth.getSession();if(data.session){user=data.session.user;await enter()}db.auth.onAuthStateChange((ev,s)=>{if(ev==="PASSWORD_RECOVERY")auth("newPassForm");if(ev==="SIGNED_OUT"){user=me=null;admin=false;auth()}})}
 const _idr=n=>new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(Math.round(Number(n)||0));
 const _krwDigits=v=>String(v??"").replace(/[^0-9]/g,"");
@@ -1274,12 +1357,12 @@ init().catch(e=>message($("authMsg"),e.message,true));
 })();
 </script>
 
-<a id="wa-float-puk" href="https://wa.me/6281293403706" target="_blank"
+<a id="wa-float-puk" href="https://wa.me/6281293403706?text=Halo%20Pengurus%20GSPMII%20PUK%20SAT%20Cikokol%20Raya%2C%20saya%20ingin%20bertanya%20tentang%20cara%20bergabung%20menjadi%20anggota%20serikat." target="_blank"
    rel="noopener noreferrer" aria-label="WhatsApp Pengurus PUK Cikokol Raya"
    title="WhatsApp Pengurus PUK Cikokol Raya">
   <svg viewBox="0 0 32 32" role="img" aria-hidden="true">
     <path fill="#fff" d="M16.04 3.2A12.7 12.7 0 0 0 5.12 22.36L3.4 28.7l6.5-1.7A12.7 12.7 0 1 0 16.04 3.2Zm0 23.1c-2 0-3.96-.53-5.67-1.54l-.4-.24-3.86 1.02 1.03-3.76-.26-.4a10.5 10.5 0 1 1 9.16 4.92Zm5.77-7.87c-.32-.16-1.9-.94-2.2-1.05-.3-.1-.52-.16-.74.16-.22.33-.84 1.05-1.03 1.27-.19.22-.38.25-.7.08-.33-.16-1.38-.5-2.63-1.6-.97-.86-1.62-1.92-1.81-2.25-.19-.33-.02-.5.14-.66.15-.15.33-.38.49-.57.16-.19.22-.33.33-.55.1-.22.05-.41-.03-.57-.08-.16-.74-1.78-1.01-2.44-.27-.64-.54-.55-.74-.56h-.63c-.22 0-.57.08-.87.41-.3.33-1.14 1.11-1.14 2.71s1.17 3.14 1.33 3.36c.16.22 2.3 3.52 5.58 4.94.78.34 1.39.54 1.87.69.79.25 1.5.21 2.06.13.63-.1 1.9-.78 2.17-1.54.27-.76.27-1.41.19-1.54-.08-.13-.3-.22-.63-.38Z"/>
-  </svg>
+  </svg><span class="wa-join-label">Gabung GSPMII</span>
 </a>
 
 <div id="gspmiiPageLoader" class="gspmii-page-loader" aria-hidden="true"><div class="loader-orbit"></div><b>Memuat halaman...</b><small>GSPMII · PUK SAT CIKOKOL RAYA</small></div>

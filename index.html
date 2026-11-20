@@ -999,7 +999,7 @@ $("accessRows")?.addEventListener("click",async e=>{
 });
 
 const badge=s=>`<span class="pill ${s==="menunggu"?"pending":s==="ditolak"?"rejected":""}">${s==="disetujui"?"Aktif":s==="ditolak"?"Ditolak":"Menunggu"}</span>`;
-async function getMe(){let {data,error}=await db.from("anggota_gspmii").select("*").eq("user_id",user.id).maybeSingle();if(error)throw error;if(!data)throw new Error("Profil anggota belum terbentuk. Hubungi pengurus; jangan membuat profil manual dari browser.");me=data;admin=me.peran==="pengurus"&&me.status_verifikasi==="disetujui"}
+async function getMe(){let {data,error}=await db.from("anggota_gspmii").select("*").eq("user_id",user.id).maybeSingle();if(error)throw error;if(!data)throw new Error("Akun berhasil masuk, tetapi belum terhubung ke data anggota. Pengurus perlu menyelesaikan verifikasi/pengaitan akun. Jangan mendaftar ulang karena dapat membuat data ganda.");me=data;admin=me.peran==="pengurus"&&me.status_verifikasi==="disetujui"}
 async function signedPhoto(path){if(!path)return "";const {data,error}=await db.storage.from("foto_anggota").createSignedUrl(path,3600);if(error){console.warn("Foto profil tidak dapat dimuat:",error.message);return ""}return data?.signedUrl||""}
 async function renderProfile(){
   $("welcome").textContent="Halo, "+me.nama_lengkap;$("userEmail").textContent=user.email;
@@ -1444,11 +1444,28 @@ $("loginForm").onsubmit=async e=>{
   await enter();
  }catch(err){
   console.error("Login GSPMII gagal:",err);
-  message($("authMsg"),"Login gagal: "+(err?.message||"Terjadi kesalahan tidak dikenal."),true);
+  const detail=String(err?.message||"Terjadi kesalahan tidak dikenal.");
+  // Pastikan pesan tidak hilang ketika event SIGNED_OUT dari Supabase mengembalikan halaman login.
+  setTimeout(()=>message($("authMsg"),"Login gagal: "+detail,true),80);
  }finally{if(btn){btn.disabled=false;btn.textContent=original;}}
 };
-$("newMemberTab").onclick=()=>{$("newMemberForm").classList.remove("hidden");$("oldMemberForm").classList.add("hidden")};
-$("oldMemberTab").onclick=()=>{$("oldMemberForm").classList.remove("hidden");$("newMemberForm").classList.add("hidden")};
+function showMemberRegistration(kind){
+ const newer=$("newMemberForm"),older=$("oldMemberForm");
+ if(!newer||!older)return;
+ newer.classList.toggle("hidden",kind!=="baru");
+ older.classList.toggle("hidden",kind!=="lama");
+ const nb=$("newMemberTab"),ob=$("oldMemberTab");
+ if(nb){nb.classList.toggle("alt",kind!=="baru");nb.setAttribute("aria-pressed",String(kind==="baru"));}
+ if(ob){ob.classList.toggle("alt",kind!=="lama");ob.setAttribute("aria-pressed",String(kind==="lama"));}
+}
+// Gunakan listener langsung dan delegasi agar tab tetap berfungsi pada browser mobile.
+$("newMemberTab").addEventListener("click",e=>{e.preventDefault();e.stopPropagation();showMemberRegistration("baru")},true);
+$("oldMemberTab").addEventListener("click",e=>{e.preventDefault();e.stopPropagation();showMemberRegistration("lama")},true);
+document.addEventListener("click",e=>{
+ const target=e.target.closest?.("#newMemberTab,#oldMemberTab");
+ if(!target)return;
+ e.preventDefault();showMemberRegistration(target.id==="oldMemberTab"?"lama":"baru");
+},true);
 const validUpload=(f,allowPdf=false)=>{if(!f)throw new Error("Semua berkas wajib diunggah.");const ok=["image/jpeg","image/png","image/webp",...(allowPdf?["application/pdf"]:[])];if(!ok.includes(f.type))throw new Error("Format berkas tidak didukung.");if(f.size>(allowPdf?8:5)*1024*1024)throw new Error("Ukuran berkas terlalu besar.");return f};
 const uploadIntakeFile=async(uid,bucket,file,label)=>{const ext=file.type==="image/png"?"png":file.type==="image/webp"?"webp":file.type==="application/pdf"?"pdf":"jpg";const path=`${uid}/${label}-${Date.now()}.${ext}`;const {error}=await db.storage.from(bucket).upload(path,file,{contentType:file.type,upsert:false});if(error)throw error;return path};
 $("newMemberForm").onsubmit=async e=>{

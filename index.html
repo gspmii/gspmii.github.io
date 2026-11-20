@@ -543,8 +543,10 @@ body:not(.logged-in) #settingsShortcut{display:none!important}
     }
   } catch(e) {}
   document.addEventListener('DOMContentLoaded', function(){
+    // GitHub Pages hanya hosting statis: login harus ditangani JavaScript/Supabase,
+    // jangan pernah mengirim form HTML POST ke alamat website.
     var f=document.getElementById('loginForm');
-    if(f){ f.setAttribute('method','post'); f.setAttribute('action', window.location.pathname); }
+    if(f){ f.removeAttribute('method'); f.removeAttribute('action'); }
     document.documentElement.style.overflowX='hidden';
     document.body.style.overflowX='hidden';
   });
@@ -605,7 +607,7 @@ input,select,textarea,button{max-width:100%}
     <h2>Portal Keanggotaan</h2>
     <p class="sub">Masuk menggunakan email terdaftar. Pendaftaran baru diperiksa pengurus sebelum diaktifkan.</p>
     <div id="authMsg" class="message hidden"></div>
-    <form id="loginForm" method="post" action="/">
+    <form id="loginForm">
       <div class="field"><label for="email">Email</label><input id="email" type="email" autocomplete="username" placeholder="nama@email.com" required></div>
       <div class="field"><label for="password">Kata sandi</label><input id="password" type="password" autocomplete="current-password" placeholder="Masukkan kata sandi" required></div>
       <div class="actions"><button class="btn" type="submit">Login</button><button class="btn alt" type="button" id="forgot">Lupa kata sandi</button></div>
@@ -1629,7 +1631,7 @@ init().catch(e=>message($("authMsg"),e.message,true));
 
 <div id="gspmiiPageLoader" class="gspmii-page-loader" aria-hidden="true"><div class="loader-orbit"></div><b>Memuat halaman...</b><small>GSPMII · PUK SAT CIKOKOL RAYA</small></div>
 <script id="gspmii-nik-input-helper">document.addEventListener("input",e=>{if(e.target&&e.target.id==="myNik")e.target.value=e.target.value.replace(/\D/g,"").slice(0,16)});</script>
-\n<script id="gspmii-auth-tabs-hardfix">
+<script id="gspmii-auth-tabs-hardfix">
 // Lapisan pengaman terpisah: tetap bekerja meskipun handler utama tab terhenti karena error JS lain.
 (function(){
   function bind(){

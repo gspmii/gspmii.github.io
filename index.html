@@ -1457,25 +1457,32 @@ async function enter(){ try{const sessionCheck=await db.auth.getSession();if(!se
 $("loginForm").onsubmit=async e=>{
  e.preventDefault();
  const btn=$("loginForm").querySelector('button[type="submit"]');
- const original=btn?.textContent||"Masuk";
- if(btn){btn.disabled=true;btn.textContent="Memeriksa...";}
- $("authMsg").classList.add("hidden");
+ const original=btn?.textContent||"Login";
+ if(btn){btn.disabled=true;btn.textContent="Menghubungkan...";}
  try{
-  if(!db)throw new Error("Koneksi aplikasi belum siap. Muat ulang halaman.");
+  if(!db || !db.auth)throw new Error("Koneksi Supabase belum siap. Muat ulang halaman.");
   const email=$("email").value.trim();
   const password=$("password").value;
   if(!email||!password)throw new Error("Email dan kata sandi wajib diisi.");
-  const {data,error}=await db.auth.signInWithPassword({email,password});
+  message($("authMsg"),"Menghubungkan ke Supabase...");
+  const request=db.auth.signInWithPassword({email,password});
+  const timeout=new Promise((_,reject)=>setTimeout(
+   ()=>reject(new Error("Supabase tidak merespons selama 20 detik. Periksa koneksi internet dan konfigurasi Supabase.")),
+   20000
+  ));
+  const {data,error}=await Promise.race([request,timeout]);
   if(error)throw error;
-  if(!data?.user)throw new Error("Login belum menghasilkan sesi pengguna. Coba lagi.");
+  if(!data?.user)throw new Error("Login tidak menghasilkan data pengguna.");
   user=data.user;
+  message($("authMsg"),"Login berhasil. Memuat portal...");
   await enter();
  }catch(err){
   console.error("Login GSPMII gagal:",err);
   const detail=String(err?.message||"Terjadi kesalahan tidak dikenal.");
-  // Pastikan pesan tidak hilang ketika event SIGNED_OUT dari Supabase mengembalikan halaman login.
   setTimeout(()=>message($("authMsg"),"Login gagal: "+detail,true),80);
- }finally{if(btn){btn.disabled=false;btn.textContent=original;}}
+ }finally{
+  if(btn){btn.disabled=false;btn.textContent=original;}
+ }
 };
 function showMemberRegistration(kind){
  const panel=$("registerForm"),login=$("loginForm"),prompt=$("registerPrompt");if(panel)panel.classList.remove("hidden");if(login)login.classList.add("hidden");if(prompt)prompt.classList.add("hidden");

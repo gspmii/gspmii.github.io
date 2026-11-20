@@ -533,6 +533,31 @@ body:not(.logged-in) #settingsShortcut{display:none!important}
 #wa-float-puk{left:auto!important;right:18px!important;bottom:calc(82px + env(safe-area-inset-bottom))!important;width:60px!important;height:60px!important;min-width:60px!important;min-height:60px!important;border-radius:50%!important;padding:0!important}
 #wa-float-puk .wa-join-label{display:none!important}
 </style>
+
+<!-- GSPMII FIX: canonical URL and mobile viewport -->
+<script>
+(function(){
+  try {
+    if (window.location.search === '?') {
+      window.history.replaceState(null, document.title, window.location.pathname + window.location.hash);
+    }
+  } catch(e) {}
+  document.addEventListener('DOMContentLoaded', function(){
+    var f=document.getElementById('loginForm');
+    if(f){ f.setAttribute('method','post'); f.setAttribute('action', window.location.pathname); }
+    document.documentElement.style.overflowX='hidden';
+    document.body.style.overflowX='hidden';
+  });
+})();
+</script>
+<style id="gspmii-mobile-overflow-fix">
+html,body{max-width:100%;overflow-x:hidden!important}
+*,*::before,*::after{box-sizing:border-box}
+img,video,canvas,svg{max-width:100%}
+.wrap,main,.card,.auth-card,.landing-grid,.hero-copy{min-width:0;max-width:100%}
+input,select,textarea,button{max-width:100%}
+@media(max-width:780px){.wrap{width:100%;padding-left:14px;padding-right:14px}.auth-card{width:100%;max-width:100%;margin-left:auto;margin-right:auto}.landing-grid{grid-template-columns:minmax(0,1fr)!important}.card{overflow-wrap:anywhere}}
+</style>
 </head>
 <body>
 <header class="topbar">
@@ -580,7 +605,7 @@ body:not(.logged-in) #settingsShortcut{display:none!important}
     <h2>Portal Keanggotaan</h2>
     <p class="sub">Masuk menggunakan email terdaftar. Pendaftaran baru diperiksa pengurus sebelum diaktifkan.</p>
     <div id="authMsg" class="message hidden"></div>
-    <form id="loginForm">
+    <form id="loginForm" method="post" action="/">
       <div class="field"><label for="email">Email</label><input id="email" type="email" autocomplete="username" placeholder="nama@email.com" required></div>
       <div class="field"><label for="password">Kata sandi</label><input id="password" type="password" autocomplete="current-password" placeholder="Masukkan kata sandi" required></div>
       <div class="actions"><button class="btn" type="submit">Login</button><button class="btn alt" type="button" id="forgot">Lupa kata sandi</button></div>
@@ -1663,9 +1688,7 @@ init().catch(e=>message($("authMsg"),e.message,true));
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});else bind();
 })();
-</script>\n</body>
-</html>
-
+</script></body>
 <style id="gspmii-menu-wa-final-adjustments">
 #wa-float-puk{
   position:fixed!important;
@@ -1699,6 +1722,5 @@ init().catch(e=>message($("authMsg"),e.message,true));
   #wa-float-puk svg{width:34px!important;height:34px!important}
 }
 </style>
-
-
-
+</body>
+</html>

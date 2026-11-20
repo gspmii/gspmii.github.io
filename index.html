@@ -413,7 +413,7 @@ body:not(.logged-in) #settingsShortcut{display:none!important}
 
 /* Tombol WhatsApp mengambang: ikon saja, tanpa nama/nomor tertulis */
 #wa-float-puk{
-  position:fixed;left:22px;bottom:24px;z-index:9999;
+  position:fixed;right:22px;left:auto;bottom:24px;z-index:9999;
   width:66px;height:66px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
   background:#25D366;box-shadow:0 5px 18px rgba(0,0,0,.28);
@@ -423,7 +423,7 @@ body:not(.logged-in) #settingsShortcut{display:none!important}
 #wa-float-puk:active{transform:scale(.94)}
 #wa-float-puk svg{width:38px;height:38px;display:block}
 @media(max-width:780px){
-  #wa-float-puk{left:18px;bottom:calc(82px + env(safe-area-inset-bottom));width:60px;height:60px}
+  #wa-float-puk{right:18px;left:auto;bottom:calc(82px + env(safe-area-inset-bottom));width:60px;height:60px}
   #wa-float-puk svg{width:35px;height:35px}
 }
 
@@ -528,6 +528,39 @@ body:not(.logged-in) #settingsShortcut{display:none!important}
 </style>
 
 
+<style id="gspmii-requested-feature-styles">
+.calendar-card{margin-bottom:16px}.calendar-head{display:flex;align-items:center;justify-content:space-between;gap:12px}.calendar-head h2{margin:0;text-align:center}.calendar-week,.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin-top:12px}.calendar-week span{text-align:center;color:var(--muted);font-size:12px;font-weight:700;padding:7px 0}.calendar-day{min-height:52px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--text);position:relative;padding:7px 3px;text-align:center}.calendar-day.today{outline:2px solid var(--accent)}.calendar-day.selected{background:var(--accent);color:white}.calendar-day.has-event:after{content:"";position:absolute;bottom:5px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:#e5b84b}.calendar-selected{margin-top:12px;padding:12px;border-radius:10px;background:var(--panel)}.academy-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}.academy-photo{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--panel)}.academy-photo img{width:100%;height:160px;object-fit:cover;display:block}.academy-photo div{padding:10px}.academy-photo h4{margin:0 0 5px}.edu-pp35{grid-column:1/-1}.edu-pp35 details{padding:12px 0;border-top:1px solid var(--line)}.edu-pp35 summary{font-weight:700;cursor:pointer}.edu-pp35 p,.edu-pp35 li{line-height:1.65}.labor-news-item{padding:13px 0;border-bottom:1px solid var(--line)}.labor-news-item a{font-weight:700}.labor-news-item small{display:block;color:var(--muted);margin-top:5px}
+#wa-float-puk{left:auto!important;right:18px!important;bottom:calc(82px + env(safe-area-inset-bottom))!important;width:60px!important;height:60px!important;min-width:60px!important;min-height:60px!important;border-radius:50%!important;padding:0!important}
+#wa-float-puk .wa-join-label{display:none!important}
+</style>
+
+<!-- GSPMII FIX: canonical URL and mobile viewport -->
+<script>
+(function(){
+  try {
+    if (window.location.search === '?') {
+      window.history.replaceState(null, document.title, window.location.pathname + window.location.hash);
+    }
+  } catch(e) {}
+  document.addEventListener('DOMContentLoaded', function(){
+    // GitHub Pages hanya hosting statis: login harus ditangani JavaScript/Supabase,
+    // jangan pernah mengirim form HTML POST ke alamat website.
+    var f=document.getElementById('loginForm');
+    if(f){ f.removeAttribute('method'); f.removeAttribute('action'); }
+    document.documentElement.style.overflowX='hidden';
+    document.body.style.overflowX='hidden';
+  });
+})();
+</script>
+<style id="gspmii-mobile-overflow-fix">
+html,body{max-width:100%;overflow-x:hidden!important}
+*,*::before,*::after{box-sizing:border-box}
+img,video,canvas,svg{max-width:100%}
+.wrap,main,.card,.auth-card,.landing-grid,.hero-copy{min-width:0;max-width:100%}
+input,select,textarea,button{max-width:100%}
+@media(max-width:780px){.wrap{width:100%;padding-left:14px;padding-right:14px}.auth-card{width:100%;max-width:100%;margin-left:auto;margin-right:auto}.landing-grid{grid-template-columns:minmax(0,1fr)!important}.card{overflow-wrap:anywhere}}
+</style>
+<!-- GSPMII menu & aspirations enhancement based on FIX7; original modules preserved. -->
 </head>
 <body>
 <header class="topbar">
@@ -648,33 +681,33 @@ body:not(.logged-in) #settingsShortcut{display:none!important}
   </div>
   <div class="dashboard-shell">
   <nav class="desktop-nav no-print" id="nav" aria-label="Menu utama">
-    <div class="menu-group-title">RUANG UTAMA</div>
-    <button data-p="home" class="active"><span class="menu-icon">⌂</span><span><b>Beranda</b><small>Ringkasan portal dan aktivitas</small></span><i>›</i></button>
-    <button data-p="profile"><span class="menu-icon">♙</span><span><b>Profil Saya</b><small>Informasi akun dan keanggotaan</small></span><i>›</i></button>
-    <button data-p="directory"><span class="menu-icon">♧</span><span><b>Direktori Anggota</b><small>Kenali rekan seperjuangan</small></span><i>›</i></button>
-    <div class="menu-group-title">ADMINISTRASI KEANGGOTAAN</div>
-    <button data-p="members" class="admin hidden"><span class="menu-icon">▤</span><span><b>Data Anggota</b><small>Kelola data keanggotaan</small></span><i>›</i></button>
-    <button data-p="verify" class="admin hidden"><span class="menu-icon">✓</span><span><b>Verifikasi</b><small>Periksa pendaftaran anggota</small></span><i>›</i></button>
-    <button data-p="card"><span class="menu-icon">▣</span><span><b>Kartu Digital</b><small>E-KTA dan identitas anggota</small></span><i>›</i></button>
-    <div class="menu-group-title">LAYANAN & INFORMASI</div>
-    <button data-p="agenda"><span class="menu-icon">▦</span><span><b>Kalender & Agenda</b><small>Jadwal kegiatan organisasi</small></span><i>›</i></button>
-    <button data-p="complaints"><span class="menu-icon">⚑</span><span><b>Layanan Pengaduan</b><small>Sampaikan aspirasi dan laporan</small></span><i>›</i></button>
-    <button data-p="documents"><span class="menu-icon">▧</span><span><b>Pusat Dokumen</b><small>Arsip dan dokumen organisasi</small></span><i>›</i></button>
-    <button data-p="dues"><span class="menu-icon">Rp</span><span><b>Transparansi Keuangan</b><small>Laporan kas masuk dan keluar</small></span><i>›</i></button>
-    <button data-p="forum"><span class="menu-icon">☷</span><span><b>Forum Diskusi</b><small>Ruang diskusi antaranggota</small></span><i>›</i></button>
-    <button data-p="news"><span class="menu-icon">▣</span><span><b>Berita & Dokumentasi</b><small>Kabar dan dokumentasi kegiatan</small></span><i>›</i></button>
-    <button data-p="notifications"><span class="menu-icon">♧</span><span><b>Notifikasi</b><small>Pemberitahuan portal</small></span><i>›</i></button>
-    <div class="menu-group-title admin hidden">PENGELOLAAN PORTAL</div>
-    <button data-p="export" class="admin hidden"><span class="menu-icon">⇩</span><span><b>Ekspor Excel</b><small>Unduh laporan administrasi</small></span><i>›</i></button>
-    <button data-p="access" class="admin owner-only hidden"><span class="menu-icon">⚙</span><span><b>Hak Akses</b><small>Pengaturan peran dan kewenangan</small></span><i>›</i></button>
-    <div class="menu-group-title">PENGUATAN & PERLINDUNGAN ANGGOTA</div>
-    <button data-p="rights"><span class="menu-icon">⚖</span><span><b>Kalkulator Hak Pekerja</b><small>Simulasi estimasi hak ketenagakerjaan</small></span><i>›</i></button>
-    <button data-p="dpc"><span class="menu-icon">📍</span><span><b>Lokasi Kantor DPC</b><small>Alamat dan petunjuk arah kantor DPC</small></span><i>›</i></button>
-    <button data-p="aspirations"><span class="menu-icon">✉</span><span><b>Kotak Aspirasi</b><small>Masukan dan usulan anggota</small></span><i>›</i></button>
-    <button data-p="regulations"><span class="menu-icon">§</span><span><b>Pusat Regulasi</b><small>Referensi aturan ketenagakerjaan</small></span><i>›</i></button>
-    <button data-p="academy"><span class="menu-icon">▤</span><span><b>Pendidikan Serikat</b><small>Materi belajar hak pekerja</small></span><i>›</i></button>
-    <button data-p="education"><span class="menu-icon">⚖</span><span><b>Edukasi Hak Pekerja</b><small>Pelajari hak dan perlindungan kerja</small></span><i>›</i></button>
-  </nav>
+<div class="menu-group-title">MENU UTAMA</div>
+<button data-p="home" class="active"><span class="menu-icon">⌂</span><span><b>Beranda</b><small>Ringkasan portal dan aktivitas</small></span><i>›</i></button>
+<button data-p="profile"><span class="menu-icon">♙</span><span><b>Profil Saya</b><small>Informasi akun dan keanggotaan</small></span><i>›</i></button>
+<button data-p="card"><span class="menu-icon">▣</span><span><b>E-KTA</b><small>Kartu identitas digital anggota</small></span><i>›</i></button>
+<button data-p="directory"><span class="menu-icon">♧</span><span><b>Direktori Anggota</b><small>Kenali rekan seperjuangan</small></span><i>›</i></button>
+<div class="menu-group-title">ADMINISTRASI KEANGGOTAAN</div>
+<button data-p="verify" class="admin hidden"><span class="menu-icon">✓</span><span><b>Verifikasi</b><small>Periksa pendaftaran anggota</small></span><i>›</i></button>
+<button data-p="members" class="admin hidden"><span class="menu-icon">▤</span><span><b>Data Anggota</b><small>Kelola data keanggotaan</small></span><i>›</i></button>
+<div class="menu-group-title">LAYANAN & INFORMASI</div>
+<button data-p="agenda"><span class="menu-icon">▦</span><span><b>Kalender & Agenda</b><small>Kalender bulanan dan jadwal kegiatan</small></span><i>›</i></button>
+<button data-p="news"><span class="menu-icon">▣</span><span><b>Berita & Dokumentasi</b><small>Berita ketenagakerjaan dan organisasi</small></span><i>›</i></button>
+<button data-p="documents"><span class="menu-icon">▧</span><span><b>Pusat Dokumen</b><small>Arsip dan dokumen organisasi</small></span><i>›</i></button>
+<button data-p="forum"><span class="menu-icon">☷</span><span><b>Forum Diskusi</b><small>Ruang diskusi antaranggota</small></span><i>›</i></button>
+<button data-p="complaints"><span class="menu-icon">⚑</span><span><b>Layanan Pengaduan</b><small>Sampaikan persoalan ketenagakerjaan</small></span><i>›</i></button>
+<button data-p="aspirations"><span class="menu-icon">✉</span><span><b>Kotak Aspirasi</b><small>Masukan dan usulan anggota</small></span><i>›</i></button>
+<button data-p="notifications"><span class="menu-icon">♧</span><span><b>Notifikasi</b><small>Pemberitahuan suara dan getar</small></span><i>›</i></button>
+<div class="menu-group-title">KEUANGAN & PENGELOLAAN</div>
+<button data-p="dues" class="admin hidden"><span class="menu-icon">Rp</span><span><b>Keuangan</b><small>Khusus pengurus dan pemilik portal</small></span><i>›</i></button>
+<div class="menu-group-title">PENGUATAN & PERLINDUNGAN ANGGOTA</div>
+<button data-p="rights"><span class="menu-icon">⚖</span><span><b>Kalkulator Hak Pekerja</b><small>Simulasi estimasi hak ketenagakerjaan</small></span><i>›</i></button>
+<button data-p="regulations"><span class="menu-icon">§</span><span><b>Pusat Regulasi</b><small>Referensi aturan ketenagakerjaan</small></span><i>›</i></button>
+<button data-p="academy"><span class="menu-icon">▤</span><span><b>Pendidikan Serikat</b><small>Galeri pendidikan dan kegiatan organisasi</small></span><i>›</i></button>
+<button data-p="education"><span class="menu-icon">⚖</span><span><b>Edukasi Hak Pekerja</b><small>Pelajari hak dan perlindungan kerja</small></span><i>›</i></button>
+<button data-p="dpc"><span class="menu-icon">📍</span><span><b>Lokasi Kantor DPC</b><small>Alamat dan petunjuk arah kantor DPC</small></span><i>›</i></button>
+<div class="menu-group-title admin hidden">PENGELOLAAN PORTAL</div>
+<button data-p="access" class="admin owner-only hidden"><span class="menu-icon">⚙</span><span><b>Hak Akses</b><small>Khusus pemilik portal</small></span><i>›</i></button>
+</nav>
   <div class="dashboard-content">
   <section id="p-home" class="page">
     <div class="grid">
@@ -736,12 +769,20 @@ body:not(.logged-in) #settingsShortcut{display:none!important}
     </div>
   </div>
 </section>
-  <section id="p-aspirations" class="page hidden"><div class="card"><h2>Kotak Aspirasi Anggota</h2><p class="sub">Sampaikan masukan untuk penguatan organisasi. Jangan masukkan NIK, data kesehatan, atau informasi pribadi sensitif pada formulir uji coba ini.</p><label class="field">Topik<input id="aspTopic" maxlength="120" placeholder="Contoh: Pendidikan hak pekerja"></label><label class="field">Aspirasi<textarea id="aspBody" rows="5" maxlength="2000" placeholder="Tuliskan aspirasi atau usulan..."></textarea></label><button class="btn" id="aspSend" type="button">Periksa isian</button><div id="aspResult" class="message hidden"></div><p class="sub">Formulir ini belum mengirim atau menyimpan data. Integrasi penyimpanan privat perlu disiapkan terlebih dahulu.</p></div></section>
+  <section id="p-aspirations" class="page hidden"><div class="grid"><div class="card span6"><h2>Kotak Aspirasi Anggota</h2><p class="sub">Sampaikan masukan dan usulan untuk penguatan organisasi. Aspirasi hanya dapat dilihat oleh pengirim dan pengurus yang berwenang.</p><form id="aspirationForm"><div class="field"><label>Topik aspirasi</label><input id="aspTopic" maxlength="120" required placeholder="Contoh: Pendidikan hak pekerja"></div><div class="field"><label>Isi aspirasi</label><textarea id="aspBody" rows="5" maxlength="3000" required minlength="5" placeholder="Tuliskan aspirasi atau usulan secara jelas..."></textarea></div><button class="btn" id="aspSend" type="submit">Kirim Aspirasi</button></form><div id="aspResult" class="message hidden" aria-live="polite"></div></div><div class="card span6"><h3>Riwayat Aspirasi Saya</h3><div id="aspRows">Memuat...</div></div><div class="card span12 admin"><h3>Aspirasi Masuk</h3><p class="sub">Bagian ini hanya terlihat oleh pengurus yang telah disetujui.</p><div id="aspAdminRows">Memuat...</div></div></div></section>
   <section id="p-regulations" class="page hidden"><div class="card"><h2>Pusat Regulasi Ketenagakerjaan</h2><p class="sub">Daftar referensi untuk bahan belajar. Pastikan selalu memeriksa perubahan peraturan dan status keberlakuannya.</p><ul><li>UU No. 13 Tahun 2003 tentang Ketenagakerjaan sebagaimana telah diubah.</li><li>UU No. 6 Tahun 2023 tentang Penetapan Perppu Cipta Kerja menjadi Undang-Undang.</li><li>PP No. 35 Tahun 2021 tentang PKWT, alih daya, waktu kerja dan waktu istirahat, serta PHK.</li><li>Peraturan Perusahaan dan/atau Perjanjian Kerja Bersama yang berlaku di tempat kerja.</li></ul><p class="sub">Dokumen PDF resmi dan fitur pencarian regulasi dapat ditambahkan setelah sumber dokumen diverifikasi.</p></div></section>
-  <section id="p-academy" class="page hidden"><div class="card"><h2>Pendidikan Serikat Pekerja</h2><p class="sub">Materi pembelajaran bertahap untuk anggota.</p><div class="grid"><article class="card span6"><h3>Modul 1 — Dasar Berserikat</h3><p>Tujuan serikat pekerja, hak berserikat, dan peran anggota.</p></article><article class="card span6"><h3>Modul 2 — Hubungan Kerja</h3><p>PKWT, PKWTT, peraturan perusahaan, dan PKB.</p></article><article class="card span6"><h3>Modul 3 — Perselisihan Hubungan Industrial</h3><p>Perundingan bipartit, mediasi, dan proses penyelesaian perselisihan.</p></article><article class="card span6"><h3>Modul 4 — Hak Saat PHK</h3><p>Komponen hak dan cara memeriksa perhitungan sesuai dasar hukum.</p></article></div><p class="sub">Materi ini merupakan kerangka awal, belum menyediakan ujian atau sertifikat digital.</p></div></section>
+  <section id="p-academy" class="page hidden"><div class="card"><h2>Pendidikan Serikat & Dokumentasi Kegiatan</h2><p class="sub">Dokumentasi pendidikan, MUSNIK, konsolidasi, pelantikan, dan kegiatan organisasi. Galeri dapat dilihat seluruh anggota.</p><div class="card admin"><h3>Unggah dokumentasi kegiatan</h3><form id="academyUploadForm"><div class="field"><label>Judul kegiatan</label><input id="academyTitle" required maxlength="160"></div><div class="field"><label>Keterangan</label><textarea id="academyDescription" rows="3"></textarea></div><div class="field"><label>Foto kegiatan (JPG/PNG/WebP, maks. 5 MB)</label><input id="academyPhoto" type="file" accept="image/jpeg,image/png,image/webp" required></div><button class="btn" type="submit">Unggah ke Galeri</button></form><div id="academyUploadMsg" class="message hidden"></div></div><h3>Galeri Kegiatan GSPMII</h3><div id="academyGallery" class="academy-gallery"><div class="empty">Memuat dokumentasi...</div></div></div><div class="card"><h2>Materi Pendidikan Serikat Pekerja</h2><p class="sub">Materi pembelajaran bertahap untuk anggota.</p><div class="grid"><article class="card span6"><h3>Modul 1 — Dasar Berserikat</h3><p>Tujuan serikat pekerja, hak berserikat, dan peran anggota.</p></article><article class="card span6"><h3>Modul 2 — Hubungan Kerja</h3><p>PKWT, PKWTT, peraturan perusahaan, dan PKB.</p></article><article class="card span6"><h3>Modul 3 — Perselisihan Hubungan Industrial</h3><p>Perundingan bipartit, mediasi, dan proses penyelesaian perselisihan.</p></article><article class="card span6"><h3>Modul 4 — Hak Saat PHK</h3><p>Komponen hak dan cara memeriksa perhitungan sesuai dasar hukum.</p></article></div><p class="sub">Materi ini merupakan kerangka awal, belum menyediakan ujian atau sertifikat digital.</p></div></section>
 <section id="p-education" class="page hidden">
  <div class="card edu-page-card">
   <div class="edu-page-hero"><span class="edu-kicker">PUSAT PENGETAHUAN GSPMII</span><h2>Edukasi Hak Pekerja</h2><p>Pahami hak dan kewajiban dalam hubungan kerja. Materi ini bersifat edukasi umum; penerapan pada kasus tertentu perlu melihat dokumen dan aturan yang berlaku.</p></div>
+  <article class="edu-topic edu-pp35"><span>PP</span><div><h3>PP Nomor 35 Tahun 2021 — Memahami Aturan Hubungan Kerja</h3><p>Peraturan Pemerintah tentang PKWT, alih daya, waktu kerja dan waktu istirahat, serta pemutusan hubungan kerja. Baca ringkasan per bab berikut.</p>
+  <details><summary>1. PKWT — Perjanjian Kerja Waktu Tertentu</summary><p>PKWT digunakan untuk pekerjaan yang memenuhi kriteria pekerjaan tertentu sesuai peraturan. Perjanjian harus dibuat tertulis dan memuat identitas para pihak, jabatan/jenis pekerjaan, tempat kerja, besaran upah, hak dan kewajiban, serta jangka waktu atau selesainya pekerjaan.</p><ul><li>PKWT tidak boleh mensyaratkan masa percobaan kerja. Jika dicantumkan, ketentuan masa percobaan batal demi hukum dan masa kerja tetap dihitung.</li><li>PKWT berdasarkan jangka waktu dan selesainya pekerjaan memiliki ketentuan batas waktu sesuai PP 35/2021 dan perubahannya.</li><li>Pengusaha wajib memberikan uang kompensasi kepada pekerja PKWT yang memenuhi syarat ketika PKWT berakhir, secara proporsional berdasarkan masa kerja.</li></ul></details>
+  <details><summary>2. Alih Daya (Outsourcing)</summary><p>Hubungan kerja pekerja alih daya berada pada perusahaan alih daya berdasarkan perjanjian kerja. Perusahaan alih daya harus memenuhi hak pekerja dan perlindungan kerja sesuai ketentuan peraturan perundang-undangan. Periksa siapa pemberi kerja dalam kontrak, siapa yang membayar upah, jaminan sosial, dan mekanisme pengaduan.</p></details>
+  <details><summary>3. Waktu Kerja, Istirahat, dan Lembur</summary><p>Ketentuan umum waktu kerja adalah 7 jam sehari dan 40 jam seminggu untuk 6 hari kerja, atau 8 jam sehari dan 40 jam seminggu untuk 5 hari kerja, dengan pengecualian sektor/pekerjaan tertentu sesuai aturan. Pengusaha wajib memberi waktu istirahat mingguan dan istirahat di antara jam kerja. Kerja lembur harus memenuhi persyaratan perintah/persetujuan dan dibayar sesuai ketentuan.</p></details>
+  <details><summary>4. PHK — Prosedur dan Hak Pekerja</summary><p>PHK harus diupayakan untuk dihindari. Jika tidak dapat dihindari, pengusaha menyampaikan maksud dan alasan PHK melalui pemberitahuan sesuai ketentuan. Jika pekerja menolak, pekerja dapat menyampaikan penolakan beserta alasannya dan menempuh perundingan bipartit. Bila tidak tercapai kesepakatan, perselisihan dapat dicatatkan untuk proses penyelesaian hubungan industrial.</p><ul><li>Komponen hak akibat PHK dapat mencakup uang pesangon, uang penghargaan masa kerja, dan uang penggantian hak, dengan besaran bergantung alasan PHK dan ketentuan yang berlaku.</li><li>Jangan menyamakan resign dengan PHK oleh pengusaha. Pengunduran diri atas kemauan sendiri memiliki syarat dan konsekuensi hak yang berbeda.</li><li>Minta rincian perhitungan tertulis dan cocokkan alasan PHK dengan dasar hukum yang digunakan.</li></ul></details>
+  <details><summary>5. Checklist praktis saat menghadapi PHK</summary><ul><li>Simpan perjanjian kerja, peraturan perusahaan/PKB, slip upah, absensi, surat peringatan, dan surat pemberitahuan PHK.</li><li>Catat tanggal menerima surat dan tenggat menyampaikan penolakan.</li><li>Jangan menandatangani dokumen kosong atau pernyataan yang tidak sesuai fakta.</li><li>Mintalah pendampingan serikat pekerja dan dokumentasikan perundingan.</li></ul></details>
+  <p class="sub">Catatan pembaruan hukum: PP 35/2021 berstatus berlaku pada JDIH Kemnaker. Untuk isu alih daya, periksa juga Permenaker Nomor 7 Tahun 2026 yang berlaku sejak 30 April 2026. Ringkasan ini bukan kutipan lengkap peraturan atau nasihat hukum untuk kasus individual.</p><p class="sub">Sumber resmi: <a href="https://jdih.kemnaker.go.id/peraturan/detail/1723/peraturan-pemerintah-nomor-35-tahun-2021" target="_blank" rel="noopener">PP 35/2021 — JDIH Kemnaker</a> · <a href="https://jdih.kemnaker.go.id/" target="_blank" rel="noopener">JDIH Kemnaker (Permenaker 7/2026)</a>.</p></div></article>
+  <p class="sub">Rujukan: <a href="https://peraturan.bpk.go.id/Details/161904/pp-no-35-tahun-2021" target="_blank" rel="noopener">PP Nomor 35 Tahun 2021 — Database Peraturan BPK</a>.</p>
   <div class="edu-grid">
    <article class="edu-topic"><span>01</span><div><h3>Hak Normatif Pekerja</h3><p>Kenali hak terkait upah, waktu kerja, istirahat, cuti, jaminan sosial, dan keselamatan kerja.</p><details><summary>Baca materi</summary><ul><li>Periksa perjanjian kerja dan peraturan perusahaan atau PKB.</li><li>Simpan slip upah, jadwal kerja, bukti lembur, dan dokumen terkait.</li><li>Catat kronologi jika ada hak yang belum dipenuhi dan komunikasikan melalui jalur resmi.</li></ul></details></div></article>
    <article class="edu-topic"><span>02</span><div><h3>Perjanjian Kerja & Status Pekerja</h3><p>Memahami hubungan kerja, isi perjanjian, serta dokumen ketenagakerjaan.</p><details><summary>Baca materi</summary><ul><li>Baca masa berlaku, jabatan, lokasi kerja, upah, dan ketentuan berakhirnya hubungan kerja.</li><li>Simpan salinan kontrak dan setiap perubahan tertulis.</li><li>Jangan menandatangani dokumen kosong atau dokumen yang belum dipahami.</li></ul></details></div></article>
@@ -782,14 +823,14 @@ body:not(.logged-in) #settingsShortcut{display:none!important}
   <section id="p-form" class="page hidden"><div class="card"><h2 id="formTitle">Formulir Anggota</h2><form id="memberForm"><input id="fUid" type="hidden"><div class="field"><label>Nama lengkap</label><input id="fName" required></div><div class="field"><label>Nomor Anggota (diterbitkan pengurus)</label><input id="fMemberNo" placeholder="Contoh: 10.6.006"></div><div class="field"><label>Nomor HP</label><input id="fPhone"></div><div class="row"><div class="field"><label>Unit kerja</label><input id="fUnit" placeholder="Toko / DC / Kantor"></div><div class="field"><label>Jabatan anggota</label><input id="fPosition" placeholder="Anggota / Pengurus"></div></div><div class="field"><label>NIK anggota (akses terbatas)</label><input id="fNik" inputmode="numeric" maxlength="16"></div><div class="field"><label>Alamat</label><textarea id="fAddress"></textarea></div><p class="notice">Status verifikasi dikelola melalui menu Verifikasi. Hak akses pengurus tidak dapat diubah dari formulir ini.</p><button class="btn">Simpan data</button> <button class="btn alt" type="button" id="clearForm">Kosongkan</button></form></div></section>
   <section id="p-verify" class="page hidden"><div class="grid"><div class="card span12"><h2>Verifikasi Calon Anggota</h2><p class="sub">Periksa data dan berkas pendaftaran. KTP dan bukti pembayaran hanya dapat dibuka oleh pengurus yang berwenang.</p><div id="verifyRows"></div></div><div class="card span12"><h2>Antrean Pendaftaran Baru</h2><p class="sub">Data pendaftaran dari formulir publik, termasuk KTP, pas foto, dan bukti pembayaran.</p><div id="newApplicationRows">Memuat pendaftaran...</div></div></div></section>
   <section id="p-card" class="page hidden"><div class="card"><h2>Kartu Anggota Digital</h2><p class="sub">Memuat nomor anggota dan identitas organisasi.</p><div id="card"></div><button id="print" class="btn no-print">Cetak / Simpan PDF</button></div></section>
-  <section id="p-agenda" class="page hidden"><div class="grid"><div class="card span6 admin"><h2>Tambah Pengumuman / Agenda</h2><form id="agendaForm"><div class="field"><label>Judul kegiatan</label><input id="aTitle" required></div><div class="field"><label>Tanggal dan waktu</label><input id="aDate" type="datetime-local" required></div><div class="field"><label>Lokasi</label><input id="aPlace"></div><div class="field"><label>Informasi / jenis kegiatan</label><textarea id="aBody"></textarea></div><button class="btn">Terbitkan</button></form></div><div class="card span6"><h2>Agenda & Pengumuman</h2><div id="agendaRows"></div></div></div></section>
+  <section id="p-agenda" class="page hidden"><div class="card calendar-card"><div class="calendar-head"><button type="button" class="btn alt" id="calPrev">‹</button><h2 id="calendarMonth">Kalender</h2><button type="button" class="btn alt" id="calNext">›</button></div><div class="calendar-week"><span>Min</span><span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span></div><div id="calendarGrid" class="calendar-grid"></div><div id="calendarSelected" class="calendar-selected">Pilih tanggal untuk melihat agenda.</div></div><div class="grid"><div class="card span6 admin"><h2>Tambah Pengumuman / Agenda</h2><form id="agendaForm"><div class="field"><label>Judul kegiatan</label><input id="aTitle" required></div><div class="field"><label>Tanggal dan waktu</label><input id="aDate" type="datetime-local" required></div><div class="field"><label>Lokasi</label><input id="aPlace"></div><div class="field"><label>Informasi / jenis kegiatan</label><textarea id="aBody"></textarea></div><button class="btn">Terbitkan</button></form></div><div class="card span6"><h2>Agenda & Pengumuman</h2><div id="agendaRows"></div></div></div></section>
   <section id="p-complaints" class="page hidden"><div class="grid"><div class="card span6"><h2>Layanan Pengaduan Anggota</h2><p class="sub">Sampaikan persoalan ketenagakerjaan secara privat kepada pengurus. Hindari memasukkan data pribadi pihak lain yang tidak diperlukan.</p><form id="complaintForm"><div class="field"><label>Judul pengaduan</label><input id="cTitle" required maxlength="160"></div><div class="field"><label>Kategori</label><select id="cCategory"><option>Perselisihan hak</option><option>Perselisihan kepentingan</option><option>PHK</option><option>Upah dan tunjangan</option><option>Keselamatan dan kesehatan kerja</option><option>Perlakuan tidak adil</option><option>Lainnya</option></select></div><div class="field"><label>Kronologi / uraian</label><textarea id="cBody" required minlength="10" rows="6"></textarea></div><button class="btn">Kirim Pengaduan</button></form><div id="complaintMsg" class="message hidden"></div></div><div class="card span6"><h2>Riwayat Pengaduan Saya</h2><div id="complaintRows">Memuat...</div></div><div class="card span12 admin"><h3>Pengaduan Masuk</h3><div id="complaintAdminRows">Memuat...</div></div></div></section>
   <section id="p-documents" class="page hidden"><div class="grid"><div class="card span6 admin"><h2>Tambah Dokumen</h2><form id="documentForm"><div class="field"><label>Nama dokumen</label><input id="dTitle" required></div><div class="field"><label>Kategori</label><select id="dCategory"><option>AD/ART</option><option>Regulasi Ketenagakerjaan</option><option>Surat Edaran</option><option>Materi Pendidikan</option><option>Formulir</option><option>Lainnya</option></select></div><div class="field"><label>Deskripsi</label><textarea id="dDesc"></textarea></div><div class="field"><label>URL dokumen (PDF atau tautan resmi)</label><input id="dUrl" type="url" required placeholder="https://..."></div><button class="btn">Simpan Dokumen</button></form></div><div class="card span12"><h2>Pusat Dokumen Organisasi</h2><p class="sub">Gunakan tautan dokumen resmi yang memiliki izin akses sesuai kebutuhan.</p><div id="documentRows">Memuat...</div></div></div></section>
-  <section id="p-dues" class="page hidden"><div class="grid"><div class="card span12"><h2>Transparansi Keuangan Organisasi</h2><p class="sub">Seluruh anggota yang disetujui dapat melihat arus kas masuk dan keluar. Riwayat transaksi ditampilkan tanpa membuka data pribadi pembayar.</p><div class="stats-row"><div class="stat"><b id="kasMasuk">Rp0</b><span>Total Dana Masuk</span></div><div class="stat"><b id="kasKeluar">Rp0</b><span>Total Dana Keluar</span></div><div class="stat"><b id="kasSaldo">Rp0</b><span>Saldo Kas Saat Ini</span></div></div><div class="notice" id="kasOpeningInfo">Saldo awal: Rp0</div><div class="kas-chart-card"><div class="kas-chart-head"><div><h3>Grafik Arus Kas 6 Bulan</h3><p class="sub">Perbandingan dana masuk dan dana keluar per bulan.</p></div><span class="kas-legend"><i class="in"></i> Masuk <i class="out"></i> Keluar</span></div><div id="kasChart" class="kas-chart" role="img" aria-label="Grafik pemasukan dan pengeluaran enam bulan terakhir"><div class="empty">Grafik akan tampil setelah data dimuat.</div></div></div><div class="kas-chart-card"><h3>Ringkasan Kategori</h3><div id="kasCategorySummary" class="kas-category-summary">Belum ada data transaksi.</div></div><h3 style="margin-top:18px">Riwayat Arus Kas</h3><div id="duesRows">Memuat...</div></div><div class="card span12 admin"><h3>Catat Transaksi Kas</h3><p class="sub">Pengurus dapat mencatat dana masuk maupun dana keluar. Koreksi dilakukan dengan transaksi penyesuaian agar riwayat tetap transparan.</p><form id="duesForm"><div class="row"><div class="field"><label>Jenis transaksi</label><select id="kasJenis" required><option value="masuk">Dana Masuk</option><option value="keluar">Dana Keluar</option></select></div><div class="field"><label>Kategori</label><select id="kasKategori"><option>Iuran Anggota</option><option>Donasi</option><option>Kas Organisasi</option><option>Kegiatan</option><option>Operasional</option><option>Bantuan Anggota</option><option>Administrasi</option><option>Penyesuaian</option><option>Lainnya</option></select></div></div><div class="field"><label>Uraian transaksi</label><input id="kasUraian" required maxlength="180" placeholder="Contoh: Iuran anggota November 2026 / konsumsi rapat"></div><div class="row"><div class="field"><label>Nominal (Rp)</label><input id="duesAmount" type="number" min="1" step="1" required></div><div class="field"><label>Tanggal transaksi</label><input id="duesDate" type="date" required></div></div><div class="field"><label>Metode</label><select id="duesMethod"><option>Tunai</option><option>Transfer</option><option>QRIS</option><option>Lainnya</option></select></div><button class="btn">Simpan Transaksi</button></form></div><div class="card span12 hidden" id="kasOwnerPanel"><h3>Pengaturan Saldo Awal — Admin Pemilik</h3><p class="sub">Hanya akun pemilik portal yang dapat mengatur saldo awal. Pengaturan ini tidak menghapus transaksi masuk dan keluar yang sudah tercatat.</p><form id="kasOpeningForm"><div class="field"><label>Saldo awal (Rp)</label><input id="kasOpeningAmount" type="number" min="0" step="1" required></div><button class="btn alt">Simpan Saldo Awal</button></form></div></div></section>
+  <section id="p-dues" class="page hidden admin"><div class="grid"><div class="card span12"><h2>Transparansi Keuangan Organisasi</h2><p class="sub">Menu keuangan hanya tersedia bagi pengurus yang disetujui dan pemilik portal. Anggota biasa tidak memperoleh akses ke laporan kas.</p><div class="stats-row"><div class="stat"><b id="kasMasuk">Rp0</b><span>Total Dana Masuk</span></div><div class="stat"><b id="kasKeluar">Rp0</b><span>Total Dana Keluar</span></div><div class="stat"><b id="kasSaldo">Rp0</b><span>Saldo Kas Saat Ini</span></div></div><div class="notice" id="kasOpeningInfo">Saldo awal: Rp0</div><div class="kas-chart-card"><div class="kas-chart-head"><div><h3>Grafik Arus Kas 6 Bulan</h3><p class="sub">Perbandingan dana masuk dan dana keluar per bulan.</p></div><span class="kas-legend"><i class="in"></i> Masuk <i class="out"></i> Keluar</span></div><div id="kasChart" class="kas-chart" role="img" aria-label="Grafik pemasukan dan pengeluaran enam bulan terakhir"><div class="empty">Grafik akan tampil setelah data dimuat.</div></div></div><div class="kas-chart-card"><h3>Ringkasan Kategori</h3><div id="kasCategorySummary" class="kas-category-summary">Belum ada data transaksi.</div></div><h3 style="margin-top:18px">Riwayat Arus Kas</h3><div id="duesRows">Memuat...</div></div><div class="card span12 admin"><h3>Catat Transaksi Kas</h3><p class="sub">Pengurus dapat mencatat dana masuk maupun dana keluar. Koreksi dilakukan dengan transaksi penyesuaian agar riwayat tetap transparan.</p><form id="duesForm"><div class="row"><div class="field"><label>Jenis transaksi</label><select id="kasJenis" required><option value="masuk">Dana Masuk</option><option value="keluar">Dana Keluar</option></select></div><div class="field"><label>Kategori</label><select id="kasKategori"><option>Iuran Anggota</option><option>Donasi</option><option>Kas Organisasi</option><option>Kegiatan</option><option>Operasional</option><option>Bantuan Anggota</option><option>Administrasi</option><option>Penyesuaian</option><option>Lainnya</option></select></div></div><div class="field"><label>Uraian transaksi</label><input id="kasUraian" required maxlength="180" placeholder="Contoh: Iuran anggota November 2026 / konsumsi rapat"></div><div class="row"><div class="field"><label>Nominal (Rp)</label><input id="duesAmount" type="number" min="1" step="1" required></div><div class="field"><label>Tanggal transaksi</label><input id="duesDate" type="date" required></div></div><div class="field"><label>Metode</label><select id="duesMethod"><option>Tunai</option><option>Transfer</option><option>QRIS</option><option>Lainnya</option></select></div><button class="btn">Simpan Transaksi</button></form></div><div class="card span12 hidden" id="kasOwnerPanel"><h3>Pengaturan Saldo Awal — Admin Pemilik</h3><p class="sub">Hanya akun pemilik portal yang dapat mengatur saldo awal. Pengaturan ini tidak menghapus transaksi masuk dan keluar yang sudah tercatat.</p><form id="kasOpeningForm"><div class="field"><label>Saldo awal (Rp)</label><input id="kasOpeningAmount" type="number" min="0" step="1" required></div><button class="btn alt">Simpan Saldo Awal</button></form></div></div></section>
   <section id="p-forum" class="page hidden"><div class="grid"><div class="card span6"><h2>Mulai Diskusi</h2><form id="forumForm"><div class="field"><label>Topik diskusi</label><input id="fTitle" required maxlength="160"></div><div class="field"><label>Isi diskusi</label><textarea id="fBody" required minlength="5" rows="5"></textarea></div><button class="btn">Terbitkan Diskusi</button></form></div><div class="card span12"><h2>Forum Diskusi Anggota</h2><p class="sub">Ruang bertukar gagasan dengan saling menghormati dan menjaga kerahasiaan informasi.</p><div id="forumRows">Memuat...</div></div></div></section>
-  <section id="p-news" class="page hidden"><div class="grid"><div class="card span6 admin"><h2>Terbitkan Berita / Dokumentasi</h2><form id="newsForm"><div class="field"><label>Judul</label><input id="nTitle" required></div><div class="field"><label>Ringkasan</label><textarea id="nSummary"></textarea></div><div class="field"><label>Isi berita</label><textarea id="nBody" rows="5"></textarea></div><div class="field"><label>Tautan foto / dokumentasi (opsional)</label><input id="nImage" type="url"></div><button class="btn">Terbitkan</button></form></div><div class="card span12"><h2>Berita & Dokumentasi</h2><div id="newsRows">Memuat...</div></div></div></section>
+  <section id="p-news" class="page hidden"><div class="grid"><div class="card span6 admin"><h2>Terbitkan Berita / Dokumentasi</h2><form id="newsForm"><div class="field"><label>Judul</label><input id="nTitle" required></div><div class="field"><label>Ringkasan</label><textarea id="nSummary"></textarea></div><div class="field"><label>Isi berita</label><textarea id="nBody" rows="5"></textarea></div><div class="field"><label>Tautan foto / dokumentasi (opsional)</label><input id="nImage" type="url"></div><button class="btn">Terbitkan</button></form></div><div class="card span12"><h2>Berita & Dokumentasi Organisasi</h2><div id="newsRows">Memuat...</div></div><div class="card span12"><div class="row" style="justify-content:space-between;align-items:center"><div><h2>Berita Ketenagakerjaan Terkini</h2><p class="sub">Ringkasan berita dari Google News. Baca artikel lengkap di situs penerbit aslinya.</p></div><button type="button" class="btn alt" id="refreshLaborNews">Perbarui berita</button></div><div id="laborNewsRows"><div class="empty">Memuat berita dari Google News...</div></div><small class="sub">Berita dimuat dari RSS Google News. Ketersediaan mengikuti layanan sumber dan koneksi internet.</small></div></div></section>
   <section id="p-notifications" class="page hidden"><div class="card"><div class="row" style="align-items:center;justify-content:space-between"><div><h2>Notifikasi Otomatis</h2><p class="sub">Pemberitahuan agenda baru dan perkembangan layanan anggota.</p></div><button id="readAllNotifications" class="btn alt">Tandai semua dibaca</button></div><div id="notificationRows">Memuat...</div></div></section>
-  <section id="p-export" class="page hidden"><div class="card"><h2>Ekspor Excel</h2><p class="sub">Unduh data anggota CSV yang dapat dibuka di Microsoft Excel.</p><button id="export" class="btn">Unduh CSV</button><div class="notice">Data NIK adalah data pribadi. Jaga kerahasiaannya.</div></div></section>
+  
   <section id="p-access" class="page hidden">
     <div class="card">
       <div class="userrole">KHUSUS AKUN PEMILIK PORTAL</div>
@@ -847,10 +888,11 @@ body:not(.logged-in) #settingsShortcut{display:none!important}
   <button data-p="complaints"><span class="menu-icon">⚑</span>Layanan Pengaduan</button><button data-p="documents"><span class="menu-icon">▧</span>Pusat Dokumen</button>
   <button data-p="dues"><span class="menu-icon">Rp</span>Transparansi Keuangan</button><button data-p="forum"><span class="menu-icon">☷</span>Forum Diskusi</button>
   <button data-p="news"><span class="menu-icon">▣</span>Berita & Dokumentasi</button><button data-p="notifications"><span class="menu-icon">♧</span>Notifikasi</button>
-  <button data-p="export" class="admin hidden"><span class="menu-icon">⇩</span>Ekspor Excel</button><button data-p="access" class="admin hidden"><span class="menu-icon">⚙</span>Hak Akses</button>
+  <button data-p="access" class="admin hidden"><span class="menu-icon">⚙</span>Hak Akses</button>
 </div>
 <script>
 (()=>{"use strict";
+if(location.search==="?"||location.search===""){if(location.href.endsWith("?"))history.replaceState(null,"",location.pathname+location.hash);}
 const SB="https://iyytbgwjkznngowptsqo.supabase.co",KEY="sb_publishable_rot8WQ443SBPE5hEPLLg4A_a5ix05wh", $=id=>document.getElementById(id);
 let db,user,me,admin=false,rows=[];
 function setTheme(t){document.documentElement.dataset.theme=t;localStorage.setItem("gspmii_theme",t);$("themeBtn").textContent=t==="dark"?"☀️":"🌙";$("themeBtn").setAttribute("aria-label",t==="dark"?"Aktifkan mode terang":"Aktifkan mode gelap");$("themeBtn").title=t==="dark"?"Mode terang":"Mode gelap"}setTheme(localStorage.getItem("gspmii_theme")||"dark");$("themeBtn").onclick=()=>setTheme(document.documentElement.dataset.theme==="dark"?"light":"dark");
@@ -928,7 +970,7 @@ function auth(mode="loginForm"){$("loginSolidarity").classList.toggle("hidden",m
 $("settingTheme").onclick=()=>{setTheme(document.documentElement.dataset.theme==="dark"?"light":"dark");$("themeDescription").textContent=document.documentElement.dataset.theme==="dark"?"Mode gelap aktif":"Mode terang aktif"};
 $("settingPassword").onclick=async()=>{const pw=prompt("Masukkan kata sandi baru (minimal 8 karakter):");if(!pw)return;if(pw.length<8){alert("Kata sandi minimal 8 karakter.");return}const {error}=await db.auth.updateUser({password:pw});if(error)alert("Gagal mengubah kata sandi: "+error.message);else alert("Kata sandi berhasil diperbarui.")};
 if($("loginTab"))$("loginTab").onclick=()=>auth();$("registerTab").onclick=()=>auth("registerForm");$("forgot").onclick=()=>{$("resetEmail").value=$("email").value;auth("resetForm")};$("backLogin").onclick=()=>auth();
-function _pageNow(p){document.body.dataset.page=p;if(p==="notifications"){loadNotifications().catch(e=>featureError("notificationRows",e));}if(p==="access"){if(user?.id!==GSPMII_OWNER_UID){alert("Akses khusus pemilik portal.");page("home");return}loadAccessMembers().catch(e=>message($("accessMsg"),"Gagal memuat data anggota: "+e.message,true));}document.querySelectorAll(".page").forEach(x=>x.classList.toggle("hidden",x.id!=="p-"+p));document.querySelectorAll("[data-p]").forEach(x=>x.classList.toggle("active",x.dataset.p===p));$("mobileMenu").classList.add("hidden");if(p==="directory")loadDirectory().catch(e=>message($("appMsg"),"Direktori belum dapat dimuat: "+e.message,true));if(p==="card"){drawCard().then(()=>renderMemberQr()).catch(e=>message($("appMsg"),"Gagal memuat E-KTA: "+e.message,true))}if(p==="complaints")loadComplaints().catch(e=>featureError("complaintRows",e));if(p==="documents")loadDocuments().catch(e=>featureError("documentRows",e));if(p==="dues")loadDues().catch(e=>featureError("duesRows",e));if(p==="forum")loadForum().catch(e=>featureError("forumRows",e));if(p==="news")loadNews().catch(e=>featureError("newsRows",e));if(p==="notifications")loadNotifications().catch(e=>featureError("notificationRows",e));const activePage=document.getElementById("p-"+p);if(activePage&&p!=="home"&&!activePage.querySelector(".page-backbar")){const bar=document.createElement("div");bar.className="page-backbar";bar.innerHTML='<button type="button" class="page-back-button" data-page-back>← Kembali</button><span>GSPMII · Portal Anggota</span>';activePage.insertBefore(bar,activePage.firstChild);}}
+function _pageNow(p){document.body.dataset.page=p;if(p==="notifications"){loadNotifications().catch(e=>featureError("notificationRows",e));}if(p==="dues"&&!admin&&user?.id!==GSPMII_OWNER_UID){alert("Menu keuangan khusus pengurus dan pemilik portal.");page("home");return}if(p==="access"){if(user?.id!==GSPMII_OWNER_UID){alert("Akses khusus pemilik portal.");page("home");return}loadAccessMembers().catch(e=>message($("accessMsg"),"Gagal memuat data anggota: "+e.message,true));}document.querySelectorAll(".page").forEach(x=>x.classList.toggle("hidden",x.id!=="p-"+p));document.querySelectorAll("[data-p]").forEach(x=>x.classList.toggle("active",x.dataset.p===p));$("mobileMenu").classList.add("hidden");if(p==="directory")loadDirectory().catch(e=>message($("appMsg"),"Direktori belum dapat dimuat: "+e.message,true));if(p==="card"){drawCard().then(()=>renderMemberQr()).catch(e=>message($("appMsg"),"Gagal memuat E-KTA: "+e.message,true))}if(p==="complaints")loadComplaints().catch(e=>featureError("complaintRows",e));if(p==="aspirations")loadAspirations().catch(e=>featureError("aspRows",e));if(p==="documents")loadDocuments().catch(e=>featureError("documentRows",e));if(p==="dues")loadDues().catch(e=>featureError("duesRows",e));if(p==="forum")loadForum().catch(e=>featureError("forumRows",e));if(p==="news")loadNews().catch(e=>featureError("newsRows",e));if(p==="notifications")loadNotifications().catch(e=>featureError("notificationRows",e));const activePage=document.getElementById("p-"+p);if(activePage&&p!=="home"&&!activePage.querySelector(".page-backbar")){const bar=document.createElement("div");bar.className="page-backbar";bar.innerHTML='<button type="button" class="page-back-button" data-page-back>← Kembali</button><span>GSPMII · Portal Anggota</span>';activePage.insertBefore(bar,activePage.firstChild);}}
 
 let gspmiiPageHistory=[];
 function page(p,fromBack=false){
@@ -940,7 +982,7 @@ function page(p,fromBack=false){
 }
 document.addEventListener("click",e=>{const back=e.target.closest("[data-page-back]");if(!back)return;const previous=gspmiiPageHistory.pop()||"home";page(previous,true);});
 
-document.querySelectorAll("[data-p],[data-go]").forEach(b=>b.onclick=()=>{let p=b.dataset.p||b.dataset.go;if(["members","form","verify","export"].includes(p)&&!admin)return;if(p==="access"&&user?.id!==GSPMII_OWNER_UID)return;page(p)});
+document.querySelectorAll("[data-p],[data-go]").forEach(b=>b.onclick=()=>{let p=b.dataset.p||b.dataset.go;if(["members","form","verify","export"].includes(p)&&!admin)return;if(p==="dues"&&!admin&&user?.id!==GSPMII_OWNER_UID)return;if(p==="access"&&user?.id!==GSPMII_OWNER_UID)return;page(p)});
 async function loadAccessMembers(){
   if(user?.id!==GSPMII_OWNER_UID)throw new Error("Akses khusus pemilik portal.");
   const box=$("accessRows"); if(!box)return;
@@ -987,7 +1029,7 @@ $("accessRows")?.addEventListener("click",async e=>{
 });
 
 const badge=s=>`<span class="pill ${s==="menunggu"?"pending":s==="ditolak"?"rejected":""}">${s==="disetujui"?"Aktif":s==="ditolak"?"Ditolak":"Menunggu"}</span>`;
-async function getMe(){let {data,error}=await db.from("anggota_gspmii").select("*").eq("user_id",user.id).maybeSingle();if(error)throw error;if(!data)throw new Error("Profil anggota belum terbentuk. Hubungi pengurus; jangan membuat profil manual dari browser.");me=data;admin=me.peran==="pengurus"&&me.status_verifikasi==="disetujui"}
+async function getMe(){let {data,error}=await db.from("anggota_gspmii").select("*").eq("user_id",user.id).maybeSingle();if(error)throw error;if(!data)throw new Error("Akun berhasil masuk, tetapi belum terhubung ke data anggota. Pengurus perlu menyelesaikan verifikasi/pengaitan akun. Jangan mendaftar ulang karena dapat membuat data ganda.");me=data;admin=me.peran==="pengurus"&&me.status_verifikasi==="disetujui"}
 async function signedPhoto(path){if(!path)return "";const {data,error}=await db.storage.from("foto_anggota").createSignedUrl(path,3600);if(error){console.warn("Foto profil tidak dapat dimuat:",error.message);return ""}return data?.signedUrl||""}
 async function renderProfile(){
   $("welcome").textContent="Halo, "+me.nama_lengkap;$("userEmail").textContent=user.email;
@@ -1290,7 +1332,7 @@ async function loadDues(){
   if(owner&&$("kasOpeningAmount"))$("kasOpeningAmount").value=String(saldoAwal);
 }
 
-$("duesForm").onsubmit=async e=>{e.preventDefault();if(!admin){alert("Hanya pengurus yang dapat mencatat transaksi.");return}const payload={jenis:$("kasJenis").value,kategori:$("kasKategori").value,uraian:$("kasUraian").value.trim(),nominal:Number($("duesAmount").value),tanggal:$("duesDate").value,metode:$("duesMethod").value,created_by:user.id};const {error}=await db.from("gspmii_kas_transaksi").insert(payload);if(error){alert("Gagal menyimpan: "+error.message);return}e.target.reset();await loadDues();alert("Transaksi kas berhasil dicatat.")};
+$("duesForm").onsubmit=async e=>{e.preventDefault();if(!admin&&user?.id!==GSPMII_OWNER_UID){alert("Hanya pengurus dan pemilik portal yang dapat mencatat transaksi.");return}const payload={jenis:$("kasJenis").value,kategori:$("kasKategori").value,uraian:$("kasUraian").value.trim(),nominal:Number($("duesAmount").value),tanggal:$("duesDate").value,metode:$("duesMethod").value,created_by:user.id};const {error}=await db.from("gspmii_kas_transaksi").insert(payload);if(error){alert("Gagal menyimpan: "+error.message);return}e.target.reset();await loadDues();alert("Transaksi kas berhasil dicatat.")};
 $("kasOpeningForm").onsubmit=async e=>{e.preventDefault();if(user.id!==GSPMII_OWNER_UID){alert("Hanya admin pemilik portal yang dapat mengatur saldo awal.");return}const amount=Number($("kasOpeningAmount").value);if(!Number.isFinite(amount)||amount<0){alert("Saldo awal tidak valid.");return}if(!confirm("Atur saldo awal menjadi "+rupiah(amount)+"? Riwayat transaksi tidak akan dihapus."))return;const {error}=await db.rpc("gspmii_owner_set_saldo_awal",{p_saldo_awal:amount});if(error){alert("Gagal mengatur saldo: "+error.message);return}await loadDues();alert("Saldo awal berhasil diperbarui.")};
 async function loadForum(){
   const {data,error}=await db.from("gspmii_forum").select("*").order("created_at",{ascending:false});
@@ -1328,6 +1370,7 @@ $("forumRows").onsubmit=async e=>{const form=e.target.closest("form[data-reply-f
 async function loadNews(){let {data,error}=await db.from("gspmii_berita").select("*").order("created_at",{ascending:false});if(error)throw error;$("newsRows").innerHTML=(data||[]).map(x=>itemCard(x.judul,(x.ringkasan||"")+"\n"+(x.isi||""),new Date(x.created_at).toLocaleString("id-ID"),x.url_gambar?`<a href="${esc(x.url_gambar)}" target="_blank" rel="noopener">Lihat dokumentasi ↗</a>`:"")).join("")||'<div class="empty">Belum ada berita atau dokumentasi.</div>'}
 $("newsForm").onsubmit=async e=>{e.preventDefault();if($("nImage").value.trim()&&!/^https:\/\//i.test($("nImage").value.trim())){alert("Tautan dokumentasi harus menggunakan HTTPS.");return}const {error}=await db.from("gspmii_berita").insert({judul:$("nTitle").value.trim(),ringkasan:$("nSummary").value.trim(),isi:$("nBody").value.trim(),url_gambar:$("nImage").value.trim()||null,created_by:user.id});if(error){alert(error.message);return}e.target.reset();await loadNews();alert("Berita berhasil diterbitkan.")};
 let gspmiiNotifChannel=null,gspmiiLastNotifId=null,gspmiiAudioReady=false;
+document.addEventListener("pointerdown",()=>{gspmiiAudioReady=true},{once:true,passive:true});
 function notifSound(){try{if(!gspmiiAudioReady)return;const C=window.AudioContext||window.webkitAudioContext;if(!C)return;const c=new C(),o=c.createOscillator(),g=c.createGain();o.type="sine";o.frequency.setValueAtTime(880,c.currentTime);o.frequency.setValueAtTime(1175,c.currentTime+.12);g.gain.setValueAtTime(.0001,c.currentTime);g.gain.exponentialRampToValueAtTime(.12,c.currentTime+.02);g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+.32);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.34);o.onended=()=>c.close()}catch(e){console.debug("Suara notifikasi tidak tersedia",e)}}
 function notifToast(title,msg){$("notifToastTitle").textContent=title||"Notifikasi baru";$("notifToastText").textContent=msg||"Ada pemberitahuan baru di portal.";$("notifToast").classList.remove("hidden");notifSound();clearTimeout(window.gspmiiToastTimer);window.gspmiiToastTimer=setTimeout(()=>$(("notifToast")).classList.add("hidden"),6500)}
 function renderNotifBell(rows){const unread=(rows||[]).filter(x=>!x.dibaca).length;const b=$("notifBadge");if(b){b.textContent=unread>99?"99+":String(unread);b.classList.toggle("hidden",unread===0)}const q=$("notifQuickRows");if(q)q.innerHTML=(rows||[]).slice(0,6).map(x=>`<button type="button" class="notif-quick-item ${x.dibaca?"":"unread"}" data-notif-open="${esc(String(x.id))}"><span class="notif-quick-icon">${/anggota|daftar|registr/i.test(x.judul||"")?"👤":/pengadu|pesan|aspir/i.test(x.judul||"")?"💬":"🔔"}</span><span class="notif-quick-copy"><b>${esc(x.judul||"Pemberitahuan")}</b><small>${esc(x.pesan||"")}</small><small>${x.created_at?new Date(x.created_at).toLocaleString("id-ID"):""}</small></span>${x.dibaca?"":"<i class=\"notif-unread-dot\"></i>"}</button>`).join("")||'<div class="empty" style="padding:18px">Belum ada notifikasi.</div>'}
@@ -1411,32 +1454,51 @@ async function secureGspmiiSignOut(release=true){
 }
 ["pointerdown","keydown","touchstart","scroll","click"].forEach(evt=>document.addEventListener(evt,()=>{if(user)resetGspmiiIdleTimer();},{passive:true}));
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&user)resetGspmiiIdleTimer()});
-window.addEventListener("pagehide",()=>{if(user&&gspmiiSessionClaimed){db.rpc("gspmii_release_device_session",{p_session_token:gspmiiDeviceToken});}});
+// Sesi perangkat dilepas hanya melalui logout eksplisit; pagehide tidak boleh menghapus sesi saat aplikasi HP berpindah sementara.
 
-async function enter(){ try{await claimGspmiiDeviceSession();}catch(sessionErr){console.error("Sesi perangkat GSPMII:",sessionErr);await db.auth.signOut();message($("authMsg"),sessionErr.message,true);return;} resetGspmiiIdleTimer(); $("publicIntro").classList.add("hidden");$("landingNote").classList.add("hidden");$("auth").classList.add("hidden");$("app").classList.remove("hidden");document.body.classList.add("logged-in");$("mobileDock").classList.remove("hidden");try{await getMe();document.querySelectorAll(".admin").forEach(x=>x.classList.toggle("hidden",!admin));document.querySelectorAll(".owner-only").forEach(x=>x.classList.toggle("hidden",user.id!==GSPMII_OWNER_UID));document.querySelectorAll(".member-only").forEach(x=>x.classList.toggle("hidden",admin));await renderProfile();await drawCard();await loadAgenda();await loadPublicStats();try{await loadNotifications()}catch(ne){console.warn("Notifikasi belum dapat dimuat:",ne)}startNotifRealtime();if(admin)await loadAdmin();page("home")}catch(e){message($("appMsg"),"Gagal memuat data: "+e.message,true)}}
+async function enter(){ try{const sessionCheck=await db.auth.getSession();if(!sessionCheck.data?.session?.user?.id)throw new Error("Sesi autentikasi Supabase tidak ditemukan setelah login. Silakan coba masuk kembali.");user=sessionCheck.data.session.user;await claimGspmiiDeviceSession();}catch(sessionErr){console.error("Sesi perangkat GSPMII:",sessionErr);auth("loginForm");setTimeout(()=>message($("authMsg"),"Login berhasil diverifikasi, tetapi pemeriksaan keamanan perangkat gagal: "+(sessionErr?.message||"Kesalahan tidak diketahui")+". Jangan tutup halaman; kirim pesan ini kepada pengurus.",true),50);return;} resetGspmiiIdleTimer(); $("publicIntro").classList.add("hidden");$("landingNote").classList.add("hidden");$("auth").classList.add("hidden");$("app").classList.remove("hidden");document.body.classList.add("logged-in");$("mobileDock").classList.remove("hidden");try{await getMe();document.querySelectorAll(".admin").forEach(x=>x.classList.toggle("hidden",!admin));if(user.id===GSPMII_OWNER_UID){document.querySelector('[data-p="dues"]')?.classList.remove("hidden");$("p-dues")?.classList.remove("hidden")}document.querySelectorAll(".owner-only").forEach(x=>x.classList.toggle("hidden",user.id!==GSPMII_OWNER_UID));document.querySelectorAll(".member-only").forEach(x=>x.classList.toggle("hidden",admin));await renderProfile();await drawCard();await loadAgenda();await loadPublicStats();try{await loadNotifications()}catch(ne){console.warn("Notifikasi belum dapat dimuat:",ne)}startNotifRealtime();if(admin)await loadAdmin();page("home")}catch(e){message($("appMsg"),"Gagal memuat data: "+e.message,true)}}
 $("loginForm").onsubmit=async e=>{
  e.preventDefault();
  const btn=$("loginForm").querySelector('button[type="submit"]');
- const original=btn?.textContent||"Masuk";
- if(btn){btn.disabled=true;btn.textContent="Memeriksa...";}
- $("authMsg").classList.add("hidden");
+ const original=btn?.textContent||"Login";
+ if(btn){btn.disabled=true;btn.textContent="Menghubungkan...";}
  try{
-  if(!db)throw new Error("Koneksi aplikasi belum siap. Muat ulang halaman.");
+  if(!db||!db.auth)throw new Error("Koneksi Supabase belum siap. Muat ulang halaman.");
   const email=$("email").value.trim();
   const password=$("password").value;
   if(!email||!password)throw new Error("Email dan kata sandi wajib diisi.");
+  message($("authMsg"),"Sedang menghubungkan ke Supabase...");
   const {data,error}=await db.auth.signInWithPassword({email,password});
   if(error)throw error;
-  if(!data?.user)throw new Error("Login belum menghasilkan sesi pengguna. Coba lagi.");
+  if(!data?.user)throw new Error("Supabase tidak mengembalikan data pengguna.");
   user=data.user;
+  message($("authMsg"),"Login berhasil. Memuat portal...");
   await enter();
  }catch(err){
-  console.error("Login GSPMII gagal:",err);
-  message($("authMsg"),"Login gagal: "+(err?.message||"Terjadi kesalahan tidak dikenal."),true);
- }finally{if(btn){btn.disabled=false;btn.textContent=original;}}
+  console.error("GSPMII login error:",err);
+  setTimeout(()=>message($("authMsg"),"Login gagal: "+String(err?.message||err||"Kesalahan tidak diketahui"),true),80);
+ }finally{
+  if(btn){btn.disabled=false;btn.textContent=original;}
+ }
 };
-$("newMemberTab").onclick=()=>{$("newMemberForm").classList.remove("hidden");$("oldMemberForm").classList.add("hidden")};
-$("oldMemberTab").onclick=()=>{$("oldMemberForm").classList.remove("hidden");$("newMemberForm").classList.add("hidden")};
+function showMemberRegistration(kind){
+ const panel=$("registerForm"),login=$("loginForm"),prompt=$("registerPrompt");if(panel)panel.classList.remove("hidden");if(login)login.classList.add("hidden");if(prompt)prompt.classList.add("hidden");
+ const newer=$("newMemberForm"),older=$("oldMemberForm");
+ if(!newer||!older)return;
+ newer.classList.toggle("hidden",kind!=="baru");
+ older.classList.toggle("hidden",kind!=="lama");
+ const nb=$("newMemberTab"),ob=$("oldMemberTab");
+ if(nb){nb.classList.toggle("alt",kind!=="baru");nb.setAttribute("aria-pressed",String(kind==="baru"));}
+ if(ob){ob.classList.toggle("alt",kind!=="lama");ob.setAttribute("aria-pressed",String(kind==="lama"));}
+}
+// Gunakan listener langsung dan delegasi agar tab tetap berfungsi pada browser mobile.
+$("newMemberTab").addEventListener("click",e=>{e.preventDefault();e.stopPropagation();showMemberRegistration("baru")},true);
+$("oldMemberTab").addEventListener("click",e=>{e.preventDefault();e.stopPropagation();showMemberRegistration("lama")},true);
+document.addEventListener("click",e=>{
+ const target=e.target.closest?.("#newMemberTab,#oldMemberTab");
+ if(!target)return;
+ e.preventDefault();showMemberRegistration(target.id==="oldMemberTab"?"lama":"baru");
+},true);
 const validUpload=(f,allowPdf=false)=>{if(!f)throw new Error("Semua berkas wajib diunggah.");const ok=["image/jpeg","image/png","image/webp",...(allowPdf?["application/pdf"]:[])];if(!ok.includes(f.type))throw new Error("Format berkas tidak didukung.");if(f.size>(allowPdf?8:5)*1024*1024)throw new Error("Ukuran berkas terlalu besar.");return f};
 const uploadIntakeFile=async(uid,bucket,file,label)=>{const ext=file.type==="image/png"?"png":file.type==="image/webp"?"webp":file.type==="application/pdf"?"pdf":"jpg";const path=`${uid}/${label}-${Date.now()}.${ext}`;const {error}=await db.storage.from(bucket).upload(path,file,{contentType:file.type,upsert:false});if(error)throw error;return path};
 $("newMemberForm").onsubmit=async e=>{
@@ -1470,7 +1532,7 @@ $("oldMemberForm").onsubmit=async e=>{
 $("resetForm").onsubmit=async e=>{e.preventDefault();let {error}=await db.auth.resetPasswordForEmail($("resetEmail").value.trim(),{redirectTo:location.origin+location.pathname});message($("authMsg"),error?error.message:"Tautan reset diminta. Periksa email dan folder Spam.",!!error)};
 $("newPassForm").onsubmit=async e=>{e.preventDefault();if($("newPass").value.length<8||$("newPass").value!==$("newPass2").value){message($("authMsg"),"Kata sandi harus sama dan minimal 8 karakter.",true);return}let {error}=await db.auth.updateUser({password:$("newPass").value});if(error){message($("authMsg"),error.message,true);return}await db.auth.signOut();auth();message($("authMsg"),"Kata sandi berhasil diubah. Silakan masuk.")};
 $("logout").onclick=async()=>{await secureGspmiiSignOut(true)};
-async function init(){db=window.supabase.createClient(SB,KEY);if(location.hash.includes("type=recovery"))auth("newPassForm");let {data}=await db.auth.getSession();if(data.session){user=data.session.user;await enter()}db.auth.onAuthStateChange((ev,s)=>{if(ev==="PASSWORD_RECOVERY")auth("newPassForm");if(ev==="SIGNED_OUT"){user=me=null;admin=false;auth()}})}
+async function init(){db=window.supabase.createClient(SB,KEY);window.gspmiiSupabaseClient=db;if(location.hash.includes("type=recovery"))auth("newPassForm");let {data}=await db.auth.getSession();if(data.session){user=data.session.user;await enter()}db.auth.onAuthStateChange((ev,s)=>{if(ev==="PASSWORD_RECOVERY")auth("newPassForm");if(ev==="SIGNED_OUT"){user=me=null;admin=false;auth()}})}
 const _idr=n=>new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(Math.round(Number(n)||0));
 const _krwDigits=v=>String(v??"").replace(/[^0-9]/g,"");
 const _krwNum=id=>Number(_krwDigits($(id)?.value)||0);
@@ -1481,8 +1543,95 @@ document.querySelectorAll(".krw-money").forEach(el=>{el.addEventListener("input"
 const _krwFactors={eff_loss:{p:.5,u:1,label:"Efisiensi karena kerugian"},eff_prevent:{p:1,u:1,label:"Efisiensi untuk mencegah kerugian"},close_loss:{p:.5,u:1,label:"Perusahaan tutup karena kerugian"},close_noloss:{p:1,u:1,label:"Perusahaan tutup bukan karena kerugian"},merger_worker:{p:1,u:1,label:"Penggabungan/peleburan/pemisahan — pekerja tidak bersedia melanjutkan"},merger_employer:{p:1,u:1,label:"Penggabungan/peleburan/pemisahan — pengusaha tidak bersedia menerima"},takeover_worker:{p:.5,u:1,label:"Pengambilalihan dengan perubahan syarat kerja — pekerja menolak melanjutkan"},takeover_employer:{p:1,u:1,label:"Pengambilalihan — pengusaha tidak bersedia menerima"}};
 $("krwReason")?.addEventListener("change",()=>{const r=$("krwReason").value,n=$("krwReasonNote");if(!n)return;n.textContent=_krwFactors[r]?`Faktor simulasi: pesangon ${_krwFactors[r].p}× ketentuan dasar dan UPMK ${_krwFactors[r].u}× ketentuan dasar. Cocokkan alasan PHK dengan dokumen resminya.`:r==="resign"?"Pengunduran diri bukan PHK oleh pengusaha. Simulasi hanya menjumlahkan UPH dan uang pisah yang memang menjadi hak berdasarkan ketentuan yang berlaku.":"Kategori ini tidak diberi faktor otomatis agar kalkulator tidak menghasilkan angka yang berpotensi keliru. Periksa dasar PHK dan ketentuan khusus terlebih dahulu.";});
 $("krwCalc")?.addEventListener("click",()=>{const basic=_krwNum("krwBasic"),fixed=_krwNum("krwFixed"),w=basic+fixed,y=Number($("krwYears")?.value||0),m=Number($("krwMonths")?.value||0),leave=_krwNum("krwLeave"),other=_krwNum("krwOther"),separate=_krwNum("krwSeparate"),reason=$("krwReason")?.value,box=$("krwResult");if(!(w>0)||leave<0||other<0||separate<0){box.textContent="Masukkan upah pokok dan/atau tunjangan tetap lebih dari nol. Pastikan komponen rupiah tidak negatif.";box.classList.remove("hidden");return;}const months=y*12+m,service=months/12;let basePesangon=months<12?1:Math.min(9,Math.floor(months/12)+1);if(months>=96)basePesangon=9;let baseUpmk=0;if(months>=36&&months<72)baseUpmk=2;else if(months>=72&&months<108)baseUpmk=3;else if(months>=108&&months<144)baseUpmk=4;else if(months>=144&&months<180)baseUpmk=5;else if(months>=180&&months<216)baseUpmk=6;else if(months>=216&&months<252)baseUpmk=7;else if(months>=252&&months<288)baseUpmk=8;else if(months>=288)baseUpmk=10;let pFactor=0,uFactor=0,pesangon=0,upmk=0,upahInfo="Upah dasar simulasi = upah pokok + tunjangan tetap.";if(_krwFactors[reason]){pFactor=_krwFactors[reason].p;uFactor=_krwFactors[reason].u;pesangon=w*basePesangon*pFactor;upmk=w*baseUpmk*uFactor;}else if(reason==="resign"){upahInfo="Pengunduran diri: pesangon dan UPMK tidak dihitung otomatis; hanya UPH/uang pisah yang dimasukkan.";}else{box.innerHTML="<b>Perhitungan belum dapat ditentukan otomatis.</b><br>Alasan PHK ini memerlukan pemeriksaan ketentuan khusus, dokumen PHK, dan aturan pelaksana yang berlaku. Ubah kategori hanya jika sesuai fakta dan surat PHK.";box.classList.remove("hidden");return;}const uph=leave+other+separate,total=pesangon+upmk+uph;const fmt=n=>_idr(n);const row=(label,value)=>`<div class="krw-result-row"><span>${label}</span><strong>${fmt(value)}</strong></div>`;box.innerHTML=`<div class="krw-result-head"><span>ESTIMASI TOTAL HAK</span><strong>${fmt(total)}</strong><small>${y} tahun ${m} bulan · ${_krwFactors[reason]?.label||"Pengunduran diri"}</small></div><h3>Rincian perhitungan</h3>${row("Upah dasar per bulan",w)}${row("Uang pesangon",pesangon)}<small>Dasar: ${basePesangon} bulan upah × faktor ${pFactor}×</small>${row("Uang penghargaan masa kerja (UPMK)",upmk)}<small>Dasar: ${baseUpmk} bulan upah × faktor ${uFactor}×</small>${row("Uang penggantian hak (UPH) dan komponen yang dimasukkan",uph)}<small>Termasuk cuti belum gugur ${fmt(leave)}, hak lain ${fmt(other)}, dan uang pisah ${fmt(separate)} sesuai data yang dimasukkan.</small><div class="krw-result-total"><span>Perkiraan keseluruhan</span><strong>${fmt(total)}</strong></div><p class="krw-hint">${upahInfo} Masa kerja dihitung dari total bulan yang dipilih. Dasar tabel masa kerja dan faktor pengali mengikuti ketentuan yang dipilih pada simulasi; hasil harus diverifikasi terhadap UU 27/2026, PP 35/2021 sepanjang masih berlaku, PK/PP/PKB, serta dokumen PHK.</p><button class="btn krw-print" type="button" onclick="window.print()">Cetak / Simpan PDF</button>`;box.classList.remove("hidden");});
-$("aspSend")?.addEventListener("click",()=>{const t=$("aspTopic").value.trim(),b=$("aspBody").value.trim(),r=$("aspResult");r.textContent=t&&b?"Isian sudah lengkap. Belum dikirim atau disimpan karena penyimpanan privat belum diaktifkan.":"Isi topik dan aspirasi terlebih dahulu.";r.classList.remove("hidden");});
+async function loadAspirations(){
+ const {data,error}=await db.from("gspmii_aspirasi").select("*").order("created_at",{ascending:false}).limit(100);
+ if(error)throw error;
+ const rows=data||[],mine=rows.filter(x=>x.user_id===user.id),ownBox=$("aspRows"),adminBox=$("aspAdminRows");
+ if(ownBox)ownBox.innerHTML=mine.map(x=>itemCard(x.judul,x.isi,(x.status||"diterima").toUpperCase()+" · "+new Date(x.created_at).toLocaleString("id-ID")+(x.catatan_pengurus?" · Catatan: "+x.catatan_pengurus:"" ))).join("")||'<div class="empty">Belum ada aspirasi yang dikirim.</div>';
+ if(admin&&adminBox)adminBox.innerHTML=rows.map(x=>itemCard(x.judul,x.isi,"Pengirim: "+x.user_id+" · "+new Date(x.created_at).toLocaleString("id-ID"),`<select data-asp-status="${x.id}"><option value="diterima" ${x.status==="diterima"?"selected":""}>Diterima</option><option value="diproses" ${x.status==="diproses"?"selected":""}>Diproses</option><option value="ditindaklanjuti" ${x.status==="ditindaklanjuti"?"selected":""}>Ditindaklanjuti</option></select><input data-asp-note="${x.id}" placeholder="Catatan pengurus" value="${esc(x.catatan_pengurus||"")}"><button class="btn" data-asp-save="${x.id}">Simpan</button>`)).join("")||'<div class="empty">Belum ada aspirasi masuk.</div>';
+}
+$("aspirationForm")?.addEventListener("submit",async e=>{e.preventDefault();const btn=$("aspSend"),r=$("aspResult");btn.disabled=true;try{const {error}=await db.from("gspmii_aspirasi").insert({user_id:user.id,judul:$("aspTopic").value.trim(),isi:$("aspBody").value.trim()});if(error)throw error;e.target.reset();message(r,"Aspirasi berhasil dikirim secara privat.");await loadAspirations()}catch(err){message(r,"Gagal mengirim aspirasi: "+(err.message||err),true)}finally{btn.disabled=false}});
+$("aspAdminRows")?.addEventListener("click",async e=>{const id=e.target?.dataset?.aspSave;if(!id)return;const status=document.querySelector(`[data-asp-status="${id}"]`)?.value||"diterima",catatan=document.querySelector(`[data-asp-note="${id}"]`)?.value||"";const {error}=await db.from("gspmii_aspirasi").update({status,catatan_pengurus:catatan}).eq("id",id);if(error){alert("Gagal memperbarui aspirasi: "+error.message);return}await loadAspirations();alert("Status aspirasi diperbarui.")});
 init().catch(e=>message($("authMsg"),e.message,true));
+
+(()=>{
+ const $=id=>document.getElementById(id);
+ let calMonth=new Date();calMonth.setDate(1);let calEvents=[];let calSelected=new Date();
+ const safeDate=v=>{const d=new Date(v);return Number.isNaN(d.getTime())?null:d};
+ function drawCalendar(){
+  const grid=$("calendarGrid"),title=$("calendarMonth");if(!grid||!title)return;
+  const y=calMonth.getFullYear(),m=calMonth.getMonth(),first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate();
+  title.textContent=calMonth.toLocaleDateString("id-ID",{month:"long",year:"numeric"});
+  let html="";for(let i=0;i<first;i++)html+='<span></span>';
+  for(let d=1;d<=days;d++){const date=new Date(y,m,d),key=date.toDateString(),today=new Date().toDateString(),has=calEvents.some(e=>{const x=safeDate(e.tanggal);return x&&x.toDateString()===key});html+=`<button type="button" class="calendar-day ${key===today?'today':''} ${key===calSelected.toDateString()?'selected':''} ${has?'has-event':''}" data-cal-day="${d}">${d}</button>`}
+  grid.innerHTML=html;renderCalendarSelected();
+ }
+ function renderCalendarSelected(){
+  const box=$("calendarSelected");if(!box)return;const key=calSelected.toDateString(),events=calEvents.filter(e=>{const d=safeDate(e.tanggal);return d&&d.toDateString()===key});
+  box.innerHTML=`<b>${calSelected.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}</b>`+(events.length?events.map(e=>`<div class="item"><b>${esc(e.judul||"Agenda")}</b><small>${esc(e.tanggal||"")} · ${esc(e.lokasi||"")}</small><p>${esc(e.deskripsi||"")}</p></div>`).join(""):'<p class="sub">Tidak ada agenda pada tanggal ini.</p>');
+ }
+ $("calPrev")?.addEventListener("click",()=>{calMonth.setMonth(calMonth.getMonth()-1);drawCalendar()});
+ $("calNext")?.addEventListener("click",()=>{calMonth.setMonth(calMonth.getMonth()+1);drawCalendar()});
+ $("calendarGrid")?.addEventListener("click",e=>{const b=e.target.closest("[data-cal-day]");if(!b)return;calSelected=new Date(calMonth.getFullYear(),calMonth.getMonth(),Number(b.dataset.calDay));drawCalendar()});
+ const oldLoadAgenda=window.loadAgenda;
+ // The existing loadAgenda is a top-level function in this portal; wrap it to feed the calendar without changing its CRUD behavior.
+ if(typeof loadAgenda==="function"&&!loadAgenda.__calendarWrapped){
+  const original=loadAgenda;
+  loadAgenda=async function(){await original();try{const {data}=await db.from("agenda_gspmii").select("id,judul,tanggal,lokasi,deskripsi").order("tanggal",{ascending:true});calEvents=data||[];drawCalendar()}catch(e){console.warn("Kalender gagal memuat agenda",e)}};
+  loadAgenda.__calendarWrapped=true;
+ }
+ drawCalendar();
+
+ async function loadLaborNews(){
+  const box=$("laborNewsRows");if(!box)return;box.innerHTML='<div class="empty">Mengambil berita dari Google News...</div>';
+  const rss="https://news.google.com/rss/search?q="+encodeURIComponent("ketenagakerjaan OR buruh OR serikat pekerja Indonesia")+"&hl=id&gl=ID&ceid=ID:id";
+  try{
+   const api="https://api.rss2json.com/v1/api.json?rss_url="+encodeURIComponent(rss);
+   const res=await fetch(api);if(!res.ok)throw new Error("Layanan berita tidak merespons");const data=await res.json();if(data.status!=="ok")throw new Error(data.message||"Feed berita tidak tersedia");
+   box.innerHTML=(data.items||[]).slice(0,12).map(x=>`<article class="labor-news-item"><a href="${esc(x.link)}" target="_blank" rel="noopener noreferrer">${esc(x.title)}</a><small>${esc(x.author||"Google News")} · ${esc(x.pubDate||"")}</small></article>`).join("")||'<div class="empty">Belum ada berita yang ditemukan.</div>';
+  }catch(e){box.innerHTML='<div class="notice">Berita otomatis belum dapat dimuat. Periksa koneksi atau coba tombol Perbarui berita. Sumber: <a href="https://news.google.com/" target="_blank" rel="noopener">Google News</a>.</div>';console.warn(e)}
+ }
+ $("refreshLaborNews")?.addEventListener("click",loadLaborNews);
+ const newsPageObserver=new MutationObserver(()=>{const page=$("p-news");if(page&&!page.classList.contains("hidden")&&!page.dataset.feedLoaded){page.dataset.feedLoaded="1";loadLaborNews()}});
+ if($("p-news"))newsPageObserver.observe($("p-news"),{attributes:true,attributeFilter:["class"]});
+
+ async function loadAcademyGallery(){
+  const box=$("academyGallery");if(!box||!db||!user)return;
+  const {data,error}=await db.from("gspmii_pendidikan_galeri").select("*").order("created_at",{ascending:false}).limit(100);
+  if(error){box.innerHTML='<div class="notice">Galeri belum tersambung. Pengurus perlu menjalankan SQL pengaturan galeri.</div>';return}
+  box.innerHTML=(data||[]).map(x=>`<article class="academy-photo"><img src="${esc(x.foto_url||"")}" alt="${esc(x.judul||"Dokumentasi kegiatan")}" loading="lazy"><div><h4>${esc(x.judul||"Kegiatan GSPMII")}</h4><p>${esc(x.keterangan||"")}</p><small>${x.created_at?new Date(x.created_at).toLocaleDateString("id-ID"):""}</small></div></article>`).join("")||'<div class="empty">Belum ada dokumentasi kegiatan.</div>';
+ }
+ $("academyUploadForm")?.addEventListener("submit",async e=>{
+  e.preventDefault();const f=$("academyPhoto")?.files?.[0],msg=$("academyUploadMsg"),btn=e.target.querySelector('button[type="submit"]')||e.target.querySelector("button");
+  if(!f||!["image/jpeg","image/png","image/webp"].includes(f.type)||f.size>5*1024*1024){if(msg){msg.textContent="Pilih foto JPG, PNG, atau WebP maksimal 5 MB.";msg.classList.remove("hidden")}return}
+  if(!admin){alert("Hanya pengurus yang dapat mengunggah dokumentasi.");return}
+  btn.disabled=true;btn.textContent="Mengunggah...";
+  try{
+   const ext=f.type==="image/png"?"png":f.type==="image/webp"?"webp":"jpg",path=`${user.id}/${Date.now()}.${ext}`;
+   const up=await db.storage.from("galeri_pendidikan").upload(path,f,{contentType:f.type,upsert:false});if(up.error)throw up.error;
+   const pub=db.storage.from("galeri_pendidikan").getPublicUrl(path);
+   const ins=await db.from("gspmii_pendidikan_galeri").insert({judul:$("academyTitle").value.trim(),keterangan:$("academyDescription").value.trim(),foto_path:path,foto_url:pub.data.publicUrl,dibuat_oleh:user.id});
+   if(ins.error)throw ins.error;e.target.reset();if(msg){msg.textContent="Dokumentasi berhasil diunggah.";msg.classList.remove("hidden")}await loadAcademyGallery();
+  }catch(err){if(msg){msg.textContent="Gagal mengunggah: "+(err.message||err);msg.classList.remove("hidden")}}
+  finally{btn.disabled=false;btn.textContent="Unggah ke Galeri"}
+ });
+ const oldPage=window.page;
+ if(typeof page==="function"&&!page.__academyWrapped){
+  const originalPage=page;
+  page=function(p){const r=originalPage(p);if(p==="academy")setTimeout(loadAcademyGallery,0);return r};
+  page.__academyWrapped=true;
+ }
+ document.addEventListener("click",e=>{if(e.target.closest("#notifBell")){window.gspmiiAudioReady=true}});
+ const toastNode=$("notifToast");
+ if(toastNode){let wasHidden=toastNode.classList.contains("hidden");new MutationObserver(()=>{const hidden=toastNode.classList.contains("hidden");if(wasHidden&&!hidden){try{if(navigator.vibrate)navigator.vibrate([120,60,120])}catch(e){}}wasHidden=hidden}).observe(toastNode,{attributes:true,attributeFilter:["class"]})}
+ const oldToast=window.notifToast;
+ if(typeof notifToast==="function"&&!notifToast.__hapticWrapped){
+  const original=notifToast;
+  window.notifToast=function(title,msg){const r=original(title,msg);try{if(navigator.vibrate)navigator.vibrate([120,60,120])}catch(e){}return r};
+  window.notifToast.__hapticWrapped=true;
+ }
+})();
+
 })();
 </script>
 
@@ -1491,10 +1640,180 @@ init().catch(e=>message($("authMsg"),e.message,true));
    title="WhatsApp Pengurus PUK Cikokol Raya">
   <svg viewBox="0 0 32 32" role="img" aria-hidden="true">
     <path fill="#fff" d="M16.04 3.2A12.7 12.7 0 0 0 5.12 22.36L3.4 28.7l6.5-1.7A12.7 12.7 0 1 0 16.04 3.2Zm0 23.1c-2 0-3.96-.53-5.67-1.54l-.4-.24-3.86 1.02 1.03-3.76-.26-.4a10.5 10.5 0 1 1 9.16 4.92Zm5.77-7.87c-.32-.16-1.9-.94-2.2-1.05-.3-.1-.52-.16-.74.16-.22.33-.84 1.05-1.03 1.27-.19.22-.38.25-.7.08-.33-.16-1.38-.5-2.63-1.6-.97-.86-1.62-1.92-1.81-2.25-.19-.33-.02-.5.14-.66.15-.15.33-.38.49-.57.16-.19.22-.33.33-.55.1-.22.05-.41-.03-.57-.08-.16-.74-1.78-1.01-2.44-.27-.64-.54-.55-.74-.56h-.63c-.22 0-.57.08-.87.41-.3.33-1.14 1.11-1.14 2.71s1.17 3.14 1.33 3.36c.16.22 2.3 3.52 5.58 4.94.78.34 1.39.54 1.87.69.79.25 1.5.21 2.06.13.63-.1 1.9-.78 2.17-1.54.27-.76.27-1.41.19-1.54-.08-.13-.3-.22-.63-.38Z"/>
-  </svg><span class="wa-join-label">Gabung GSPMII</span>
+  </svg>
 </a>
 
 <div id="gspmiiPageLoader" class="gspmii-page-loader" aria-hidden="true"><div class="loader-orbit"></div><b>Memuat halaman...</b><small>GSPMII · PUK SAT CIKOKOL RAYA</small></div>
 <script id="gspmii-nik-input-helper">document.addEventListener("input",e=>{if(e.target&&e.target.id==="myNik")e.target.value=e.target.value.replace(/\D/g,"").slice(0,16)});</script>
+<script id="gspmii-auth-tabs-hardfix">
+// Lapisan pengaman terpisah: tetap bekerja meskipun handler utama tab terhenti karena error JS lain.
+(function(){
+  function bind(){
+    const reg=document.getElementById('registerForm');
+    const login=document.getElementById('loginForm');
+    const prompt=document.getElementById('registerPrompt');
+    const newer=document.getElementById('newMemberForm');
+    const older=document.getElementById('oldMemberForm');
+    const nb=document.getElementById('newMemberTab');
+    const ob=document.getElementById('oldMemberTab');
+    function choose(kind){
+      if(!reg||!newer||!older)return;
+      reg.classList.remove('hidden');
+      if(login)login.classList.add('hidden');
+      if(prompt)prompt.classList.add('hidden');
+      newer.classList.toggle('hidden',kind!=='baru');
+      older.classList.toggle('hidden',kind!=='lama');
+      if(nb)nb.classList.toggle('alt',kind!=='baru');
+      if(ob)ob.classList.toggle('alt',kind!=='lama');
+      reg.scrollIntoView({behavior:'smooth',block:'start'});
+    }
+    nb?.addEventListener('click',function(e){e.preventDefault();choose('baru')});
+    ob?.addEventListener('click',function(e){e.preventDefault();choose('lama')});
+    // Handler submit berdiri sendiri; mencegah tombol mengirim form GET ke URL berakhiran tanda tanya.
+    older?.addEventListener('submit',async function(e){
+      e.preventDefault();e.stopImmediatePropagation();
+      const btn=older.querySelector('button[type="submit"]');
+      if(!window.supabase||!window.supabase.createClient){alert('Koneksi Supabase belum siap. Muat ulang halaman.');return;}
+      if(btn){btn.disabled=true;btn.textContent='Mengirim permohonan...';}
+      try{
+        const email=document.getElementById('oldEmail').value.trim().toLowerCase();
+        const name=document.getElementById('oldName').value.trim();
+        const phone=document.getElementById('oldPhone').value.trim();
+        const password=document.getElementById('oldPass').value;
+        if(!name||!email||!phone||password.length<8)throw new Error('Lengkapi nama, email, nomor HP, dan kata sandi minimal 8 karakter.');
+        const SB='https://iyytbgwjkznngowptsqo.supabase.co';
+        const KEY=(window.GSPMII_SUPABASE_ANON_KEY||document.querySelector('meta[name="gspmii-anon-key"]')?.content);
+        // Ambil client yang telah dibuat aplikasi utama bila tersedia.
+        const appClient=window.gspmiiSupabaseClient;
+        const client=appClient||(KEY?window.supabase.createClient(SB,KEY):null);
+        if(!client)throw new Error('Koneksi aplikasi tidak ditemukan. Silakan kirim screenshot pesan ini ke pengurus.');
+        const {data,error}=await client.auth.signUp({email,password,options:{data:{nama_lengkap:name,no_hp:phone,jenis_pendaftaran:'member_lama'}}});
+        if(error)throw error;
+        if(!data?.user)throw new Error('Akun belum berhasil dibuat.');
+        if(!data.session){
+          older.reset();
+          alert('Akun berhasil dibuat. Silakan buka email untuk konfirmasi, lalu login kembali. Setelah login, pengurus perlu memproses pencocokan data anggota lama.');
+          return;
+        }
+        const {error:insertError}=await client.from('pendaftaran_anggota').insert({user_id:data.user.id,nama_lengkap:name,email,telepon:phone,status:'menunggu_verifikasi_member_lama',data_profil:{jenis_pendaftaran:'member_lama',nama_lengkap:name,email,no_hp:phone}});
+        if(insertError)throw insertError;
+        older.reset();alert('Permohonan aktivasi akun member lama terkirim. Pengurus akan mencocokkan data sebelum menghubungkan akun dengan data anggota lama.');
+      }catch(err){alert('Pengajuan member lama gagal: '+(err?.message||'Kesalahan tidak diketahui.'));}
+      finally{if(btn){btn.disabled=false;btn.textContent='Ajukan Aktivasi Akun';}}
+    },true);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});else bind();
+})();
+</script></body>
+<style id="gspmii-menu-wa-final-adjustments">
+#wa-float-puk{
+  position:fixed!important;
+  right:20px!important;
+  left:auto!important;
+  bottom:24px!important;
+  width:62px!important;
+  min-width:62px!important;
+  height:62px!important;
+  min-height:62px!important;
+  padding:0!important;
+  border-radius:50%!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:0!important;
+  z-index:9999!important;
+}
+#wa-float-puk .wa-join-label{display:none!important}
+#wa-float-puk svg{width:36px!important;height:36px!important}
+@media(max-width:780px){
+  #wa-float-puk{
+    right:18px!important;
+    left:auto!important;
+    bottom:calc(82px + env(safe-area-inset-bottom))!important;
+    width:58px!important;
+    min-width:58px!important;
+    height:58px!important;
+    min-height:58px!important;
+  }
+  #wa-float-puk svg{width:34px!important;height:34px!important}
+}
+</style>
+
+<script id="gspmii-login-emergency-fallback">
+(function(){
+  function install(){
+    var form=document.getElementById("loginForm");
+    var msg=document.getElementById("authMsg");
+    if(!form || typeof form.onsubmit==="function") return;
+
+    form.addEventListener("submit", async function(ev){
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+
+      var btn=form.querySelector('button[type="submit"]');
+      var oldText=btn ? btn.textContent : "Login";
+      var email=(document.getElementById("email")||{}).value||"";
+      var password=(document.getElementById("password")||{}).value||"";
+      function show(text,isError){
+        if(!msg)return;
+        msg.textContent=text;
+        msg.className="message"+(isError?" err":"");
+        msg.classList.remove("hidden");
+      }
+
+      if(!email.trim() || !password){
+        show("Email dan kata sandi wajib diisi.",true);
+        return;
+      }
+      if(btn){btn.disabled=true;btn.textContent="Menghubungkan...";}
+      show("Menyiapkan koneksi login...",false);
+
+      try{
+        if(!window.supabase || typeof window.supabase.createClient!=="function"){
+          throw new Error("Pustaka Supabase tidak termuat. Muat ulang halaman.");
+        }
+        var client=window.gspmiiSupabaseClient;
+        if(!client){
+          client=window.supabase.createClient(
+            "https://iyytbgwjkznngowptsqo.supabase.co",
+            "sb_publishable_rot8WQ443SBPE5hEPLLg4A_a5ix05wh"
+          );
+          window.gspmiiSupabaseClient=client;
+        }
+        var result=await client.auth.signInWithPassword({
+          email:email.trim(),
+          password:password
+        });
+        if(result.error) throw result.error;
+        if(!result.data || !result.data.user) throw new Error("Login tidak mengembalikan data pengguna.");
+        show("Autentikasi berhasil. Memuat ulang portal...",false);
+        window.location.reload();
+      }catch(err){
+        console.error("GSPMII fallback login error:",err);
+        show("Login gagal: "+String(err && err.message ? err.message : err),true);
+      }finally{
+        if(btn){btn.disabled=false;btn.textContent=oldText;}
+      }
+    },true);
+  }
+
+  if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded",install,{once:true});
+  }else{
+    install();
+  }
+
+  window.addEventListener("error",function(ev){
+    var form=document.getElementById("loginForm");
+    var msg=document.getElementById("authMsg");
+    if(form && typeof form.onsubmit!=="function" && msg){
+      msg.textContent="Kesalahan JavaScript: "+String(ev.message||"periksa koneksi halaman");
+      msg.className="message err";
+      msg.classList.remove("hidden");
+    }
+  });
+})();
+</script>
+
 </body>
 </html>

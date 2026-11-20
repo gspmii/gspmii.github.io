@@ -890,6 +890,7 @@ input,select,textarea,button{max-width:100%}
 </div>
 <script>
 (()=>{"use strict";
+if(location.search==="?"||location.search===""){if(location.href.endsWith("?"))history.replaceState(null,"",location.pathname+location.hash);}
 const SB="https://iyytbgwjkznngowptsqo.supabase.co",KEY="sb_publishable_rot8WQ443SBPE5hEPLLg4A_a5ix05wh", $=id=>document.getElementById(id);
 let db,user,me,admin=false,rows=[];
 function setTheme(t){document.documentElement.dataset.theme=t;localStorage.setItem("gspmii_theme",t);$("themeBtn").textContent=t==="dark"?"☀️":"🌙";$("themeBtn").setAttribute("aria-label",t==="dark"?"Aktifkan mode terang":"Aktifkan mode gelap");$("themeBtn").title=t==="dark"?"Mode terang":"Mode gelap"}setTheme(localStorage.getItem("gspmii_theme")||"dark");$("themeBtn").onclick=()=>setTheme(document.documentElement.dataset.theme==="dark"?"light":"dark");
@@ -1450,9 +1451,9 @@ async function secureGspmiiSignOut(release=true){
 }
 ["pointerdown","keydown","touchstart","scroll","click"].forEach(evt=>document.addEventListener(evt,()=>{if(user)resetGspmiiIdleTimer();},{passive:true}));
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&user)resetGspmiiIdleTimer()});
-window.addEventListener("pagehide",()=>{if(user&&gspmiiSessionClaimed){db.rpc("gspmii_release_device_session",{p_session_token:gspmiiDeviceToken});}});
+// Sesi perangkat dilepas hanya melalui logout eksplisit; pagehide tidak boleh menghapus sesi saat aplikasi HP berpindah sementara.
 
-async function enter(){ try{await claimGspmiiDeviceSession();}catch(sessionErr){console.error("Sesi perangkat GSPMII:",sessionErr);await db.auth.signOut();message($("authMsg"),sessionErr.message,true);return;} resetGspmiiIdleTimer(); $("publicIntro").classList.add("hidden");$("landingNote").classList.add("hidden");$("auth").classList.add("hidden");$("app").classList.remove("hidden");document.body.classList.add("logged-in");$("mobileDock").classList.remove("hidden");try{await getMe();document.querySelectorAll(".admin").forEach(x=>x.classList.toggle("hidden",!admin));document.querySelectorAll(".owner-only").forEach(x=>x.classList.toggle("hidden",user.id!==GSPMII_OWNER_UID));document.querySelectorAll(".member-only").forEach(x=>x.classList.toggle("hidden",admin));await renderProfile();await drawCard();await loadAgenda();await loadPublicStats();try{await loadNotifications()}catch(ne){console.warn("Notifikasi belum dapat dimuat:",ne)}startNotifRealtime();if(admin)await loadAdmin();page("home")}catch(e){message($("appMsg"),"Gagal memuat data: "+e.message,true)}}
+async function enter(){ try{const sessionCheck=await db.auth.getSession();if(!sessionCheck.data?.session?.user?.id)throw new Error("Sesi autentikasi Supabase tidak ditemukan setelah login. Silakan coba masuk kembali.");user=sessionCheck.data.session.user;await claimGspmiiDeviceSession();}catch(sessionErr){console.error("Sesi perangkat GSPMII:",sessionErr);auth("loginForm");setTimeout(()=>message($("authMsg"),"Login berhasil diverifikasi, tetapi pemeriksaan keamanan perangkat gagal: "+(sessionErr?.message||"Kesalahan tidak diketahui")+". Jangan tutup halaman; kirim pesan ini kepada pengurus.",true),50);return;} resetGspmiiIdleTimer(); $("publicIntro").classList.add("hidden");$("landingNote").classList.add("hidden");$("auth").classList.add("hidden");$("app").classList.remove("hidden");document.body.classList.add("logged-in");$("mobileDock").classList.remove("hidden");try{await getMe();document.querySelectorAll(".admin").forEach(x=>x.classList.toggle("hidden",!admin));document.querySelectorAll(".owner-only").forEach(x=>x.classList.toggle("hidden",user.id!==GSPMII_OWNER_UID));document.querySelectorAll(".member-only").forEach(x=>x.classList.toggle("hidden",admin));await renderProfile();await drawCard();await loadAgenda();await loadPublicStats();try{await loadNotifications()}catch(ne){console.warn("Notifikasi belum dapat dimuat:",ne)}startNotifRealtime();if(admin)await loadAdmin();page("home")}catch(e){message($("appMsg"),"Gagal memuat data: "+e.message,true)}}
 $("loginForm").onsubmit=async e=>{
  e.preventDefault();
  const btn=$("loginForm").querySelector('button[type="submit"]');
@@ -1477,6 +1478,7 @@ $("loginForm").onsubmit=async e=>{
  }finally{if(btn){btn.disabled=false;btn.textContent=original;}}
 };
 function showMemberRegistration(kind){
+ const panel=$("registerForm"),login=$("loginForm"),prompt=$("registerPrompt");if(panel)panel.classList.remove("hidden");if(login)login.classList.add("hidden");if(prompt)prompt.classList.add("hidden");
  const newer=$("newMemberForm"),older=$("oldMemberForm");
  if(!newer||!older)return;
  newer.classList.toggle("hidden",kind!=="baru");

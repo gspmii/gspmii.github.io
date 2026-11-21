@@ -375,6 +375,7 @@ body:not(.logged-in) #settingsShortcut{display:none!important}
 .directory-person small{font-size:11px;color:var(--muted);overflow-wrap:anywhere}
 .directory-avatar{width:42px;height:42px;min-width:42px;border-radius:50%;object-fit:cover;border:2px solid var(--line);display:grid;place-items:center}
 .directory-initials{background:linear-gradient(145deg,#18365b,#294e78);color:#f0d58b;font-size:13px;font-weight:900;letter-spacing:.5px}
+.directory-avatar-wrap{position:relative;display:inline-flex;flex:0 0 42px;width:42px;height:42px}.directory-avatar-wrap .directory-avatar{width:42px;height:42px}.directory-online-dot{position:absolute;right:-1px;bottom:-1px;width:12px;height:12px;border-radius:50%;background:#22c55e;border:2px solid #0c192b;box-shadow:0 0 0 2px rgba(34,197,94,.18)}.directory-online-dot.offline{background:#64748b;box-shadow:none}.directory-online-label{font-size:10px;color:#22c55e;font-weight:700;margin-top:3px;display:block}
 
 /* GSPMII live notification UI */
 .topbar .head{display:flex;align-items:center;justify-content:space-between;gap:14px}
@@ -413,7 +414,7 @@ body:not(.logged-in) #settingsShortcut{display:none!important}
 
 /* Tombol WhatsApp mengambang: ikon saja, tanpa nama/nomor tertulis */
 #wa-float-puk{
-  position:fixed;right:22px;left:auto;bottom:24px;z-index:9999;
+  position:fixed;left:22px;bottom:24px;z-index:9999;
   width:66px;height:66px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
   background:#25D366;box-shadow:0 5px 18px rgba(0,0,0,.28);
@@ -423,7 +424,7 @@ body:not(.logged-in) #settingsShortcut{display:none!important}
 #wa-float-puk:active{transform:scale(.94)}
 #wa-float-puk svg{width:38px;height:38px;display:block}
 @media(max-width:780px){
-  #wa-float-puk{right:18px;left:auto;bottom:calc(82px + env(safe-area-inset-bottom));width:60px;height:60px}
+  #wa-float-puk{left:18px;bottom:calc(82px + env(safe-area-inset-bottom));width:60px;height:60px}
   #wa-float-puk svg{width:35px;height:35px}
 }
 
@@ -648,32 +649,32 @@ body:not(.logged-in) #settingsShortcut{display:none!important}
   </div>
   <div class="dashboard-shell">
   <nav class="desktop-nav no-print" id="nav" aria-label="Menu utama">
-    <div class="menu-group-title">MENU UTAMA</div>
+    <div class="menu-group-title">RUANG UTAMA</div>
     <button data-p="home" class="active"><span class="menu-icon">⌂</span><span><b>Beranda</b><small>Ringkasan portal dan aktivitas</small></span><i>›</i></button>
     <button data-p="profile"><span class="menu-icon">♙</span><span><b>Profil Saya</b><small>Informasi akun dan keanggotaan</small></span><i>›</i></button>
-    <button data-p="card"><span class="menu-icon">▣</span><span><b>E-KTA</b><small>Kartu identitas digital anggota</small></span><i>›</i></button>
     <button data-p="directory"><span class="menu-icon">♧</span><span><b>Direktori Anggota</b><small>Kenali rekan seperjuangan</small></span><i>›</i></button>
-    <div class="menu-group-title admin hidden">ADMINISTRASI KEANGGOTAAN</div>
-    <button data-p="verify" class="admin hidden"><span class="menu-icon">✓</span><span><b>Verifikasi</b><small>Periksa pendaftaran anggota</small></span><i>›</i></button>
+    <div class="menu-group-title">ADMINISTRASI KEANGGOTAAN</div>
     <button data-p="members" class="admin hidden"><span class="menu-icon">▤</span><span><b>Data Anggota</b><small>Kelola data keanggotaan</small></span><i>›</i></button>
+    <button data-p="verify" class="admin hidden"><span class="menu-icon">✓</span><span><b>Verifikasi</b><small>Periksa pendaftaran anggota</small></span><i>›</i></button>
+    <button data-p="card"><span class="menu-icon">▣</span><span><b>Kartu Digital</b><small>E-KTA dan identitas anggota</small></span><i>›</i></button>
     <div class="menu-group-title">LAYANAN & INFORMASI</div>
     <button data-p="agenda"><span class="menu-icon">▦</span><span><b>Kalender & Agenda</b><small>Jadwal kegiatan organisasi</small></span><i>›</i></button>
-    <button data-p="news"><span class="menu-icon">▣</span><span><b>Berita & Dokumentasi</b><small>Kabar dan dokumentasi kegiatan</small></span><i>›</i></button>
+    <button data-p="complaints"><span class="menu-icon">⚑</span><span><b>Layanan Pengaduan</b><small>Sampaikan aspirasi dan laporan</small></span><i>›</i></button>
     <button data-p="documents"><span class="menu-icon">▧</span><span><b>Pusat Dokumen</b><small>Arsip dan dokumen organisasi</small></span><i>›</i></button>
+    <button data-p="dues"><span class="menu-icon">Rp</span><span><b>Transparansi Keuangan</b><small>Laporan kas masuk dan keluar</small></span><i>›</i></button>
     <button data-p="forum"><span class="menu-icon">☷</span><span><b>Forum Diskusi</b><small>Ruang diskusi antaranggota</small></span><i>›</i></button>
-    <button data-p="complaints"><span class="menu-icon">⚑</span><span><b>Layanan Pengaduan</b><small>Sampaikan laporan anggota</small></span><i>›</i></button>
-    <button data-p="aspirations"><span class="menu-icon">✉</span><span><b>Kotak Aspirasi</b><small>Masukan dan usulan anggota</small></span><i>›</i></button>
+    <button data-p="news"><span class="menu-icon">▣</span><span><b>Berita & Dokumentasi</b><small>Kabar dan dokumentasi kegiatan</small></span><i>›</i></button>
     <button data-p="notifications"><span class="menu-icon">♧</span><span><b>Notifikasi</b><small>Pemberitahuan portal</small></span><i>›</i></button>
-    <div class="menu-group-title finance-menu-group finance-access hidden">KEUANGAN & PENGELOLAAN</div>
-    <button data-p="dues" class="finance-access hidden"><span class="menu-icon">Rp</span><span><b>Keuangan</b><small>Pengelolaan kas dan iuran</small></span><i>›</i></button>
-    <div class="menu-group-title">PENGUATAN & PERLINDUNGAN</div>
+    <div class="menu-group-title admin hidden">PENGELOLAAN PORTAL</div>
+    <button data-p="export" class="admin hidden"><span class="menu-icon">⇩</span><span><b>Ekspor Excel</b><small>Unduh laporan administrasi</small></span><i>›</i></button>
+    <button data-p="access" class="admin owner-only hidden"><span class="menu-icon">⚙</span><span><b>Hak Akses</b><small>Pengaturan peran dan kewenangan</small></span><i>›</i></button>
+    <div class="menu-group-title">PENGUATAN & PERLINDUNGAN ANGGOTA</div>
     <button data-p="rights"><span class="menu-icon">⚖</span><span><b>Kalkulator Hak Pekerja</b><small>Simulasi estimasi hak ketenagakerjaan</small></span><i>›</i></button>
-    <button data-p="regulations"><span class="menu-icon">§</span><span><b>Pusat Regulasi</b><small>Referensi aturan ketenagakerjaan</small></span><i>›</i></button>
-    <button data-p="academy"><span class="menu-icon">▤</span><span><b>Pendidikan Serikat</b><small>Materi dan dokumentasi pendidikan</small></span><i>›</i></button>
-    <button data-p="education"><span class="menu-icon">⚖</span><span><b>Edukasi Hak Pekerja</b><small>Pelajari hak dan perlindungan kerja</small></span><i>›</i></button>
     <button data-p="dpc"><span class="menu-icon">📍</span><span><b>Lokasi Kantor DPC</b><small>Alamat dan petunjuk arah kantor DPC</small></span><i>›</i></button>
-    <div class="menu-group-title owner-only hidden">HAK AKSES</div>
-    <button data-p="access" class="owner-only hidden"><span class="menu-icon">⚙</span><span><b>Hak Akses (Pemilik Portal)</b><small>Pengaturan peran dan kewenangan</small></span><i>›</i></button>
+    <button data-p="aspirations"><span class="menu-icon">✉</span><span><b>Kotak Aspirasi</b><small>Masukan dan usulan anggota</small></span><i>›</i></button>
+    <button data-p="regulations"><span class="menu-icon">§</span><span><b>Pusat Regulasi</b><small>Referensi aturan ketenagakerjaan</small></span><i>›</i></button>
+    <button data-p="academy"><span class="menu-icon">▤</span><span><b>Pendidikan Serikat</b><small>Materi belajar hak pekerja</small></span><i>›</i></button>
+    <button data-p="education"><span class="menu-icon">⚖</span><span><b>Edukasi Hak Pekerja</b><small>Pelajari hak dan perlindungan kerja</small></span><i>›</i></button>
   </nav>
   <div class="dashboard-content">
   <section id="p-home" class="page">
@@ -847,25 +848,37 @@ body:not(.logged-in) #settingsShortcut{display:none!important}
   <button data-p="complaints"><span class="menu-icon">⚑</span>Layanan Pengaduan</button><button data-p="documents"><span class="menu-icon">▧</span>Pusat Dokumen</button>
   <button data-p="dues"><span class="menu-icon">Rp</span>Transparansi Keuangan</button><button data-p="forum"><span class="menu-icon">☷</span>Forum Diskusi</button>
   <button data-p="news"><span class="menu-icon">▣</span>Berita & Dokumentasi</button><button data-p="notifications"><span class="menu-icon">♧</span>Notifikasi</button>
-  <button data-p="access" class="admin hidden"><span class="menu-icon">⚙</span>Hak Akses</button>
+  <button data-p="export" class="admin hidden"><span class="menu-icon">⇩</span>Ekspor Excel</button><button data-p="access" class="admin hidden"><span class="menu-icon">⚙</span>Hak Akses</button>
 </div>
 <script>
 (()=>{"use strict";
 const SB="https://iyytbgwjkznngowptsqo.supabase.co",KEY="sb_publishable_rot8WQ443SBPE5hEPLLg4A_a5ix05wh", $=id=>document.getElementById(id);
-let db,user,me,admin=false,financeAccess=false,rows=[];
+let db,user,me,admin=false,rows=[];
 function setTheme(t){document.documentElement.dataset.theme=t;localStorage.setItem("gspmii_theme",t);$("themeBtn").textContent=t==="dark"?"☀️":"🌙";$("themeBtn").setAttribute("aria-label",t==="dark"?"Aktifkan mode terang":"Aktifkan mode gelap");$("themeBtn").title=t==="dark"?"Mode terang":"Mode gelap"}setTheme(localStorage.getItem("gspmii_theme")||"dark");$("themeBtn").onclick=()=>setTheme(document.documentElement.dataset.theme==="dark"?"light":"dark");
 const langSelect=$("languageSelect");
 const langText={
  id:{
   brandSub:"Gabungan Serikat Pekerja Manufaktur Independen Indonesia",
-  menuGroups:["MENU UTAMA","ADMINISTRASI KEANGGOTAAN","LAYANAN & INFORMASI","KEUANGAN & PENGELOLAAN","PENGUATAN & PERLINDUNGAN","HAK AKSES"],
-  menus:[["Beranda","Ringkasan portal dan aktivitas"],["Profil Saya","Informasi akun dan keanggotaan"],["E-KTA","Kartu identitas digital anggota"],["Direktori Anggota","Kenali rekan seperjuangan"],["Verifikasi","Periksa pendaftaran anggota"],["Data Anggota","Kelola data keanggotaan"],["Kalender & Agenda","Jadwal kegiatan organisasi"],["Berita & Dokumentasi","Kabar dan dokumentasi kegiatan"],["Pusat Dokumen","Arsip dan dokumen organisasi"],["Forum Diskusi","Ruang diskusi antaranggota"],["Layanan Pengaduan","Sampaikan laporan anggota"],["Kotak Aspirasi","Masukan dan usulan anggota"],["Notifikasi","Pemberitahuan portal"],["Keuangan","Pengelolaan kas dan iuran"],["Kalkulator Hak Pekerja","Simulasi estimasi hak ketenagakerjaan"],["Pusat Regulasi","Referensi aturan ketenagakerjaan"],["Pendidikan Serikat","Materi dan dokumentasi pendidikan"],["Edukasi Hak Pekerja","Pelajari hak dan perlindungan kerja"],["Lokasi Kantor DPC","Alamat dan petunjuk arah kantor DPC"],["Hak Akses (Pemilik Portal)","Pengaturan peran dan kewenangan"]],
+  menuGroups:["RUANG UTAMA","ADMINISTRASI KEANGGOTAAN","LAYANAN & INFORMASI","PENGELOLAAN PORTAL"],
+  menus:[
+   ["Beranda","Ringkasan portal dan aktivitas"],["Profil Saya","Informasi akun dan keanggotaan"],["Direktori Anggota","Kenali rekan seperjuangan"],
+   ["Data Anggota","Kelola data keanggotaan"],,["Verifikasi","Periksa pendaftaran anggota"],
+   ["Kartu Digital","E-KTA dan identitas anggota"],["Kalender & Agenda","Jadwal kegiatan organisasi"],["Layanan Pengaduan","Sampaikan aspirasi dan laporan"],
+   ["Pusat Dokumen","Arsip dan dokumen organisasi"],["Transparansi Keuangan","Laporan kas masuk dan keluar"],["Forum Diskusi","Ruang diskusi antaranggota"],
+   ["Berita & Dokumentasi","Kabar dan dokumentasi kegiatan"],["Notifikasi","Pemberitahuan portal"],["Ekspor Excel","Unduh laporan administrasi"],["Hak Akses","Pengaturan peran dan kewenangan"]
+  ],
   settings:"Pengaturan",language:"Bahasa",themeLight:"Aktifkan mode terang",themeDark:"Aktifkan mode gelap"
  },
  en:{
   brandSub:"Independent Indonesian Manufacturing Workers Union",
-  menuGroups:["MAIN MENU","MEMBERSHIP ADMINISTRATION","SERVICES & INFORMATION","FINANCE & MANAGEMENT","WORKER PROTECTION","ACCESS CONTROL"],
-  menus:[["Home","Portal overview and activity"],["My Profile","Account and membership details"],["Digital ID Card","Member digital identity"],["Member Directory","Meet fellow members"],["Verification","Review membership applications"],["Member Data","Manage membership records"],["Calendar & Events","Organization activity schedule"],["News & Documentation","News and activity documentation"],["Document Center","Organization files and archives"],["Discussion Forum","Member discussion space"],["Member Complaints","Submit reports"],["Suggestion Box","Member suggestions"],["Notifications","Portal notifications"],["Finance","Cash and dues management"],["Worker Rights Calculator","Estimate employment entitlements"],["Regulation Center","Employment regulations"],["Union Education","Education materials and documentation"],["Worker Rights Education","Learn workplace rights"],["DPC Office Location","Address and directions"],["Portal Owner Access","Roles and permissions"]],
+  menuGroups:["MAIN AREA","MEMBERSHIP ADMINISTRATION","SERVICES & INFORMATION","PORTAL MANAGEMENT"],
+  menus:[
+   ["Home","Portal overview and activity"],["My Profile","Account and membership details"],["Member Directory","Meet fellow members"],
+   ["Member Data","Manage membership records"],["Member Form","Add or update member details"],["Verification","Review membership applications"],
+   ["Digital ID Card","Digital membership identity"],["Calendar & Events","Organization activity schedule"],["Member Complaints","Submit concerns and reports"],
+   ["Document Center","Organization files and archives"],["Financial Transparency","Income and expense reports"],["Discussion Forum","Member discussion space"],
+   ["News & Documentation","News and activity documentation"],["Notifications","Portal notifications"],["Export to Excel","Download administration reports"],["Access Control","Roles and permissions"]
+  ],
   settings:"Settings",language:"Language",themeLight:"Switch to light mode",themeDark:"Switch to dark mode"
  }
 };
@@ -873,7 +886,7 @@ function applyLanguage(code){
  const t=langText[code]||langText.id;
  const groups=[...document.querySelectorAll("#nav .menu-group-title")];
  groups.forEach((el,i)=>{if(t.menuGroups[i])el.textContent=t.menuGroups[i]});
- const order=["home","profile","card","directory","verify","members","agenda","news","documents","forum","complaints","aspirations","notifications","dues","rights","regulations","academy","education","dpc","access"];
+ const order=["home","profile","directory","members","form","verify","card","agenda","complaints","documents","dues","forum","news","notifications","export","access"];
  order.forEach((key,i)=>{
   document.querySelectorAll(`#nav [data-p="${key}"],#mobileMenu [data-p="${key}"]`).forEach(btn=>{
    const title=btn.querySelector("b")||btn.childNodes[btn.childNodes.length-1];
@@ -916,7 +929,7 @@ function auth(mode="loginForm"){$("loginSolidarity").classList.toggle("hidden",m
 $("settingTheme").onclick=()=>{setTheme(document.documentElement.dataset.theme==="dark"?"light":"dark");$("themeDescription").textContent=document.documentElement.dataset.theme==="dark"?"Mode gelap aktif":"Mode terang aktif"};
 $("settingPassword").onclick=async()=>{const pw=prompt("Masukkan kata sandi baru (minimal 8 karakter):");if(!pw)return;if(pw.length<8){alert("Kata sandi minimal 8 karakter.");return}const {error}=await db.auth.updateUser({password:pw});if(error)alert("Gagal mengubah kata sandi: "+error.message);else alert("Kata sandi berhasil diperbarui.")};
 if($("loginTab"))$("loginTab").onclick=()=>auth();$("registerTab").onclick=()=>auth("registerForm");$("forgot").onclick=()=>{$("resetEmail").value=$("email").value;auth("resetForm")};$("backLogin").onclick=()=>auth();
-function _pageNow(p){if(p==="dues"&&!financeAccess){alert("Akses Keuangan khusus Pemilik Portal, Pengurus, dan Bendahara.");p="home"}document.body.dataset.page=p;if(p==="notifications"){loadNotifications().catch(e=>featureError("notificationRows",e));}if(p==="access"){if(user?.id!==GSPMII_OWNER_UID){alert("Akses khusus pemilik portal.");page("home");return}loadAccessMembers().catch(e=>message($("accessMsg"),"Gagal memuat data anggota: "+e.message,true));}document.querySelectorAll(".page").forEach(x=>x.classList.toggle("hidden",x.id!=="p-"+p));document.querySelectorAll("[data-p]").forEach(x=>x.classList.toggle("active",x.dataset.p===p));$("mobileMenu").classList.add("hidden");if(p==="directory")loadDirectory().catch(e=>message($("appMsg"),"Direktori belum dapat dimuat: "+e.message,true));if(p==="card"){drawCard().then(()=>renderMemberQr()).catch(e=>message($("appMsg"),"Gagal memuat E-KTA: "+e.message,true))}if(p==="complaints")loadComplaints().catch(e=>featureError("complaintRows",e));if(p==="documents")loadDocuments().catch(e=>featureError("documentRows",e));if(p==="dues")loadDues().catch(e=>featureError("duesRows",e));if(p==="forum")loadForum().catch(e=>featureError("forumRows",e));if(p==="news")loadNews().catch(e=>featureError("newsRows",e));if(p==="notifications")loadNotifications().catch(e=>featureError("notificationRows",e));const activePage=document.getElementById("p-"+p);if(activePage&&p!=="home"&&!activePage.querySelector(".page-backbar")){const bar=document.createElement("div");bar.className="page-backbar";bar.innerHTML='<button type="button" class="page-back-button" data-page-back>← Kembali</button><span>GSPMII · Portal Anggota</span>';activePage.insertBefore(bar,activePage.firstChild);}}
+function _pageNow(p){document.body.dataset.page=p;if(p==="notifications"){loadNotifications().catch(e=>featureError("notificationRows",e));}if(p==="access"){if(user?.id!==GSPMII_OWNER_UID){alert("Akses khusus pemilik portal.");page("home");return}loadAccessMembers().catch(e=>message($("accessMsg"),"Gagal memuat data anggota: "+e.message,true));}document.querySelectorAll(".page").forEach(x=>x.classList.toggle("hidden",x.id!=="p-"+p));document.querySelectorAll("[data-p]").forEach(x=>x.classList.toggle("active",x.dataset.p===p));$("mobileMenu").classList.add("hidden");if(p==="directory"){loadDirectory().catch(e=>message($("appMsg"),"Direktori belum dapat dimuat: "+e.message,true));startDirectoryLiveRefresh()}else{stopDirectoryLiveRefresh()}if(p==="card"){drawCard().then(()=>renderMemberQr()).catch(e=>message($("appMsg"),"Gagal memuat E-KTA: "+e.message,true))}if(p==="complaints")loadComplaints().catch(e=>featureError("complaintRows",e));if(p==="documents")loadDocuments().catch(e=>featureError("documentRows",e));if(p==="dues")loadDues().catch(e=>featureError("duesRows",e));if(p==="forum")loadForum().catch(e=>featureError("forumRows",e));if(p==="news")loadNews().catch(e=>featureError("newsRows",e));if(p==="notifications")loadNotifications().catch(e=>featureError("notificationRows",e));const activePage=document.getElementById("p-"+p);if(activePage&&p!=="home"&&!activePage.querySelector(".page-backbar")){const bar=document.createElement("div");bar.className="page-backbar";bar.innerHTML='<button type="button" class="page-back-button" data-page-back>← Kembali</button><span>GSPMII · Portal Anggota</span>';activePage.insertBefore(bar,activePage.firstChild);}}
 
 let gspmiiPageHistory=[];
 function page(p,fromBack=false){
@@ -928,7 +941,7 @@ function page(p,fromBack=false){
 }
 document.addEventListener("click",e=>{const back=e.target.closest("[data-page-back]");if(!back)return;const previous=gspmiiPageHistory.pop()||"home";page(previous,true);});
 
-document.querySelectorAll("[data-p],[data-go]").forEach(b=>b.onclick=()=>{let p=b.dataset.p||b.dataset.go;if(["members","form","verify","export"].includes(p)&&!admin)return;if(p==="dues"&&!financeAccess){alert("Menu Keuangan hanya untuk Pemilik Portal, Pengurus, dan Bendahara yang disetujui.");return}if(p==="access"&&user?.id!==GSPMII_OWNER_UID)return;page(p)});
+document.querySelectorAll("[data-p],[data-go]").forEach(b=>b.onclick=()=>{let p=b.dataset.p||b.dataset.go;if(["members","form","verify","export"].includes(p)&&!admin)return;if(p==="access"&&user?.id!==GSPMII_OWNER_UID)return;page(p)});
 async function loadAccessMembers(){
   if(user?.id!==GSPMII_OWNER_UID)throw new Error("Akses khusus pemilik portal.");
   const box=$("accessRows"); if(!box)return;
@@ -975,7 +988,7 @@ $("accessRows")?.addEventListener("click",async e=>{
 });
 
 const badge=s=>`<span class="pill ${s==="menunggu"?"pending":s==="ditolak"?"rejected":""}">${s==="disetujui"?"Aktif":s==="ditolak"?"Ditolak":"Menunggu"}</span>`;
-async function getMe(){let {data,error}=await db.from("anggota_gspmii").select("*").eq("user_id",user.id).maybeSingle();if(error)throw error;if(!data)throw new Error("Profil anggota belum terbentuk. Hubungi pengurus; jangan membuat profil manual dari browser.");me=data;admin=me.peran==="pengurus"&&me.status_verifikasi==="disetujui";financeAccess=(user.id===GSPMII_OWNER_UID)||(me.status_verifikasi==="disetujui"&&(me.peran==="pengurus"||me.peran==="bendahara"))}
+async function getMe(){let {data,error}=await db.from("anggota_gspmii").select("*").eq("user_id",user.id).maybeSingle();if(error)throw error;if(!data)throw new Error("Profil anggota belum terbentuk. Hubungi pengurus; jangan membuat profil manual dari browser.");me=data;admin=me.peran==="pengurus"&&me.status_verifikasi==="disetujui"}
 async function signedPhoto(path){if(!path)return "";const {data,error}=await db.storage.from("foto_anggota").createSignedUrl(path,3600);if(error){console.warn("Foto profil tidak dapat dimuat:",error.message);return ""}return data?.signedUrl||""}
 async function renderProfile(){
   $("welcome").textContent="Halo, "+me.nama_lengkap;$("userEmail").textContent=user.email;
@@ -999,17 +1012,32 @@ async function renderProfile(){
 
 
 async function loadPublicStats(){const {data,error}=await db.rpc("gspmii_public_member_stats");if(error)throw error;const x=Array.isArray(data)?data[0]:data||{};$("total").textContent=x.total_anggota??0;$("active").textContent=x.anggota_aktif??0;$("new").textContent=x.bergabung_bulan_ini??0;$("pending").textContent=x.menunggu_verifikasi??0;}
+let gspmiiDirectoryRefreshTimer=null,gspmiiDirectoryLoading=false;
 async function loadDirectory(){
-  const {data,error}=await db.rpc("gspmii_public_member_directory_with_photo");
-  if(error)throw error;
-  const a=data||[];
-  const cards=await Promise.all(a.map(async m=>{
-    const photo=await signedPhoto(m.foto_url);
-    const initials=String(m.nama_lengkap||"?").trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase();
-    const avatar=photo?`<img class="directory-avatar" src="${esc(photo)}" alt="Foto ${esc(m.nama_lengkap||"anggota")}" loading="lazy">`:`<div class="directory-avatar directory-initials">${esc(initials||"?")}</div>`;
-    return `<tr><td><div class="directory-person">${avatar}<div><b>${esc(m.nama_lengkap||"Tanpa nama")}</b><small>Anggota GSPMII</small></div></div></td><td>${esc(m.nomor_anggota||"Belum diterbitkan")}</td><td>${esc(m.unit_kerja||"-")}</td><td>${esc(m.jabatan||"Anggota")}</td><td>${esc(m.status_keanggotaan||"Aktif")}</td></tr>`;
-  }));
-  $("directoryRows").innerHTML=a.length?`<div class="tablewrap"><table><tr><th>Nama Anggota</th><th>Nomor Anggota</th><th>Unit Kerja</th><th>Jabatan</th><th>Status</th></tr>${cards.join("")}</table></div>`:'<div class="empty">Belum ada anggota aktif.</div>';
+  if(gspmiiDirectoryLoading)return;
+  gspmiiDirectoryLoading=true;
+  try{
+    const {data,error}=await db.rpc("gspmii_public_member_directory_online");
+    if(error)throw error;
+    const a=data||[];
+    const cards=await Promise.all(a.map(async m=>{
+      const photo=await signedPhoto(m.foto_url);
+      const initials=String(m.nama_lengkap||"?").trim().split(/\\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase();
+      const avatar=photo?`<img class="directory-avatar" src="${esc(photo)}" alt="Foto ${esc(m.nama_lengkap||"anggota")}" loading="lazy">`:`<div class="directory-avatar directory-initials">${esc(initials||"?")}</div>`;
+      const online=!!m.is_online;
+      return `<tr><td><div class="directory-person"><span class="directory-avatar-wrap">${avatar}<i class="directory-online-dot ${online?"":"offline"}" title="${online?"Sedang online":"Offline"}" aria-label="${online?"Sedang online":"Offline"}"></i></span><div><b>${esc(m.nama_lengkap||"Tanpa nama")}</b><small class="directory-online-label">${online?"● Online":"○ Offline"}</small></div></div></td><td>${esc(m.nomor_anggota||"Belum diterbitkan")}</td><td>${esc(m.unit_kerja||"-")}</td><td>${esc(m.jabatan||"Anggota")}</td><td>${esc(m.status_keanggotaan||"Aktif")}</td></tr>`;
+    }));
+    $("directoryRows").innerHTML=a.length?`<div class="tablewrap"><table><tr><th>Nama Anggota</th><th>Nomor Anggota</th><th>Unit Kerja</th><th>Jabatan</th><th>Status</th></tr>${cards.join("")}</table></div>`:'<div class="empty">Belum ada anggota aktif.</div>';
+  }finally{gspmiiDirectoryLoading=false}
+}
+function startDirectoryLiveRefresh(){
+  if(gspmiiDirectoryRefreshTimer)clearInterval(gspmiiDirectoryRefreshTimer);
+  gspmiiDirectoryRefreshTimer=setInterval(()=>{
+    if(document.body.dataset.page==="directory"&&user)loadDirectory().catch(e=>console.warn("Pembaruan status online gagal:",e));
+  },15000);
+}
+function stopDirectoryLiveRefresh(){
+  if(gspmiiDirectoryRefreshTimer){clearInterval(gspmiiDirectoryRefreshTimer);gspmiiDirectoryRefreshTimer=null}
 }
 async function loadAdmin(){if(!admin)return;let {data,error}=await db.from("anggota_gspmii").select("*").order("tanggal_daftar",{ascending:false});if(error)throw error;rows=data||[];let d=new Date();$("total").textContent=rows.length;$("active").textContent=rows.filter(x=>x.status_verifikasi==="disetujui").length;$("pending").textContent=rows.filter(x=>x.status_verifikasi==="menunggu").length;$("new").textContent=rows.filter(x=>{let t=x.tanggal_daftar&&new Date(x.tanggal_daftar);return t&&t.getMonth()===d.getMonth()&&t.getFullYear()===d.getFullYear()}).length;drawRows();drawVerify()}
 function drawRows(){let q=$("search").value.toLowerCase();let a=rows.filter(m=>[m.nama_lengkap,m.email,m.nomor_anggota,m.unit_kerja,m.jabatan].some(x=>String(x||"").toLowerCase().includes(q)));$("memberRows").innerHTML=a.length?`<div class="tablewrap"><table><tr><th>Nama / Email</th><th>No. Anggota</th><th>Unit</th><th>Jabatan</th><th>NIK</th><th>Status</th><th>Aksi</th></tr>${a.map(m=>`<tr><td><b>${esc(m.nama_lengkap)}</b><br>${esc(m.email)}${user.id===GSPMII_OWNER_UID?`<br><button class="btn" type="button" style="margin-top:7px;padding:6px 9px;font-size:11px" data-view-full="${esc(m.id)}">Lihat profil lengkap</button>`:""}</td><td>${esc(m.nomor_anggota||"-")}</td><td>${esc(m.unit_kerja||"-")}</td><td>${esc(m.jabatan||"-")}</td><td>${esc(m.nik||"-")}</td><td>${badge(m.status_verifikasi)}</td><td><button class="btn alt" data-edit="${esc(m.id)}">Edit</button> <button class="btn red" data-del="${esc(m.id)}">Hapus</button></td></tr>`).join("")}</table></div>`:'<div class="empty">Data tidak ditemukan.</div>'}
@@ -1315,21 +1343,40 @@ $("forumForm").onsubmit=async e=>{e.preventDefault();const {error}=await db.from
 $("forumRows").onsubmit=async e=>{const form=e.target.closest("form[data-reply-form]");if(!form)return;e.preventDefault();const {error}=await db.from("gspmii_forum_balasan").insert({topik_id:form.dataset.replyForm,user_id:user.id,isi:form.elements.reply.value.trim()});if(error){alert(error.message);return}await loadForum()};
 async function loadNews(){let {data,error}=await db.from("gspmii_berita").select("*").order("created_at",{ascending:false});if(error)throw error;$("newsRows").innerHTML=(data||[]).map(x=>itemCard(x.judul,(x.ringkasan||"")+"\n"+(x.isi||""),new Date(x.created_at).toLocaleString("id-ID"),x.url_gambar?`<a href="${esc(x.url_gambar)}" target="_blank" rel="noopener">Lihat dokumentasi ↗</a>`:"")).join("")||'<div class="empty">Belum ada berita atau dokumentasi.</div>'}
 $("newsForm").onsubmit=async e=>{e.preventDefault();if($("nImage").value.trim()&&!/^https:\/\//i.test($("nImage").value.trim())){alert("Tautan dokumentasi harus menggunakan HTTPS.");return}const {error}=await db.from("gspmii_berita").insert({judul:$("nTitle").value.trim(),ringkasan:$("nSummary").value.trim(),isi:$("nBody").value.trim(),url_gambar:$("nImage").value.trim()||null,created_by:user.id});if(error){alert(error.message);return}e.target.reset();await loadNews();alert("Berita berhasil diterbitkan.")};
-let gspmiiNotifChannel=null,gspmiiLastNotifId=null,gspmiiAudioReady=false,gspmiiAudioContext=null;
-function unlockNotifAudio(){try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;if(!gspmiiAudioContext)gspmiiAudioContext=new C();if(gspmiiAudioContext.state==="suspended")gspmiiAudioContext.resume();gspmiiAudioReady=true}catch(e){console.debug("Audio notifikasi tidak tersedia",e)}}
-function notifSound(){try{if(!gspmiiAudioReady||!gspmiiAudioContext)return;const c=gspmiiAudioContext;if(c.state==="suspended"){c.resume().then(()=>notifSound());return}const o=c.createOscillator(),g=c.createGain(),now=c.currentTime;o.type="sine";o.frequency.setValueAtTime(880,now);o.frequency.setValueAtTime(1175,now+.13);g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(.11,now+.025);g.gain.exponentialRampToValueAtTime(.0001,now+.38);o.connect(g);g.connect(c.destination);o.start(now);o.stop(now+.4);if(navigator.vibrate)navigator.vibrate([120,60,120])}catch(e){console.debug("Suara notifikasi tidak tersedia",e)}}
+let gspmiiNotifChannel=null,gspmiiLastNotifId=null,gspmiiAudioReady=false,gspmiiNotifAudioContext=null;
+function unlockGspmiiNotificationAudio(){
+  try{
+    const C=window.AudioContext||window.webkitAudioContext;
+    if(!C)return;
+    if(!gspmiiNotifAudioContext)gspmiiNotifAudioContext=new C();
+    if(gspmiiNotifAudioContext.state==="suspended")gspmiiNotifAudioContext.resume();
+    gspmiiAudioReady=true;
+  }catch(e){console.debug("Audio notifikasi tidak tersedia",e)}
+}
+function notifSound(){
+  try{
+    if(!gspmiiAudioReady||!gspmiiNotifAudioContext)return;
+    const c=gspmiiNotifAudioContext;
+    if(c.state==="suspended"){c.resume().then(()=>notifSound());return}
+    const o=c.createOscillator(),g=c.createGain(),now=c.currentTime;
+    o.type="sine";o.frequency.setValueAtTime(880,now);o.frequency.setValueAtTime(1175,now+.13);
+    g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(.12,now+.025);g.gain.exponentialRampToValueAtTime(.0001,now+.38);
+    o.connect(g);g.connect(c.destination);o.start(now);o.stop(now+.4);
+    if(navigator.vibrate)navigator.vibrate([150,70,150]);
+  }catch(e){console.debug("Suara/getar notifikasi tidak tersedia",e)}
+}
 function notifToast(title,msg){$("notifToastTitle").textContent=title||"Notifikasi baru";$("notifToastText").textContent=msg||"Ada pemberitahuan baru di portal.";$("notifToast").classList.remove("hidden");notifSound();clearTimeout(window.gspmiiToastTimer);window.gspmiiToastTimer=setTimeout(()=>$(("notifToast")).classList.add("hidden"),6500)}
 function renderNotifBell(rows){const unread=(rows||[]).filter(x=>!x.dibaca).length;const b=$("notifBadge");if(b){b.textContent=unread>99?"99+":String(unread);b.classList.toggle("hidden",unread===0)}const q=$("notifQuickRows");if(q)q.innerHTML=(rows||[]).slice(0,6).map(x=>`<button type="button" class="notif-quick-item ${x.dibaca?"":"unread"}" data-notif-open="${esc(String(x.id))}"><span class="notif-quick-icon">${/anggota|daftar|registr/i.test(x.judul||"")?"👤":/pengadu|pesan|aspir/i.test(x.judul||"")?"💬":"🔔"}</span><span class="notif-quick-copy"><b>${esc(x.judul||"Pemberitahuan")}</b><small>${esc(x.pesan||"")}</small><small>${x.created_at?new Date(x.created_at).toLocaleString("id-ID"):""}</small></span>${x.dibaca?"":"<i class=\"notif-unread-dot\"></i>"}</button>`).join("")||'<div class="empty" style="padding:18px">Belum ada notifikasi.</div>'}
 async function loadNotifications(){let {data,error}=await db.from("gspmii_notifikasi").select("*").eq("user_id",user.id).order("created_at",{ascending:false}).limit(100);if(error)throw error;data=data||[];$("notificationRows").innerHTML=data.map(x=>itemCard(x.judul,x.pesan,new Date(x.created_at).toLocaleString("id-ID"),x.dibaca?"Sudah dibaca":`<button class="btn alt" data-notif-read="${x.id}">Tandai dibaca</button>`)).join("")||'<div class="empty">Belum ada notifikasi.</div>';renderNotifBell(data);gspmiiLastNotifId=data[0]?.id||gspmiiLastNotifId}
 function startNotifRealtime(){if(!db||!user?.id||gspmiiNotifChannel)return;gspmiiNotifChannel=db.channel("gspmii-notif-"+user.id).on("postgres_changes",{event:"INSERT",schema:"public",table:"gspmii_notifikasi",filter:"user_id=eq."+user.id},payload=>{const n=payload.new||{};if(n.id===gspmiiLastNotifId)return;gspmiiLastNotifId=n.id||gspmiiLastNotifId;notifToast(n.judul||"Notifikasi baru",n.pesan||"Ada pemberitahuan baru.");loadNotifications().catch(e=>console.warn("Gagal memperbarui notifikasi",e))}).subscribe();}
 function stopNotifRealtime(){if(db&&gspmiiNotifChannel){db.removeChannel(gspmiiNotifChannel);gspmiiNotifChannel=null}}
-$("notifBell")?.addEventListener("click",()=>{unlockNotifAudio();const p=$("notifPopover"),open=p.classList.contains("hidden");p.classList.toggle("hidden",!open);$("notifBell").setAttribute("aria-expanded",String(open));if(open)loadNotifications().catch(e=>console.warn(e))});
+$("notifBell")?.addEventListener("click",()=>{unlockGspmiiNotificationAudio();const p=$("notifPopover"),open=p.classList.contains("hidden");p.classList.toggle("hidden",!open);$("notifBell").setAttribute("aria-expanded",String(open));if(open)loadNotifications().catch(e=>console.warn(e))});
 $("notifOpenAll")?.addEventListener("click",()=>{ $("notifPopover").classList.add("hidden");page("notifications")});
 $("notifToastClose")?.addEventListener("click",()=>$("notifToast").classList.add("hidden"));
 $("notifReadAll")?.addEventListener("click",async()=>{const {error}=await db.from("gspmii_notifikasi").update({dibaca:true}).eq("user_id",user.id);if(error){alert(error.message);return}await loadNotifications()});
 $("notifQuickRows")?.addEventListener("click",async e=>{const b=e.target.closest("[data-notif-open]");if(!b)return;const id=b.dataset.notifOpen;const {error}=await db.from("gspmii_notifikasi").update({dibaca:true}).eq("id",id).eq("user_id",user.id);if(error){console.warn(error);return}$("notifPopover").classList.add("hidden");await loadNotifications();page("notifications")});
 document.addEventListener("pointerdown",e=>{if(!e.target.closest("#notifPopover")&&!e.target.closest("#notifBell")){$("notifPopover")?.classList.add("hidden");$("notifBell")?.setAttribute("aria-expanded","false")}});
-["pointerdown","keydown","touchstart"].forEach(evt=>document.addEventListener(evt,unlockNotifAudio,{once:true,passive:true}));
+["pointerdown","keydown","touchstart"].forEach(evt=>document.addEventListener(evt,unlockGspmiiNotificationAudio,{once:true,passive:true}));
 $("notificationRows").onclick=async e=>{const id=e.target.dataset.notifRead;if(!id)return;const {error}=await db.from("gspmii_notifikasi").update({dibaca:true}).eq("id",id);if(error){alert(error.message);return}await loadNotifications()};
 $("readAllNotifications").onclick=async()=>{const {error}=await db.from("gspmii_notifikasi").update({dibaca:true}).eq("user_id",user.id);if(error){alert(error.message);return}await loadNotifications()};
 
@@ -1402,7 +1449,7 @@ async function secureGspmiiSignOut(release=true){
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&user)resetGspmiiIdleTimer()});
 window.addEventListener("pagehide",()=>{if(user&&gspmiiSessionClaimed){db.rpc("gspmii_release_device_session",{p_session_token:gspmiiDeviceToken});}});
 
-async function enter(){ try{await claimGspmiiDeviceSession();}catch(sessionErr){console.error("Sesi perangkat GSPMII:",sessionErr);await db.auth.signOut();message($("authMsg"),sessionErr.message,true);return;} resetGspmiiIdleTimer(); $("publicIntro").classList.add("hidden");$("landingNote").classList.add("hidden");$("auth").classList.add("hidden");$("app").classList.remove("hidden");document.body.classList.add("logged-in");$("mobileDock").classList.remove("hidden");try{await getMe();document.querySelectorAll(".admin").forEach(x=>x.classList.toggle("hidden",!admin));document.querySelectorAll(".owner-only").forEach(x=>x.classList.toggle("hidden",user.id!==GSPMII_OWNER_UID));document.querySelectorAll(".finance-access").forEach(x=>x.classList.toggle("hidden",!financeAccess));document.querySelectorAll(".member-only").forEach(x=>x.classList.toggle("hidden",admin));await renderProfile();await drawCard();await loadAgenda();await loadPublicStats();try{await loadNotifications()}catch(ne){console.warn("Notifikasi belum dapat dimuat:",ne)}startNotifRealtime();if(admin)await loadAdmin();page("home")}catch(e){message($("appMsg"),"Gagal memuat data: "+e.message,true)}}
+async function enter(){ try{await claimGspmiiDeviceSession();}catch(sessionErr){console.error("Sesi perangkat GSPMII:",sessionErr);await db.auth.signOut();message($("authMsg"),sessionErr.message,true);return;} resetGspmiiIdleTimer(); $("publicIntro").classList.add("hidden");$("landingNote").classList.add("hidden");$("auth").classList.add("hidden");$("app").classList.remove("hidden");document.body.classList.add("logged-in");$("mobileDock").classList.remove("hidden");try{await getMe();document.querySelectorAll(".admin").forEach(x=>x.classList.toggle("hidden",!admin));document.querySelectorAll(".owner-only").forEach(x=>x.classList.toggle("hidden",user.id!==GSPMII_OWNER_UID));document.querySelectorAll(".member-only").forEach(x=>x.classList.toggle("hidden",admin));await renderProfile();await drawCard();await loadAgenda();await loadPublicStats();try{await loadNotifications()}catch(ne){console.warn("Notifikasi belum dapat dimuat:",ne)}startNotifRealtime();if(admin)await loadAdmin();page("home")}catch(e){message($("appMsg"),"Gagal memuat data: "+e.message,true)}}
 $("loginForm").onsubmit=async e=>{
  e.preventDefault();
  const btn=$("loginForm").querySelector('button[type="submit"]');
@@ -1480,7 +1527,7 @@ init().catch(e=>message($("authMsg"),e.message,true));
    title="WhatsApp Pengurus PUK Cikokol Raya">
   <svg viewBox="0 0 32 32" role="img" aria-hidden="true">
     <path fill="#fff" d="M16.04 3.2A12.7 12.7 0 0 0 5.12 22.36L3.4 28.7l6.5-1.7A12.7 12.7 0 1 0 16.04 3.2Zm0 23.1c-2 0-3.96-.53-5.67-1.54l-.4-.24-3.86 1.02 1.03-3.76-.26-.4a10.5 10.5 0 1 1 9.16 4.92Zm5.77-7.87c-.32-.16-1.9-.94-2.2-1.05-.3-.1-.52-.16-.74.16-.22.33-.84 1.05-1.03 1.27-.19.22-.38.25-.7.08-.33-.16-1.38-.5-2.63-1.6-.97-.86-1.62-1.92-1.81-2.25-.19-.33-.02-.5.14-.66.15-.15.33-.38.49-.57.16-.19.22-.33.33-.55.1-.22.05-.41-.03-.57-.08-.16-.74-1.78-1.01-2.44-.27-.64-.54-.55-.74-.56h-.63c-.22 0-.57.08-.87.41-.3.33-1.14 1.11-1.14 2.71s1.17 3.14 1.33 3.36c.16.22 2.3 3.52 5.58 4.94.78.34 1.39.54 1.87.69.79.25 1.5.21 2.06.13.63-.1 1.9-.78 2.17-1.54.27-.76.27-1.41.19-1.54-.08-.13-.3-.22-.63-.38Z"/>
-  </svg>
+  </svg><span class="wa-join-label">Gabung GSPMII</span>
 </a>
 
 <div id="gspmiiPageLoader" class="gspmii-page-loader" aria-hidden="true"><div class="loader-orbit"></div><b>Memuat halaman...</b><small>GSPMII · PUK SAT CIKOKOL RAYA</small></div>

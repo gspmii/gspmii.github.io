@@ -1136,7 +1136,7 @@ async function loadNewApplications(){
         <button class="btn alt" type="button" data-app-file="${esc(x.id)}" data-file-kind="bukti">Lihat Bukti Bayar</button>
         ${user?.id===GSPMII_OWNER_UID?`<button class="btn" type="button" data-app-pdf="${esc(x.id)}">Unduh PDF Berkas</button>`:""}
       </div>
-      ${pending?`<div class="actions" style="margin-top:10px">${x.status==="menunggu_verifikasi"?`<button class="btn" type="button" data-app-approve="${esc(x.id)}">Setujui Pendaftaran</button><button class="btn red" type="button" data-app-reject="${esc(x.id)}">Tolak Pendaftaran</button>`:`<span class="notice">Member lama: cocokkan dahulu dengan data anggota yang sudah ada. Pengaitan akun belum otomatis tersedia.</span>`}</div>`:""}
+      ${pending?`<div class="actions" style="margin-top:10px">${x.status==="menunggu_verifikasi"?`<button class="btn" type="button" data-app-approve="${esc(x.id)}">Setujui Pendaftaran</button><button class="btn red" type="button" data-app-reject="${esc(x.id)}">Tolak Pendaftaran</button>`:`<button class="btn" type="button" data-old-member-approve="${esc(x.id)}">Aktifkan Anggota Lama</button><span class="notice">Aktivasi hanya berhasil jika akun sudah terhubung dengan data anggota yang berstatus disetujui.</span>`}</div>`:""}
     </article>`;
   }).join(""):'<div class="empty">Tidak ada pendaftaran pada kategori ini.</div>');
 }
@@ -1188,7 +1188,7 @@ if(pdfBtn){
   }catch(err){printWin.close();alert("Gagal menyiapkan PDF: "+(err?.message||err))}
   return;
 }
-const fileBtn=e.target.closest("[data-app-file]");if(fileBtn){const {data,error}=await db.from("pendaftaran_anggota").select("ktp_path,foto_path,bukti_pembayaran_path").eq("id",fileBtn.dataset.appFile).maybeSingle();if(error||!data){alert(error?.message||"Data tidak ditemukan");return}const map={ktp:["dokumen_pendaftaran",data.ktp_path],foto:["foto_anggota",data.foto_path],bukti:["dokumen_pendaftaran",data.bukti_pembayaran_path]};const [bucket,path]=map[fileBtn.dataset.fileKind]||[];if(!path){alert("Berkas belum tersedia.");return}const {data:link,error:linkError}=await db.storage.from(bucket).createSignedUrl(path,300);if(linkError){alert("Tidak dapat membuka berkas: "+linkError.message);return}window.open(link.signedUrl,"_blank","noopener");return}const approve=e.target.closest("[data-app-approve]");if(approve){if(!confirm("Setujui pendaftaran ini? Data akan disinkronkan ke profil anggota."))return;approve.disabled=true;const {data,error}=await db.rpc("gspmii_setujui_pendaftaran",{p_pendaftaran_id:approve.dataset.appApprove});if(error){alert("Gagal menyetujui: "+error.message);approve.disabled=false;return}alert(data?.message||"Pendaftaran disetujui.");await loadNewApplications();await loadAdmin();return}const reject=e.target.closest("[data-app-reject]");if(reject){const note=prompt("Alasan penolakan (wajib diisi):");if(note===null)return;if(!note.trim()){alert("Alasan penolakan wajib diisi.");return}const {data,error}=await db.rpc("gspmii_tolak_pendaftaran",{p_pendaftaran_id:reject.dataset.appReject,p_alasan:note.trim()});if(error){alert("Gagal menolak: "+error.message);return}alert(data?.message||"Pendaftaran ditolak.");await loadNewApplications();return}});
+const fileBtn=e.target.closest("[data-app-file]");if(fileBtn){const {data,error}=await db.from("pendaftaran_anggota").select("ktp_path,foto_path,bukti_pembayaran_path").eq("id",fileBtn.dataset.appFile).maybeSingle();if(error||!data){alert(error?.message||"Data tidak ditemukan");return}const map={ktp:["dokumen_pendaftaran",data.ktp_path],foto:["foto_anggota",data.foto_path],bukti:["dokumen_pendaftaran",data.bukti_pembayaran_path]};const [bucket,path]=map[fileBtn.dataset.fileKind]||[];if(!path){alert("Berkas belum tersedia.");return}const {data:link,error:linkError}=await db.storage.from(bucket).createSignedUrl(path,300);if(linkError){alert("Tidak dapat membuka berkas: "+linkError.message);return}window.open(link.signedUrl,"_blank","noopener");return}const oldMemberApprove=e.target.closest("[data-old-member-approve]");if(oldMemberApprove){if(!confirm("Aktifkan akun anggota lama ini? Sistem akan memeriksa kecocokan akun dan status anggota."))return;oldMemberApprove.disabled=true;const {data,error}=await db.rpc("gspmii_setujui_member_lama",{p_pendaftaran_id:oldMemberApprove.dataset.oldMemberApprove});if(error){alert("Aktivasi anggota lama gagal: "+error.message);oldMemberApprove.disabled=false;return}alert(data?.message||"Aktivasi anggota lama berhasil disetujui.");await loadNewApplications();await loadAdmin();return}const approve=e.target.closest("[data-app-approve]");if(approve){if(!confirm("Setujui pendaftaran ini? Data akan disinkronkan ke profil anggota."))return;approve.disabled=true;const {data,error}=await db.rpc("gspmii_setujui_pendaftaran",{p_pendaftaran_id:approve.dataset.appApprove});if(error){alert("Gagal menyetujui: "+error.message);approve.disabled=false;return}alert(data?.message||"Pendaftaran disetujui.");await loadNewApplications();await loadAdmin();return}const reject=e.target.closest("[data-app-reject]");if(reject){const note=prompt("Alasan penolakan (wajib diisi):");if(note===null)return;if(!note.trim()){alert("Alasan penolakan wajib diisi.");return}const {data,error}=await db.rpc("gspmii_tolak_pendaftaran",{p_pendaftaran_id:reject.dataset.appReject,p_alasan:note.trim()});if(error){alert("Gagal menolak: "+error.message);return}alert(data?.message||"Pendaftaran ditolak.");await loadNewApplications();return}});
 $("verifyRows").onclick=async e=>{let id=e.target.dataset.approve||e.target.dataset.reject;if(!id)return;let st=e.target.dataset.approve?"disetujui":"ditolak";if(!confirm(st==="disetujui"?"Aktifkan anggota ini?":"Tolak pendaftaran ini?"))return;let {error}=await db.rpc("gspmii_admin_verify_member",{p_member_id:id,p_status:st});if(error){message($("appMsg"),"Gagal mengubah status: "+error.message,true);return}await loadAdmin()};
 async function drawCard(){
   const box=$("card");
@@ -1540,7 +1540,64 @@ async function secureGspmiiSignOut(release=true){
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&user)resetGspmiiIdleTimer()});
 window.addEventListener("pagehide",()=>{if(user&&gspmiiSessionClaimed){db.rpc("gspmii_release_device_session",{p_session_token:gspmiiDeviceToken});}});
 
-async function enter(){ try{await claimGspmiiDeviceSession();}catch(sessionErr){console.error("Sesi perangkat GSPMII:",sessionErr);await db.auth.signOut();message($("authMsg"),sessionErr.message,true);return;} resetGspmiiIdleTimer(); $("publicIntro").classList.add("hidden");$("landingNote").classList.add("hidden");$("auth").classList.add("hidden");$("app").classList.remove("hidden");document.body.classList.add("logged-in");$("mobileDock").classList.remove("hidden");try{await getMe();document.querySelectorAll(".admin").forEach(x=>x.classList.toggle("hidden",!admin));document.querySelectorAll(".owner-only").forEach(x=>x.classList.toggle("hidden",user.id!==GSPMII_OWNER_UID));document.querySelectorAll(".finance-access").forEach(x=>x.classList.toggle("hidden",!financeAccess));document.querySelectorAll(".member-only").forEach(x=>x.classList.toggle("hidden",admin));await renderProfile();await drawCard();await loadAgenda();await loadPublicStats();try{await loadNotifications()}catch(ne){console.warn("Notifikasi belum dapat dimuat:",ne)}startNotifRealtime();if(admin)await loadAdmin();page("home")}catch(e){message($("appMsg"),"Gagal memuat data: "+e.message,true)}}
+
+// === MFA WAJIB GSPMII: TOTP / Google Authenticator ===
+function gspmiiMfaDialog({title,description,qr,secret,showQr=false,onVerify}){
+ return new Promise((resolve,reject)=>{
+  document.getElementById('gspmiiMfaDialog')?.remove();
+  const wrap=document.createElement('div');wrap.id='gspmiiMfaDialog';
+  wrap.style.cssText='position:fixed;inset:0;z-index:99999;background:#020817ef;display:flex;align-items:center;justify-content:center;padding:18px;overflow:auto';
+  const card=document.createElement('div');card.style.cssText='width:min(440px,100%);max-height:95vh;overflow:auto;background:#101d30;border:1px solid #34465f;border-radius:18px;padding:22px;color:#f8fafc;text-align:center;box-shadow:0 20px 70px #0009';
+  const heading=document.createElement('h2');heading.textContent=title;heading.style.cssText='margin:8px 0;color:#f4c96b';
+  const desc=document.createElement('p');desc.textContent=description;desc.style.cssText='color:#cbd5e1;font-size:14px;line-height:1.5';
+  card.append(heading,desc);
+  if(showQr){const qrWrap=document.createElement('div');qrWrap.style.cssText='background:#fff;border-radius:14px;padding:12px;display:inline-block;margin:12px auto;max-width:100%';const img=document.createElement('img');img.alt='QR Google Authenticator';img.src=qr;img.style.cssText='width:210px;height:210px;max-width:100%;display:block;object-fit:contain';qrWrap.append(img);card.append(qrWrap);const hint=document.createElement('p');hint.textContent='Jika QR tidak bisa dipindai, masukkan kunci ini secara manual:';hint.style.cssText='font-size:12px;color:#cbd5e1';const key=document.createElement('code');key.textContent=secret||'';key.style.cssText='display:block;overflow-wrap:anywhere;background:#0b1728;padding:10px;border-radius:8px;color:#facc15';card.append(hint,key)}
+  const input=document.createElement('input');input.id='gspmiiMfaCode';input.inputMode='numeric';input.autocomplete='one-time-code';input.maxLength=6;input.placeholder='Masukkan kode 6 digit';input.style.cssText='box-sizing:border-box;width:100%;padding:14px;margin:14px 0;background:#071426;border:1px solid #52657e;border-radius:10px;color:#fff;text-align:center;font-size:22px;letter-spacing:7px';
+  const err=document.createElement('div');err.style.cssText='color:#fca5a5;font-size:13px;min-height:18px;margin-bottom:10px';
+  const submit=document.createElement('button');submit.type='button';submit.textContent='Verifikasi & Lanjutkan';submit.style.cssText='width:100%;padding:13px;border:0;border-radius:10px;background:#0d9488;color:white;font-weight:700';
+  const cancel=document.createElement('button');cancel.type='button';cancel.textContent='Keluar / Batalkan';cancel.style.cssText='margin-top:10px;padding:10px;border:0;background:transparent;color:#cbd5e1';
+  card.append(input,err,submit,cancel);wrap.append(card);document.body.append(wrap);
+  input.focus();input.addEventListener('input',()=>{input.value=input.value.replace(/\D/g,'').slice(0,6)});
+  submit.onclick=async()=>{const code=input.value.trim();if(!/^\d{6}$/.test(code)){err.textContent='Kode harus terdiri dari 6 angka.';return}submit.disabled=true;submit.textContent='Memeriksa...';err.textContent='';try{await onVerify(code);wrap.remove();resolve(true)}catch(e){err.textContent='Kode salah atau kedaluwarsa. Periksa kode terbaru lalu coba lagi.';input.value='';input.focus();submit.disabled=false;submit.textContent='Verifikasi & Lanjutkan'}};
+  cancel.onclick=()=>{wrap.remove();reject(new Error('Verifikasi keamanan dibatalkan.'))};
+ });
+}
+async function ensureGspmiiMfa(){
+ const {data:aalData,error:aalError}=await db.auth.mfa.getAuthenticatorAssuranceLevel();
+ if(aalError)throw aalError;
+ if(aalData?.currentLevel==='aal2')return;
+ const {data:factorData,error:factorError}=await db.auth.mfa.listFactors();
+ if(factorError)throw factorError;
+ const verified=(factorData?.totp||[]).filter(f=>f.status==='verified');
+ if(verified.length){
+  const factor=verified[0];
+  await gspmiiMfaDialog({title:'Verifikasi Google Authenticator',description:'Buka Google Authenticator dan masukkan kode 6 digit untuk melanjutkan ke Portal GSPMII.',onVerify:async code=>{const {data:challenge,error:challengeError}=await db.auth.mfa.challenge({factorId:factor.id});if(challengeError)throw challengeError;const {error}=await db.auth.mfa.verify({factorId:factor.id,challengeId:challenge.id,code});if(error)throw error}});
+  return;
+ }
+ // Bersihkan hanya pendaftaran TOTP milik sesi pengguna ini yang belum diverifikasi.
+ const pending=(factorData?.all||[]).find(f=>f.factor_type==='totp'&&f.status==='unverified');
+ if(pending){const {error}=await db.auth.mfa.unenroll({factorId:pending.id});if(error)throw new Error('Pendaftaran Authenticator sebelumnya belum selesai dan tidak dapat dibersihkan. Hubungi Owner. Detail: '+error.message)}
+ const {data:enrolled,error:enrollError}=await db.auth.mfa.enroll({factorType:'totp',friendlyName:'GSPMII Google Authenticator'});
+ if(enrollError)throw enrollError;
+ if(!enrolled?.totp?.qr_code||!enrolled?.id)throw new Error('Supabase tidak mengembalikan QR Authenticator. Coba muat ulang atau hubungi Owner.');
+ await gspmiiMfaDialog({title:'Aktifkan Google Authenticator',description:'Pindai QR ini dengan aplikasi Google Authenticator. Setelah akun GSPMII muncul di aplikasi, masukkan kode 6 digit yang sedang tampil.',qr:enrolled.totp.qr_code,secret:enrolled.totp.secret,showQr:true,onVerify:async code=>{const {data:challenge,error:challengeError}=await db.auth.mfa.challenge({factorId:enrolled.id});if(challengeError)throw challengeError;const {error}=await db.auth.mfa.verify({factorId:enrolled.id,challengeId:challenge.id,code});if(error)throw error}});
+}
+
+async function enter(){
+ try{
+  await getMe();
+  if(user.id!==GSPMII_OWNER_UID&&me.status_verifikasi!=="disetujui")throw new Error("Akun belum disetujui pengurus. Akses portal hanya dibuka setelah status keanggotaan disetujui.");
+  await ensureGspmiiMfa();
+  await claimGspmiiDeviceSession();
+ }catch(authGateError){
+  console.error("Pemeriksaan akses/MFA GSPMII:",authGateError);
+  if(gspmiiSessionClaimed)await releaseGspmiiDeviceSession();
+  await db.auth.signOut();user=me=null;admin=false;financeAccess=false;auth();
+  message($("authMsg"),authGateError.message||"Akses belum dapat diberikan.",true);return;
+ }
+ resetGspmiiIdleTimer();$("publicIntro").classList.add("hidden");$("landingNote").classList.add("hidden");$("auth").classList.add("hidden");$("app").classList.remove("hidden");document.body.classList.add("logged-in");$("mobileDock").classList.remove("hidden");
+ try{document.querySelectorAll(".admin").forEach(x=>x.classList.toggle("hidden",!admin));document.querySelectorAll(".owner-only").forEach(x=>x.classList.toggle("hidden",user.id!==GSPMII_OWNER_UID));document.querySelectorAll(".finance-access").forEach(x=>x.classList.toggle("hidden",!financeAccess));document.querySelectorAll(".member-only").forEach(x=>x.classList.toggle("hidden",admin));await renderProfile();await drawCard();await loadAgenda();await loadPublicStats();try{await loadNotifications()}catch(ne){console.warn("Notifikasi belum dapat dimuat:",ne)}startNotifRealtime();if(admin)await loadAdmin();page("home")}catch(e){message($("appMsg"),"Gagal memuat data: "+e.message,true)}
+}
 $("loginForm").onsubmit=async e=>{
  e.preventDefault();
  const btn=$("loginForm").querySelector('button[type="submit"]');

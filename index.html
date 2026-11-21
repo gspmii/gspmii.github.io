@@ -1558,7 +1558,7 @@ function gspmiiMfaDialog({title,description,qr,secret,showQr=false,onVerify}){
   const cancel=document.createElement('button');cancel.type='button';cancel.textContent='Keluar / Batalkan';cancel.style.cssText='margin-top:10px;padding:10px;border:0;background:transparent;color:#cbd5e1';
   card.append(input,err,submit,cancel);wrap.append(card);document.body.append(wrap);
   input.focus();input.addEventListener('input',()=>{input.value=input.value.replace(/\D/g,'').slice(0,6)});
-  submit.onclick=async()=>{const code=input.value.trim();if(!/^\d{6}$/.test(code)){err.textContent='Kode harus terdiri dari 6 angka.';return}submit.disabled=true;submit.textContent='Memeriksa...';err.textContent='';try{await onVerify(code);wrap.remove();resolve(true)}catch(e){err.textContent='Kode salah atau kedaluwarsa. Periksa kode terbaru lalu coba lagi.';input.value='';input.focus();submit.disabled=false;submit.textContent='Verifikasi & Lanjutkan'}};
+  submit.onclick=async()=>{const code=input.value.trim();if(!/^\d{6}$/.test(code)){err.textContent='Kode harus terdiri dari 6 angka.';return}submit.disabled=true;submit.textContent='Memeriksa...';err.textContent='';try{await onVerify(code);wrap.remove();resolve(true)}catch(e){const detail=String(e?.message||e||'Kesalahan tidak diketahui');console.error('GSPMII MFA verification failed:',e);err.textContent='Verifikasi gagal: '+detail;input.value='';input.focus();submit.disabled=false;submit.textContent='Verifikasi & Lanjutkan'}};
   cancel.onclick=()=>{wrap.remove();reject(new Error('Verifikasi keamanan dibatalkan.'))};
  });
 }

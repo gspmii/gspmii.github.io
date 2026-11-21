@@ -1563,26 +1563,73 @@ function gspmiiMfaDialog({title,description,qr,secret,showQr=false,onVerify}){
  });
 }
 async function ensureGspmiiMfa(){
+ const mfaError=(message,cause)=>{
+  const e=new Error(message);
+  e.code='GSPMII_MFA';
+  if(cause)e.cause=cause;
+  return e;
+ };
  const {data:aalData,error:aalError}=await db.auth.mfa.getAuthenticatorAssuranceLevel();
- if(aalError)throw aalError;
+ if(aalError)throw mfaError('Gagal memeriksa status MFA: '+aalError.message,aalError);
  if(aalData?.currentLevel==='aal2')return;
+
  const {data:factorData,error:factorError}=await db.auth.mfa.listFactors();
- if(factorError)throw factorError;
+ if(factorError)throw mfaError('Gagal membaca faktor MFA: '+factorError.message,factorError);
+
  const verified=(factorData?.totp||[]).filter(f=>f.status==='verified');
  if(verified.length){
   const factor=verified[0];
-  await gspmiiMfaDialog({title:'Verifikasi Google Authenticator',description:'Buka Google Authenticator dan masukkan kode 6 digit untuk melanjutkan ke Portal GSPMII.',onVerify:async code=>{const {data:challenge,error:challengeError}=await db.auth.mfa.challenge({factorId:factor.id});if(challengeError)throw challengeError;const {error}=await db.auth.mfa.verify({factorId:factor.id,challengeId:challenge.id,code});if(error)throw error}});
+  await gspmiiMfaDialog({
+   title:'Verifikasi Google Authenticator',
+   description:'Buka Google Authenticator dan masukkan kode 6 digit terbaru.',
+   onVerify:async code=>{
+    const {data:challenge,error:challengeError}=await db.auth.mfa.challenge({factorId:factor.id});
+    if(challengeError)throw new Error('Gagal membuat challenge MFA: '+challengeError.message);
+    if(!challenge?.id)throw new Error('Supabase tidak mengembalikan ID challenge MFA.');
+    const {error}=await db.auth.mfa.verify({factorId:factor.id,challengeId:challenge.id,code});
+    if(error)throw new Error('Verifikasi TOTP gagal: '+error.message);
+   }
+  });
   return;
  }
- // Bersihkan hanya pendaftaran TOTP milik sesi pengguna ini yang belum diverifikasi.
- const pending=(factorData?.all||[]).find(f=>f.factor_type==='totp'&&f.status==='unverified');
- if(pending){const {error}=await db.auth.mfa.unenroll({factorId:pending.id});if(error)throw new Error('Pendaftaran Authenticator sebelumnya belum selesai dan tidak dapat dibersihkan. Hubungi Owner. Detail: '+error.message)}
- const {data:enrolled,error:enrollError}=await db.auth.mfa.enroll({factorType:'totp',friendlyName:'GSPMII Google Authenticator'});
- if(enrollError)throw enrollError;
- if(!enrolled?.totp?.qr_code||!enrolled?.id)throw new Error('Supabase tidak mengembalikan QR Authenticator. Coba muat ulang atau hubungi Owner.');
- await gspmiiMfaDialog({title:'Aktifkan Google Authenticator',description:'Pindai QR ini dengan aplikasi Google Authenticator. Setelah akun GSPMII muncul di aplikasi, masukkan kode 6 digit yang sedang tampil.',qr:enrolled.totp.qr_code,secret:enrolled.totp.secret,showQr:true,onVerify:async code=>{const {data:challenge,error:challengeError}=await db.auth.mfa.challenge({factorId:enrolled.id});if(challengeError)throw challengeError;const {error}=await db.auth.mfa.verify({factorId:enrolled.id,challengeId:challenge.id,code});if(error)throw error}});
-}
 
+ // Bersihkan faktor TOTP yang belum terverifikasi milik akun ini sebelum membuat
+ // faktor baru. Secret faktor pending tidak dapat diminta ulang dari listFactors.
+ const pending=(factorData?.all||[]).filter(f=>f.factor_type==='totp'&&f.status==='unverified');
+ for(const f of pending){
+  const {error}=await db.auth.mfa.unenroll({factorId:f.id});
+  if(error)throw mfaError('Faktor Authenticator lama belum dapat dibersihkan: '+error.message,error);
+ }
+
+ const {data:enrolled,error:enrollError}=await db.auth.mfa.enroll({
+  factorType:'totp',
+  friendlyName:'GSPMII Google Authenticator'
+ });
+ if(enrollError)throw mfaError('Gagal membuat faktor Authenticator: '+enrollError.message,enrollError);
+ if(!enrolled?.totp?.qr_code||!enrolled?.totp?.secret||!enrolled?.id)
+  throw mfaError('Supabase tidak mengembalikan QR, kunci, atau ID faktor Authenticator.');
+
+ // Pastikan faktor yang baru dibuat benar-benar terlihat di akun sebelum challenge.
+ const {data:checkData,error:checkError}=await db.auth.mfa.listFactors();
+ if(checkError)throw mfaError('Faktor dibuat, tetapi tidak dapat diperiksa: '+checkError.message,checkError);
+ const pendingFactor=(checkData?.all||[]).find(f=>f.id===enrolled.id&&f.factor_type==='totp');
+ if(!pendingFactor)throw mfaError('Supabase belum menemukan faktor MFA yang baru dibuat. Jangan masukkan kode; batalkan dan coba mulai ulang proses aktivasi.');
+
+ await gspmiiMfaDialog({
+  title:'Aktifkan Google Authenticator',
+  description:'Tambahkan kunci ini ke Google Authenticator, pilih Berbasis waktu, lalu masukkan kode 6 digit terbaru.',
+  qr:enrolled.totp.qr_code,
+  secret:enrolled.totp.secret,
+  showQr:true,
+  onVerify:async code=>{
+   const {data:challenge,error:challengeError}=await db.auth.mfa.challenge({factorId:enrolled.id});
+   if(challengeError)throw new Error('Faktor sudah dibuat tetapi challenge gagal. Detail: '+challengeError.message);
+   if(!challenge?.id)throw new Error('Supabase tidak mengembalikan ID challenge MFA.');
+   const {error}=await db.auth.mfa.verify({factorId:enrolled.id,challengeId:challenge.id,code});
+   if(error)throw new Error('Kode TOTP ditolak Supabase: '+error.message);
+  }
+ });
+}
 async function enter(){
  try{
   await getMe();
@@ -1592,7 +1639,11 @@ async function enter(){
  }catch(authGateError){
   console.error("Pemeriksaan akses/MFA GSPMII:",authGateError);
   if(gspmiiSessionClaimed)await releaseGspmiiDeviceSession();
-  await db.auth.signOut();user=me=null;admin=false;financeAccess=false;auth();
+  // Pertahankan sesi login ketika tahap MFA gagal agar pengguna tidak kehilangan
+  // konteks autentikasi dan faktor yang sedang diperiksa.
+  if(authGateError?.code!=="GSPMII_MFA"){
+   await db.auth.signOut();user=me=null;admin=false;financeAccess=false;auth();
+  }
   message($("authMsg"),authGateError.message||"Akses belum dapat diberikan.",true);return;
  }
  resetGspmiiIdleTimer();$("publicIntro").classList.add("hidden");$("landingNote").classList.add("hidden");$("auth").classList.add("hidden");$("app").classList.remove("hidden");document.body.classList.add("logged-in");$("mobileDock").classList.remove("hidden");

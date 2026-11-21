@@ -1087,8 +1087,108 @@ $("clearForm").onclick=()=>fill(null);
 $("memberForm").onsubmit=async e=>{e.preventDefault();let id=$("fUid").value;if(!id){message($("appMsg"),"Pendaftaran anggota dibuat melalui menu Daftar Anggota. Formulir ini hanya untuk mengedit profil yang sudah terdaftar.",true);return}let {error}=await db.rpc("gspmii_admin_update_member_v2",{p_member_id:id,p_nama_lengkap:$("fName").value.trim(),p_no_hp:$("fPhone").value.trim(),p_alamat:$("fAddress").value.trim(),p_nik:$("fNik").value.trim(),p_unit_kerja:$("fUnit").value.trim(),p_jabatan:$("fPosition").value.trim(),p_nomor_anggota:$("fMemberNo").value.trim()});if(error){message($("appMsg"),"Simpan gagal: "+error.message,true);return}message($("appMsg"),"Data anggota diperbarui.");await loadAdmin();page("members")};
 async function removeMember(id){let m=rows.find(x=>x.id===id);if(!m||!confirm("Hapus data keanggotaan "+m.nama_lengkap+"? Akun login tidak ikut dihapus."))return;let {error}=await db.rpc("gspmii_admin_delete_member",{p_member_id:id});if(error){message($("appMsg"),"Hapus gagal: "+error.message,true);return}await loadAdmin()}
 function drawVerify(){let a=rows.filter(x=>x.status_verifikasi==="menunggu");$("verifyRows").innerHTML=a.length?a.map(m=>`<div class="item"><b>${esc(m.nama_lengkap)}</b><small>${esc(m.email)} · ${esc(m.unit_kerja||"Unit kerja belum diisi")}</small><p>${esc(m.alamat||"")}</p><button class="btn" data-approve="${esc(m.id)}">Setujui / Aktifkan</button> <button class="btn red" data-reject="${esc(m.id)}">Tolak</button></div>`).join(""):'<div class="empty">Tidak ada antrean verifikasi anggota lama.</div>';loadNewApplications().catch(e=>{$("newApplicationRows").innerHTML=`<div class="notice error">Gagal memuat pendaftaran: ${esc(e.message)}</div>`})}
-async function loadNewApplications(){if(!admin)return;const box=$("newApplicationRows");box.textContent="Memuat pendaftaran...";const {data,error}=await db.from("pendaftaran_anggota").select("id,user_id,nama_lengkap,email,telepon,status,data_profil,ktp_path,foto_path,bukti_pembayaran_path,dibuat_pada").in("status",["menunggu_verifikasi","menunggu_verifikasi_member_lama"]).order("dibuat_pada",{ascending:false});if(error)throw error;if(!data?.length){box.innerHTML='<div class="empty">Belum ada pendaftaran baru yang menunggu verifikasi.</div>';return}box.innerHTML=data.map(x=>{const d=x.data_profil||{};return `<article class="item application-item"><div class="row" style="justify-content:space-between;align-items:flex-start;gap:10px"><div><b>${esc(x.nama_lengkap||d.nama_lengkap||"Tanpa nama")}</b><small>${esc(x.email||"-")} · ${esc(x.telepon||d.no_hp||"-")}</small><small>Status: ${esc(x.status)} · ${esc(x.dibuat_pada?new Date(x.dibuat_pada).toLocaleString("id-ID"):"-")}</small></div><span class="pill">${x.status==="menunggu_verifikasi_member_lama"?"Member lama":"Member baru"}</span></div><p><b>NIK:</b> ${esc(d.nik||"Tidak diisi")} · <b>Unit:</b> ${esc(d.unit_kerja||"-")} · <b>Jabatan:</b> ${esc(d.jabatan||"-")}</p><div class="actions"><button class="btn alt" type="button" data-app-file="${esc(x.id)}" data-file-kind="ktp">Lihat KTP</button><button class="btn alt" type="button" data-app-file="${esc(x.id)}" data-file-kind="foto">Lihat Pas Foto</button><button class="btn alt" type="button" data-app-file="${esc(x.id)}" data-file-kind="bukti">Lihat Bukti Bayar</button></div><div class="actions" style="margin-top:10px">${x.status==="menunggu_verifikasi"?`<button class="btn" type="button" data-app-approve="${esc(x.id)}">Setujui Pendaftaran</button><button class="btn red" type="button" data-app-reject="${esc(x.id)}">Tolak Pendaftaran</button>`:`<span class="notice">Member lama: cocokkan dahulu dengan data anggota yang sudah ada. Pengaitan akun belum otomatis tersedia.</span>`}</div></article>`}).join("")}
-$("newApplicationRows")?.addEventListener("click",async e=>{const fileBtn=e.target.closest("[data-app-file]");if(fileBtn){const {data,error}=await db.from("pendaftaran_anggota").select("ktp_path,foto_path,bukti_pembayaran_path").eq("id",fileBtn.dataset.appFile).maybeSingle();if(error||!data){alert(error?.message||"Data tidak ditemukan");return}const map={ktp:["dokumen_pendaftaran",data.ktp_path],foto:["foto_anggota",data.foto_path],bukti:["dokumen_pendaftaran",data.bukti_pembayaran_path]};const [bucket,path]=map[fileBtn.dataset.fileKind]||[];if(!path){alert("Berkas belum tersedia.");return}const {data:link,error:linkError}=await db.storage.from(bucket).createSignedUrl(path,300);if(linkError){alert("Tidak dapat membuka berkas: "+linkError.message);return}window.open(link.signedUrl,"_blank","noopener");return}const approve=e.target.closest("[data-app-approve]");if(approve){if(!confirm("Setujui pendaftaran ini? Data akan disinkronkan ke profil anggota."))return;approve.disabled=true;const {data,error}=await db.rpc("gspmii_setujui_pendaftaran",{p_pendaftaran_id:approve.dataset.appApprove});if(error){alert("Gagal menyetujui: "+error.message);approve.disabled=false;return}alert(data?.message||"Pendaftaran disetujui.");await loadNewApplications();await loadAdmin();return}const reject=e.target.closest("[data-app-reject]");if(reject){const note=prompt("Alasan penolakan (wajib diisi):");if(note===null)return;if(!note.trim()){alert("Alasan penolakan wajib diisi.");return}const {data,error}=await db.rpc("gspmii_tolak_pendaftaran",{p_pendaftaran_id:reject.dataset.appReject,p_alasan:note.trim()});if(error){alert("Gagal menolak: "+error.message);return}alert(data?.message||"Pendaftaran ditolak.");await loadNewApplications();return}});
+let gspmiiApplicationFilter="semua";
+async function loadNewApplications(){
+  if(!admin)return;
+  const box=$("newApplicationRows");
+  box.textContent="Memuat riwayat pendaftaran...";
+  const {data,error}=await db.from("pendaftaran_anggota")
+    .select("id,user_id,nama_lengkap,email,telepon,status,data_profil,ktp_path,foto_path,bukti_pembayaran_path,dibuat_pada,catatan_pengurus,diverifikasi_oleh,diverifikasi_pada")
+    .order("dibuat_pada",{ascending:false});
+  if(error)throw error;
+  const all=data||[];
+  const counts={
+    semua:all.length,
+    menunggu:all.filter(x=>["menunggu_verifikasi","menunggu_verifikasi_member_lama"].includes(x.status)).length,
+    disetujui:all.filter(x=>x.status==="disetujui").length,
+    ditolak:all.filter(x=>x.status==="ditolak").length
+  };
+  const shown=all.filter(x=>{
+    if(gspmiiApplicationFilter==="menunggu")return ["menunggu_verifikasi","menunggu_verifikasi_member_lama"].includes(x.status);
+    if(gspmiiApplicationFilter==="disetujui"||gspmiiApplicationFilter==="ditolak")return x.status===gspmiiApplicationFilter;
+    return true;
+  });
+  const tabs=`<div class="actions" style="margin:10px 0 14px;flex-wrap:wrap">
+    <button class="btn ${gspmiiApplicationFilter==="semua"?"":"alt"}" type="button" data-app-filter="semua">Semua (${counts.semua})</button>
+    <button class="btn ${gspmiiApplicationFilter==="menunggu"?"":"alt"}" type="button" data-app-filter="menunggu">Menunggu (${counts.menunggu})</button>
+    <button class="btn ${gspmiiApplicationFilter==="disetujui"?"":"alt"}" type="button" data-app-filter="disetujui">Disetujui (${counts.disetujui})</button>
+    <button class="btn ${gspmiiApplicationFilter==="ditolak"?"":"alt"}" type="button" data-app-filter="ditolak">Ditolak (${counts.ditolak})</button>
+  </div>`;
+  if(!all.length){box.innerHTML=tabs+'<div class="empty">Belum ada data pendaftaran.</div>';return}
+  box.innerHTML=tabs+(shown.length?shown.map(x=>{
+    const d=x.data_profil||{};
+    const pending=["menunggu_verifikasi","menunggu_verifikasi_member_lama"].includes(x.status);
+    const statusLabel=x.status==="disetujui"?"Disetujui":x.status==="ditolak"?"Ditolak":x.status==="menunggu_verifikasi_member_lama"?"Menunggu verifikasi · Member lama":x.status==="menunggu_verifikasi"?"Menunggu verifikasi":String(x.status||"Status tidak diketahui");
+    return `<article class="item application-item">
+      <div class="row" style="justify-content:space-between;align-items:flex-start;gap:10px">
+        <div><b>${esc(x.nama_lengkap||d.nama_lengkap||"Tanpa nama")}</b>
+        <small>${esc(x.email||"-")} · ${esc(x.telepon||d.no_hp||"-")}</small>
+        <small>Status: <b>${esc(statusLabel)}</b> · Daftar: ${esc(x.dibuat_pada?new Date(x.dibuat_pada).toLocaleString("id-ID"):"-")}</small>
+        ${!pending?`<small>Diproses: ${esc(x.diverifikasi_pada?new Date(x.diverifikasi_pada).toLocaleString("id-ID"):"-")}</small>`:""}
+        ${x.status==="ditolak"?`<p class="notice" style="margin-top:8px"><b>Alasan penolakan:</b> ${esc(x.catatan_pengurus||"Alasan tidak tercatat.")}</p>`:""}
+        ${x.status==="disetujui"?`<small>Keputusan: Pendaftaran disetujui.</small>`:""}
+        </div><span class="pill">${x.status==="menunggu_verifikasi_member_lama"?"Member lama":x.status==="ditolak"?"Ditolak":x.status==="disetujui"?"Disetujui": "Member baru"}</span>
+      </div>
+      <p><b>NIK:</b> ${esc(d.nik||"Tidak diisi")} · <b>Unit:</b> ${esc(d.unit_kerja||"-")} · <b>Jabatan:</b> ${esc(d.jabatan||"-")}</p>
+      <div class="actions">
+        <button class="btn alt" type="button" data-app-file="${esc(x.id)}" data-file-kind="ktp">Lihat KTP</button>
+        <button class="btn alt" type="button" data-app-file="${esc(x.id)}" data-file-kind="foto">Lihat Pas Foto</button>
+        <button class="btn alt" type="button" data-app-file="${esc(x.id)}" data-file-kind="bukti">Lihat Bukti Bayar</button>
+        ${user?.id===GSPMII_OWNER_UID?`<button class="btn" type="button" data-app-pdf="${esc(x.id)}">Unduh PDF Berkas</button>`:""}
+      </div>
+      ${pending?`<div class="actions" style="margin-top:10px">${x.status==="menunggu_verifikasi"?`<button class="btn" type="button" data-app-approve="${esc(x.id)}">Setujui Pendaftaran</button><button class="btn red" type="button" data-app-reject="${esc(x.id)}">Tolak Pendaftaran</button>`:`<span class="notice">Member lama: cocokkan dahulu dengan data anggota yang sudah ada. Pengaitan akun belum otomatis tersedia.</span>`}</div>`:""}
+    </article>`;
+  }).join(""):'<div class="empty">Tidak ada pendaftaran pada kategori ini.</div>');
+}
+$("newApplicationRows")?.addEventListener("click",async e=>{
+const filterBtn=e.target.closest("[data-app-filter]");
+if(filterBtn){gspmiiApplicationFilter=filterBtn.dataset.appFilter;await loadNewApplications();return}
+const pdfBtn=e.target.closest("[data-app-pdf]");
+if(pdfBtn){
+  if(user?.id!==GSPMII_OWNER_UID){alert("Unduh PDF hanya untuk Pemilik Portal.");return}
+  const printWin=window.open("about:blank","_blank");
+  if(!printWin){alert("Izinkan pop-up untuk mengunduh PDF berkas.");return}
+  printWin.document.write("<p style='font-family:Arial;padding:24px'>Menyiapkan berkas pendaftaran...</p>");
+  try{
+    const {data:x,error}=await db.from("pendaftaran_anggota").select("id,user_id,nama_lengkap,email,telepon,status,data_profil,ktp_path,foto_path,bukti_pembayaran_path,dibuat_pada,catatan_pengurus,diverifikasi_oleh,diverifikasi_pada").eq("id",pdfBtn.dataset.appPdf).single();
+    if(error||!x)throw error||new Error("Data pendaftaran tidak ditemukan.");
+    const signed=async(bucket,path)=>{
+      if(!path)return "";
+      const {data,error}=await db.storage.from(bucket).createSignedUrl(path,180);
+      if(error)throw error;
+      return data?.signedUrl||"";
+    };
+    const [ktp,foto,bukti]=await Promise.all([
+      signed("dokumen_pendaftaran",x.ktp_path),
+      signed("foto_anggota",x.foto_path),
+      signed("dokumen_pendaftaran",x.bukti_pembayaran_path)
+    ]);
+    const d=x.data_profil||{};
+    const escPdf=v=>String(v??"-").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+    const fields=[
+      ["Nama Lengkap",d.nama_lengkap||x.nama_lengkap],["Email",d.email||x.email],["Nomor Telepon",d.no_hp||x.telepon],
+      ["NIK",d.nik],["Alamat",d.alamat],["Tempat Lahir",d.tempat_lahir],["Tanggal Lahir",d.tanggal_lahir],
+      ["Jenis Kelamin",d.jenis_kelamin],["Agama",d.agama],["Unit Kerja",d.unit_kerja],["Jabatan",d.jabatan],
+      ["Tanggal Masuk Kerja",d.tanggal_masuk_kerja],["No. Induk Karyawan",d.no_induk_karyawan],
+      ["Status Pekerja",d.status_pekerja],["Nama Perusahaan",d.nama_perusahaan],["Alamat Perusahaan",d.alamat_perusahaan]
+    ];
+    const img=(url,label)=>url?`<section class="doc"><h2>${label}</h2><img src="${url}" alt="${label}"></section>`:`<section class="doc"><h2>${label}</h2><p>Berkas belum tersedia.</p></section>`;
+    const doc=`<!doctype html><html lang="id"><head><meta charset="utf-8"><title>Berkas Pendaftaran - ${escPdf(x.nama_lengkap)}</title><style>
+      body{font:12px Arial,sans-serif;color:#172033;margin:24px}h1{font-size:20px}h2{font-size:15px;border-bottom:1px solid #bbb;padding-bottom:6px}
+      .meta{margin:12px 0 18px;padding:12px;background:#f1f4f8}.data{width:100%;border-collapse:collapse}.data td{border:1px solid #ddd;padding:7px;vertical-align:top}.data td:first-child{width:34%;font-weight:bold;background:#f7f8fa}
+      .doc{page-break-inside:avoid;margin-top:24px}.doc img{max-width:100%;max-height:720px;object-fit:contain;display:block;margin:12px auto}
+      .actions{margin:18px 0}@media print{.actions{display:none}body{margin:14mm}}
+    </style></head><body onload="setTimeout(function(){window.print()},700)"><h1>BERKAS PENDAFTARAN ANGGOTA GSPMII</h1>
+      <div class="meta"><b>Nama:</b> ${escPdf(x.nama_lengkap||d.nama_lengkap)}<br><b>Status:</b> ${escPdf(x.status)}<br><b>Tanggal pendaftaran:</b> ${escPdf(x.dibuat_pada?new Date(x.dibuat_pada).toLocaleString("id-ID"):"-")}<br><b>Waktu keputusan:</b> ${escPdf(x.diverifikasi_pada?new Date(x.diverifikasi_pada).toLocaleString("id-ID"):"-")}<br><b>Catatan pengurus:</b> ${escPdf(x.catatan_pengurus||"-")}</div>
+      <h2>Formulir dan Data Profil</h2><table class="data">${fields.map(([k,v])=>`<tr><td>${escPdf(k)}</td><td>${escPdf(v)}</td></tr>`).join("")}</table>
+      ${img(foto,"Foto Calon Anggota")}${img(ktp,"Kartu Tanda Penduduk (KTP)")}${img(bukti,"Bukti Pembayaran")}
+      <div class="actions"><button onclick="window.print()">Cetak / Simpan sebagai PDF</button></div>
+    </body></html>`;
+    printWin.document.open();printWin.document.write(doc);printWin.document.close();
+  }catch(err){printWin.close();alert("Gagal menyiapkan PDF: "+(err?.message||err))}
+  return;
+}
+const fileBtn=e.target.closest("[data-app-file]");if(fileBtn){const {data,error}=await db.from("pendaftaran_anggota").select("ktp_path,foto_path,bukti_pembayaran_path").eq("id",fileBtn.dataset.appFile).maybeSingle();if(error||!data){alert(error?.message||"Data tidak ditemukan");return}const map={ktp:["dokumen_pendaftaran",data.ktp_path],foto:["foto_anggota",data.foto_path],bukti:["dokumen_pendaftaran",data.bukti_pembayaran_path]};const [bucket,path]=map[fileBtn.dataset.fileKind]||[];if(!path){alert("Berkas belum tersedia.");return}const {data:link,error:linkError}=await db.storage.from(bucket).createSignedUrl(path,300);if(linkError){alert("Tidak dapat membuka berkas: "+linkError.message);return}window.open(link.signedUrl,"_blank","noopener");return}const approve=e.target.closest("[data-app-approve]");if(approve){if(!confirm("Setujui pendaftaran ini? Data akan disinkronkan ke profil anggota."))return;approve.disabled=true;const {data,error}=await db.rpc("gspmii_setujui_pendaftaran",{p_pendaftaran_id:approve.dataset.appApprove});if(error){alert("Gagal menyetujui: "+error.message);approve.disabled=false;return}alert(data?.message||"Pendaftaran disetujui.");await loadNewApplications();await loadAdmin();return}const reject=e.target.closest("[data-app-reject]");if(reject){const note=prompt("Alasan penolakan (wajib diisi):");if(note===null)return;if(!note.trim()){alert("Alasan penolakan wajib diisi.");return}const {data,error}=await db.rpc("gspmii_tolak_pendaftaran",{p_pendaftaran_id:reject.dataset.appReject,p_alasan:note.trim()});if(error){alert("Gagal menolak: "+error.message);return}alert(data?.message||"Pendaftaran ditolak.");await loadNewApplications();return}});
 $("verifyRows").onclick=async e=>{let id=e.target.dataset.approve||e.target.dataset.reject;if(!id)return;let st=e.target.dataset.approve?"disetujui":"ditolak";if(!confirm(st==="disetujui"?"Aktifkan anggota ini?":"Tolak pendaftaran ini?"))return;let {error}=await db.rpc("gspmii_admin_verify_member",{p_member_id:id,p_status:st});if(error){message($("appMsg"),"Gagal mengubah status: "+error.message,true);return}await loadAdmin()};
 async function drawCard(){
   const box=$("card");

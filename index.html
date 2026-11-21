@@ -550,7 +550,6 @@ body:not(.logged-in) #settingsShortcut{display:none!important}
 .directory-avatar-wrap .directory-avatar{width:42px;height:42px}
 .directory-online-dot{position:absolute;right:-1px;bottom:-1px;width:12px;height:12px;border-radius:50%;background:#22c55e;border:2px solid #0c192b;box-shadow:0 0 0 2px rgba(34,197,94,.18)}
 .directory-online-dot.offline{background:#64748b;box-shadow:none}
-.directory-online-label{font-size:10px!important;color:#22c55e!important;font-weight:700;display:block}
 </style>
 </head>
 <body>
@@ -1036,7 +1035,7 @@ async function loadDirectory(){
       const initials=String(m.nama_lengkap||"?").trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase();
       const avatar=photo?`<img class="directory-avatar" src="${esc(photo)}" alt="Foto ${esc(m.nama_lengkap||"anggota")}" loading="lazy">`:`<div class="directory-avatar directory-initials">${esc(initials||"?")}</div>`;
       const online=!!m.is_online;
-      return `<tr><td><div class="directory-person"><span class="directory-avatar-wrap">${avatar}<i class="directory-online-dot ${online?"":"offline"}" title="${online?"Sedang online":"Offline"}" aria-label="${online?"Sedang online":"Offline"}"></i></span><div><b>${esc(m.nama_lengkap||"Tanpa nama")}</b><small class="directory-online-label">${online?"● Online":"○ Offline"}</small></div></div></td><td>${esc(m.nomor_anggota||"Belum diterbitkan")}</td><td>${esc(m.unit_kerja||"-")}</td><td>${esc(m.jabatan||"Anggota")}</td><td>${esc(m.status_keanggotaan||"Aktif")}</td></tr>`;
+      return `<tr><td><div class="directory-person"><span class="directory-avatar-wrap">${avatar}<i class="directory-online-dot ${online?"":"offline"}" title="${online?"Sedang online":"Offline"}" aria-label="${online?"Sedang online":"Offline"}"></i></span><div><b>${esc(m.nama_lengkap||"Tanpa nama")}</b></div></div></td><td>${esc(m.nomor_anggota||"Belum diterbitkan")}</td><td>${esc(m.unit_kerja||"-")}</td><td>${esc(m.jabatan||"Anggota")}</td><td>${esc(m.status_keanggotaan||"Aktif")}</td></tr>`;
     }));
     $("directoryRows").innerHTML=a.length?`<div class="tablewrap"><table><tr><th>Nama Anggota</th><th>Nomor Anggota</th><th>Unit Kerja</th><th>Jabatan</th><th>Status</th></tr>${cards.join("")}</table></div>`:'<div class="empty">Belum ada anggota aktif.</div>';
   }finally{gspmiiDirectoryLoading=false}

@@ -1634,16 +1634,12 @@ async function enter(){
  try{
   await getMe();
   if(user.id!==GSPMII_OWNER_UID&&me.status_verifikasi!=="disetujui")throw new Error("Akun belum disetujui pengurus. Akses portal hanya dibuka setelah status keanggotaan disetujui.");
-  await ensureGspmiiMfa();
+  // Login cukup dengan email dan kata sandi; Google Authenticator tidak digunakan.
   await claimGspmiiDeviceSession();
  }catch(authGateError){
-  console.error("Pemeriksaan akses/MFA GSPMII:",authGateError);
+  console.error("Pemeriksaan akses GSPMII:",authGateError);
   if(gspmiiSessionClaimed)await releaseGspmiiDeviceSession();
-  // Pertahankan sesi login ketika tahap MFA gagal agar pengguna tidak kehilangan
-  // konteks autentikasi dan faktor yang sedang diperiksa.
-  if(authGateError?.code!=="GSPMII_MFA"){
-   await db.auth.signOut();user=me=null;admin=false;financeAccess=false;auth();
-  }
+  await db.auth.signOut();user=me=null;admin=false;financeAccess=false;auth();
   message($("authMsg"),authGateError.message||"Akses belum dapat diberikan.",true);return;
  }
  resetGspmiiIdleTimer();$("publicIntro").classList.add("hidden");$("landingNote").classList.add("hidden");$("auth").classList.add("hidden");$("app").classList.remove("hidden");document.body.classList.add("logged-in");$("mobileDock").classList.remove("hidden");

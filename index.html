@@ -1647,10 +1647,10 @@ if(!gspmiiDeviceToken){
   gspmiiDeviceToken=(crypto?.randomUUID?crypto.randomUUID():("dev-"+Date.now()+"-"+Math.random().toString(36).slice(2)));
   localStorage.setItem(GSPMII_DEVICE_TOKEN_KEY,gspmiiDeviceToken);
 }
-let gspmiiIdleTimer=null,gspmiiWarningTimer=null,gspmiiHeartbeat=null,gspmiiLastActivity=Date.now(),gspmiiSessionClaimed=false;
-const GSPMII_IDLE_WARNING_MS=45*1000;
-const GSPMII_IDLE_LOGOUT_MS=60*1000;
+let gspmiiIdleTimer=null,gspmiiWarningTimer=null,gspmiiHeartbeat=null,gspmiiLastActivity=Date.now(),gspmiiSessionClaimed=false,gspmiiIdleLogoutStarted=false;
+const GSPMII_IDLE_LOGOUT_MS=5*60*1000; // Logout otomatis setelah 5 menit tanpa aktivitas.
 async function claimGspmiiDeviceSession(){
+  gspmiiIdleLogoutStarted=false;gspmiiLastActivity=Date.now();
   const {data,error}=await db.rpc("gspmii_claim_device_session",{p_session_token:gspmiiDeviceToken});
   if(error)throw new Error("Pengamanan satu perangkat belum siap. Pengurus perlu memasang SQL pengamanan sesi terlebih dahulu. Detail: "+error.message);
   if(data!==true)throw new Error("Akun ini sedang digunakan di perangkat lain. Keluar dari perangkat tersebut atau hubungi pengurus untuk membuka sesi.");
@@ -1667,61 +1667,41 @@ function startGspmiiSessionHeartbeat(){
   if(gspmiiHeartbeat)clearInterval(gspmiiHeartbeat);
   gspmiiHeartbeat=setInterval(async()=>{
     if(!user||!gspmiiSessionClaimed)return;
-    // Jangan perpanjang sesi database hanya karena heartbeat berjalan.
-    // Sesi hanya diperbarui jika pengguna benar-benar beraktivitas dalam 60 detik terakhir.
     if(Date.now()-gspmiiLastActivity>=GSPMII_IDLE_LOGOUT_MS)return;
     const {data,error}=await db.rpc("gspmii_touch_device_session",{p_session_token:gspmiiDeviceToken});
     if(!error&&data===false){
-      alert("Sesi akun ini telah berpindah ke perangkat lain. Anda akan keluar demi keamanan.");
+      alert("Sesi akun ini berpindah ke perangkat lain.");
       await secureGspmiiSignOut(false);
     }else if(error){
       console.warn("Heartbeat sesi perangkat gagal:",error);
     }
   },20000);
 }
-function ensureGspmiiIdleDialog(){
-  if(document.getElementById("gspmiiIdleDialog"))return;
-  const el=document.createElement("div");
-  el.id="gspmiiIdleDialog";el.className="gspmii-idle-dialog";
-  el.innerHTML='<div class="gspmii-idle-card"><div class="gspmii-idle-icon">⌛</div><b>Tidak Ada Aktivitas</b><p>Anda tidak terdeteksi beraktivitas selama 45 detik. Demi keamanan, akun akan otomatis logout pada detik ke-60. Tekan “Tetap Masuk” atau lakukan aktivitas untuk melanjutkan sesi.</p><button type="button" id="gspmiiStayButton">Tetap Masuk</button></div>';
-  document.body.appendChild(el);
-  document.getElementById("gspmiiStayButton").addEventListener("click",(e)=>{e.preventDefault();e.stopPropagation();resetGspmiiIdleTimer();});
-}
 function clearGspmiiIdleTimers(){
   if(gspmiiIdleTimer){clearTimeout(gspmiiIdleTimer);gspmiiIdleTimer=null;}
   if(gspmiiWarningTimer){clearTimeout(gspmiiWarningTimer);gspmiiWarningTimer=null;}
 }
-function showGspmiiIdleWarning(remainingMs){
-  ensureGspmiiIdleDialog();
-  document.getElementById("gspmiiIdleDialog")?.classList.add("show");
-  if(gspmiiWarningTimer)clearTimeout(gspmiiWarningTimer);
-  gspmiiWarningTimer=setTimeout(()=>secureGspmiiSignOut(true),Math.max(0,remainingMs));
+async function expireGspmiiIdleSession(){
+  if(gspmiiIdleLogoutStarted||!user)return;
+  gspmiiIdleLogoutStarted=true;
+  await secureGspmiiSignOut(true);
+  alert("Sesi sudah habis.");
 }
 function scheduleGspmiiIdleFromLastActivity(){
-  if(!user)return;
+  if(!user||gspmiiIdleLogoutStarted)return;
   clearGspmiiIdleTimers();
-  document.getElementById("gspmiiIdleDialog")?.classList.remove("show");
-  const elapsed=Date.now()-gspmiiLastActivity;
-  const remaining=GSPMII_IDLE_LOGOUT_MS-elapsed;
-  if(remaining<=0){secureGspmiiSignOut(true);return;}
-  if(elapsed>=GSPMII_IDLE_WARNING_MS){
-    showGspmiiIdleWarning(remaining);
-    return;
-  }
-  gspmiiIdleTimer=setTimeout(()=>{
-    const nowElapsed=Date.now()-gspmiiLastActivity;
-    if(nowElapsed>=GSPMII_IDLE_LOGOUT_MS){secureGspmiiSignOut(true);return;}
-    showGspmiiIdleWarning(GSPMII_IDLE_LOGOUT_MS-nowElapsed);
-  },Math.max(0,GSPMII_IDLE_WARNING_MS-elapsed));
+  const remaining=GSPMII_IDLE_LOGOUT_MS-(Date.now()-gspmiiLastActivity);
+  if(remaining<=0){expireGspmiiIdleSession();return;}
+  gspmiiIdleTimer=setTimeout(expireGspmiiIdleSession,remaining);
 }
 function resetGspmiiIdleTimer(){
+  if(gspmiiIdleLogoutStarted)return;
   gspmiiLastActivity=Date.now();
   scheduleGspmiiIdleFromLastActivity();
 }
 function checkGspmiiIdleOnResume(){
-  if(!user)return;
-  const elapsed=Date.now()-gspmiiLastActivity;
-  if(elapsed>=GSPMII_IDLE_LOGOUT_MS){secureGspmiiSignOut(true);return;}
+  if(!user||gspmiiIdleLogoutStarted)return;
+  if(Date.now()-gspmiiLastActivity>=GSPMII_IDLE_LOGOUT_MS){expireGspmiiIdleSession();return;}
   scheduleGspmiiIdleFromLastActivity();
 }
 async function secureGspmiiSignOut(release=true){

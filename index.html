@@ -1636,8 +1636,8 @@ if(!gspmiiDeviceToken){
   localStorage.setItem(GSPMII_DEVICE_TOKEN_KEY,gspmiiDeviceToken);
 }
 let gspmiiIdleTimer=null,gspmiiWarningTimer=null,gspmiiHeartbeat=null,gspmiiLastActivity=Date.now(),gspmiiSessionClaimed=false;
-const GSPMII_IDLE_WARNING_MS=14*60*1000;
-const GSPMII_IDLE_LOGOUT_MS=15*60*1000;
+const GSPMII_IDLE_WARNING_MS=45*1000;
+const GSPMII_IDLE_LOGOUT_MS=60*1000;
 async function claimGspmiiDeviceSession(){
   const {data,error}=await db.rpc("gspmii_claim_device_session",{p_session_token:gspmiiDeviceToken});
   if(error)throw new Error("Pengamanan satu perangkat belum siap. Pengurus perlu memasang SQL pengamanan sesi terlebih dahulu. Detail: "+error.message);
@@ -1655,10 +1655,15 @@ function startGspmiiSessionHeartbeat(){
   if(gspmiiHeartbeat)clearInterval(gspmiiHeartbeat);
   gspmiiHeartbeat=setInterval(async()=>{
     if(!user||!gspmiiSessionClaimed)return;
+    // Jangan perpanjang sesi database hanya karena heartbeat berjalan.
+    // Sesi hanya diperbarui jika pengguna benar-benar beraktivitas dalam 60 detik terakhir.
+    if(Date.now()-gspmiiLastActivity>=GSPMII_IDLE_LOGOUT_MS)return;
     const {data,error}=await db.rpc("gspmii_touch_device_session",{p_session_token:gspmiiDeviceToken});
     if(!error&&data===false){
       alert("Sesi akun ini telah berpindah ke perangkat lain. Anda akan keluar demi keamanan.");
       await secureGspmiiSignOut(false);
+    }else if(error){
+      console.warn("Heartbeat sesi perangkat gagal:",error);
     }
   },20000);
 }
@@ -1666,21 +1671,46 @@ function ensureGspmiiIdleDialog(){
   if(document.getElementById("gspmiiIdleDialog"))return;
   const el=document.createElement("div");
   el.id="gspmiiIdleDialog";el.className="gspmii-idle-dialog";
-  el.innerHTML='<div class="gspmii-idle-card"><div class="gspmii-idle-icon">⌛</div><b>Sesi akan berakhir</b><p>Anda tidak terdeteksi beraktivitas. Sesi akan otomatis keluar dalam 1 menit.</p><button type="button" id="gspmiiStayButton">Tetap Masuk</button></div>';
+  el.innerHTML='<div class="gspmii-idle-card"><div class="gspmii-idle-icon">⌛</div><b>Tidak Ada Aktivitas</b><p>Anda tidak terdeteksi beraktivitas selama 45 detik. Demi keamanan, akun akan otomatis logout pada detik ke-60. Tekan “Tetap Masuk” atau lakukan aktivitas untuk melanjutkan sesi.</p><button type="button" id="gspmiiStayButton">Tetap Masuk</button></div>';
   document.body.appendChild(el);
   document.getElementById("gspmiiStayButton").addEventListener("click",resetGspmiiIdleTimer);
 }
+function clearGspmiiIdleTimers(){
+  if(gspmiiIdleTimer){clearTimeout(gspmiiIdleTimer);gspmiiIdleTimer=null;}
+  if(gspmiiWarningTimer){clearTimeout(gspmiiWarningTimer);gspmiiWarningTimer=null;}
+}
+function showGspmiiIdleWarning(remainingMs){
+  ensureGspmiiIdleDialog();
+  document.getElementById("gspmiiIdleDialog")?.classList.add("show");
+  if(gspmiiWarningTimer)clearTimeout(gspmiiWarningTimer);
+  gspmiiWarningTimer=setTimeout(()=>secureGspmiiSignOut(true),Math.max(0,remainingMs));
+}
+function scheduleGspmiiIdleFromLastActivity(){
+  if(!user)return;
+  clearGspmiiIdleTimers();
+  document.getElementById("gspmiiIdleDialog")?.classList.remove("show");
+  const elapsed=Date.now()-gspmiiLastActivity;
+  const remaining=GSPMII_IDLE_LOGOUT_MS-elapsed;
+  if(remaining<=0){secureGspmiiSignOut(true);return;}
+  if(elapsed>=GSPMII_IDLE_WARNING_MS){
+    showGspmiiIdleWarning(remaining);
+    return;
+  }
+  gspmiiIdleTimer=setTimeout(()=>{
+    const nowElapsed=Date.now()-gspmiiLastActivity;
+    if(nowElapsed>=GSPMII_IDLE_LOGOUT_MS){secureGspmiiSignOut(true);return;}
+    showGspmiiIdleWarning(GSPMII_IDLE_LOGOUT_MS-nowElapsed);
+  },Math.max(0,GSPMII_IDLE_WARNING_MS-elapsed));
+}
 function resetGspmiiIdleTimer(){
   gspmiiLastActivity=Date.now();
-  if(gspmiiIdleTimer)clearTimeout(gspmiiIdleTimer);
-  if(gspmiiWarningTimer)clearTimeout(gspmiiWarningTimer);
-  document.getElementById("gspmiiIdleDialog")?.classList.remove("show");
+  scheduleGspmiiIdleFromLastActivity();
+}
+function checkGspmiiIdleOnResume(){
   if(!user)return;
-  gspmiiIdleTimer=setTimeout(()=>{
-    ensureGspmiiIdleDialog();
-    document.getElementById("gspmiiIdleDialog")?.classList.add("show");
-    gspmiiWarningTimer=setTimeout(()=>secureGspmiiSignOut(true),GSPMII_IDLE_LOGOUT_MS-GSPMII_IDLE_WARNING_MS);
-  },GSPMII_IDLE_WARNING_MS);
+  const elapsed=Date.now()-gspmiiLastActivity;
+  if(elapsed>=GSPMII_IDLE_LOGOUT_MS){secureGspmiiSignOut(true);return;}
+  scheduleGspmiiIdleFromLastActivity();
 }
 async function secureGspmiiSignOut(release=true){
   if(gspmiiIdleTimer)clearTimeout(gspmiiIdleTimer);
@@ -1693,7 +1723,7 @@ async function secureGspmiiSignOut(release=true){
   user=me=null;admin=false;auth();
 }
 ["pointerdown","keydown","touchstart","scroll","click"].forEach(evt=>document.addEventListener(evt,()=>{if(user)resetGspmiiIdleTimer();},{passive:true}));
-document.addEventListener("visibilitychange",()=>{if(!document.hidden&&user)resetGspmiiIdleTimer()}); window.addEventListener("pageshow",()=>{if(user)resetGspmiiIdleTimer()});
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkGspmiiIdleOnResume()}); window.addEventListener("pageshow",()=>checkGspmiiIdleOnResume());
 // Jangan melepas sesi perangkat saat pagehide: browser HP dapat memicu pagehide ketika tab/aplikasi hanya berpindah ke latar belakang. Sesi dilepas saat logout resmi atau logout otomatis.
 
 

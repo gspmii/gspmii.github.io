@@ -1248,9 +1248,8 @@ async function loadNewApplications(){
   if(!admin)return;
   const box=$("newApplicationRows");
   box.textContent="Memuat riwayat pendaftaran...";
-  const {data,error}=await db.from("pendaftaran_anggota")
-    .select("id,user_id,nama_lengkap,email,telepon,status,data_profil,ktp_path,foto_path,bukti_pembayaran_path,dibuat_pada,catatan_pengurus,diverifikasi_oleh,diverifikasi_pada")
-    .order("dibuat_pada",{ascending:false});
+  // Daftar verifikasi memakai RPC aman: tidak pernah mengirim path dokumen ke pengurus.
+  const {data,error}=await db.rpc("gspmii_admin_daftar_pendaftaran");
   if(error)throw error;
   const all=data||[];
   const counts={
@@ -1287,10 +1286,12 @@ async function loadNewApplications(){
       </div>
       <p><b>NIK:</b> ${esc(d.nik||"Tidak diisi")} · <b>Unit:</b> ${esc(d.unit_kerja||"-")} · <b>Jabatan:</b> ${esc(d.jabatan||"-")}</p>
       <div class="actions">
-        <button class="btn alt" type="button" data-app-file="${esc(x.id)}" data-file-kind="ktp">Lihat KTP</button>
-        <button class="btn alt" type="button" data-app-file="${esc(x.id)}" data-file-kind="foto">Lihat Pas Foto</button>
-        <button class="btn alt" type="button" data-app-file="${esc(x.id)}" data-file-kind="bukti">Lihat Bukti Bayar</button>
-        ${user?.id===GSPMII_OWNER_UID?`<button class="btn" type="button" data-app-pdf="${esc(x.id)}">Unduh PDF Berkas</button>`:""}
+        ${user?.id===GSPMII_OWNER_UID?`
+          <button class="btn alt" type="button" data-app-file="${esc(x.id)}" data-file-kind="ktp">Lihat KTP</button>
+          <button class="btn alt" type="button" data-app-file="${esc(x.id)}" data-file-kind="foto">Lihat Pas Foto</button>
+          <button class="btn alt" type="button" data-app-file="${esc(x.id)}" data-file-kind="bukti">Lihat Bukti Bayar</button>
+          <button class="btn" type="button" data-app-pdf="${esc(x.id)}">Unduh PDF Berkas</button>
+        `:`<span class="notice">Dokumen pribadi hanya dapat diakses Pemilik Portal. Pengurus dapat memeriksa data dan memutuskan pendaftaran.</span>`}
       </div>
       ${pending?`<div class="actions" style="margin-top:10px">${x.status==="menunggu_verifikasi"?`<button class="btn" type="button" data-app-approve="${esc(x.id)}">Setujui Pendaftaran</button><button class="btn red" type="button" data-app-reject="${esc(x.id)}">Tolak Pendaftaran</button>`:`<button class="btn" type="button" data-old-member-approve="${esc(x.id)}">Aktifkan Anggota Lama</button><span class="notice">Aktivasi hanya berhasil jika akun sudah terhubung dengan data anggota yang berstatus disetujui.</span>`}</div>`:""}
     </article>`;
@@ -1306,7 +1307,7 @@ if(pdfBtn){
   if(!printWin){alert("Izinkan pop-up untuk mengunduh PDF berkas.");return}
   printWin.document.write("<p style='font-family:Arial;padding:24px'>Menyiapkan berkas pendaftaran...</p>");
   try{
-    const {data:x,error}=await db.from("pendaftaran_anggota").select("id,user_id,nama_lengkap,email,telepon,status,data_profil,ktp_path,foto_path,bukti_pembayaran_path,dibuat_pada,catatan_pengurus,diverifikasi_oleh,diverifikasi_pada").eq("id",pdfBtn.dataset.appPdf).single();
+    const {data:x,error}=await db.rpc("gspmii_owner_detail_pendaftaran",{p_pendaftaran_id:pdfBtn.dataset.appPdf});
     if(error||!x)throw error||new Error("Data pendaftaran tidak ditemukan.");
     const signed=async(bucket,path)=>{
       if(!path)return "";
@@ -1321,6 +1322,7 @@ if(pdfBtn){
     ]);
     const d=x.data_profil||{};
     const escPdf=v=>String(v??"-").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+    const pdfLogo=document.querySelector(".brand-logo")?.src||"";
     const fields=[
       ["Nama Lengkap",d.nama_lengkap||x.nama_lengkap],["Email",d.email||x.email],["Nomor Telepon",d.no_hp||x.telepon],
       ["NIK",d.nik],["Alamat",d.alamat],["Tempat Lahir",d.tempat_lahir],["Tanggal Lahir",d.tanggal_lahir],
@@ -1330,11 +1332,11 @@ if(pdfBtn){
     ];
     const img=(url,label)=>url?`<section class="doc"><h2>${label}</h2><img src="${url}" alt="${label}"></section>`:`<section class="doc"><h2>${label}</h2><p>Berkas belum tersedia.</p></section>`;
     const doc=`<!doctype html><html lang="id"><head><meta charset="utf-8"><title>Berkas Pendaftaran - ${escPdf(x.nama_lengkap)}</title><style>
-      body{font:12px Arial,sans-serif;color:#172033;margin:24px}h1{font-size:20px}h2{font-size:15px;border-bottom:1px solid #bbb;padding-bottom:6px}
+      body{font:12px Arial,sans-serif;color:#172033;margin:24px}.pdf-brand{display:flex;align-items:center;gap:16px;border-bottom:3px solid #bd2029;padding-bottom:14px;margin-bottom:16px}.pdf-brand img{width:76px;height:76px;object-fit:contain}.pdf-brand h1{font-size:20px;margin:0 0 5px}.pdf-brand b{font-size:12px;letter-spacing:1px;color:#a51e2b}h2{font-size:15px;border-bottom:1px solid #bbb;padding-bottom:6px}
       .meta{margin:12px 0 18px;padding:12px;background:#f1f4f8}.data{width:100%;border-collapse:collapse}.data td{border:1px solid #ddd;padding:7px;vertical-align:top}.data td:first-child{width:34%;font-weight:bold;background:#f7f8fa}
       .doc{page-break-inside:avoid;margin-top:24px}.doc img{max-width:100%;max-height:720px;object-fit:contain;display:block;margin:12px auto}
       .actions{margin:18px 0}@media print{.actions{display:none}body{margin:14mm}}
-    </style></head><body onload="setTimeout(function(){window.print()},700)"><h1>BERKAS PENDAFTARAN ANGGOTA GSPMII</h1>
+    </style></head><body onload="setTimeout(function(){window.print()},700)"><header class="pdf-brand"><img src="${escPdf(pdfLogo)}" alt="Logo resmi GSPMII"><div><h1>BERKAS PENDAFTARAN ANGGOTA GSPMII</h1><b>PUK SAT CIKOKOL RAYA</b></div></header>
       <div class="meta"><b>Nama:</b> ${escPdf(x.nama_lengkap||d.nama_lengkap)}<br><b>Status:</b> ${escPdf(x.status)}<br><b>Tanggal pendaftaran:</b> ${escPdf(x.dibuat_pada?new Date(x.dibuat_pada).toLocaleString("id-ID"):"-")}<br><b>Waktu keputusan:</b> ${escPdf(x.diverifikasi_pada?new Date(x.diverifikasi_pada).toLocaleString("id-ID"):"-")}<br><b>Catatan pengurus:</b> ${escPdf(x.catatan_pengurus||"-")}</div>
       <h2>Formulir dan Data Profil</h2><table class="data">${fields.map(([k,v])=>`<tr><td>${escPdf(k)}</td><td>${escPdf(v)}</td></tr>`).join("")}</table>
       ${img(foto,"Foto Calon Anggota")}${img(ktp,"Kartu Tanda Penduduk (KTP)")}${img(bukti,"Bukti Pembayaran")}
@@ -1344,7 +1346,17 @@ if(pdfBtn){
   }catch(err){printWin.close();alert("Gagal menyiapkan PDF: "+(err?.message||err))}
   return;
 }
-const fileBtn=e.target.closest("[data-app-file]");if(fileBtn){const {data,error}=await db.from("pendaftaran_anggota").select("ktp_path,foto_path,bukti_pembayaran_path").eq("id",fileBtn.dataset.appFile).maybeSingle();if(error||!data){alert(error?.message||"Data tidak ditemukan");return}const map={ktp:["dokumen_pendaftaran",data.ktp_path],foto:["foto_anggota",data.foto_path],bukti:["dokumen_pendaftaran",data.bukti_pembayaran_path]};const [bucket,path]=map[fileBtn.dataset.fileKind]||[];if(!path){alert("Berkas belum tersedia.");return}const {data:link,error:linkError}=await db.storage.from(bucket).createSignedUrl(path,300);if(linkError){alert("Tidak dapat membuka berkas: "+linkError.message);return}window.open(link.signedUrl,"_blank","noopener");return}const oldMemberApprove=e.target.closest("[data-old-member-approve]");if(oldMemberApprove){if(!confirm("Aktifkan akun anggota lama ini? Sistem akan memeriksa kecocokan akun dan status anggota."))return;oldMemberApprove.disabled=true;const {data,error}=await db.rpc("gspmii_setujui_member_lama",{p_pendaftaran_id:oldMemberApprove.dataset.oldMemberApprove});if(error){alert("Aktivasi anggota lama gagal: "+error.message);oldMemberApprove.disabled=false;return}alert(data?.message||"Aktivasi anggota lama berhasil disetujui.");await loadNewApplications();await loadAdmin();return}const approve=e.target.closest("[data-app-approve]");if(approve){if(!confirm("Setujui pendaftaran ini? Data akan disinkronkan ke profil anggota."))return;approve.disabled=true;const {data,error}=await db.rpc("gspmii_setujui_pendaftaran",{p_pendaftaran_id:approve.dataset.appApprove});if(error){alert("Gagal menyetujui: "+error.message);approve.disabled=false;return}alert(data?.message||"Pendaftaran disetujui.");await loadNewApplications();await loadAdmin();return}const reject=e.target.closest("[data-app-reject]");if(reject){const note=prompt("Alasan penolakan (wajib diisi):");if(note===null)return;if(!note.trim()){alert("Alasan penolakan wajib diisi.");return}const {data,error}=await db.rpc("gspmii_tolak_pendaftaran",{p_pendaftaran_id:reject.dataset.appReject,p_alasan:note.trim()});if(error){alert("Gagal menolak: "+error.message);return}alert(data?.message||"Pendaftaran ditolak.");await loadNewApplications();return}});
+const fileBtn=e.target.closest("[data-app-file]");if(fileBtn){
+  if(user?.id!==GSPMII_OWNER_UID){alert("Dokumen hanya dapat diakses Pemilik Portal.");return}
+  const {data,error}=await db.rpc("gspmii_owner_detail_pendaftaran",{p_pendaftaran_id:fileBtn.dataset.appFile});
+  if(error||!data){alert(error?.message||"Data tidak ditemukan");return}
+  const map={ktp:["dokumen_pendaftaran",data.ktp_path],foto:["foto_anggota",data.foto_path],bukti:["dokumen_pendaftaran",data.bukti_pembayaran_path]};
+  const [bucket,path]=map[fileBtn.dataset.fileKind]||[];
+  if(!path){alert("Berkas belum tersedia.");return}
+  const {data:link,error:linkError}=await db.storage.from(bucket).createSignedUrl(path,300);
+  if(linkError){alert("Tidak dapat membuka berkas: "+linkError.message);return}
+  window.open(link.signedUrl,"_blank","noopener");return
+}const oldMemberApprove=e.target.closest("[data-old-member-approve]");if(oldMemberApprove){if(!confirm("Aktifkan akun anggota lama ini? Sistem akan memeriksa kecocokan akun dan status anggota."))return;oldMemberApprove.disabled=true;const {data,error}=await db.rpc("gspmii_setujui_member_lama",{p_pendaftaran_id:oldMemberApprove.dataset.oldMemberApprove});if(error){alert("Aktivasi anggota lama gagal: "+error.message);oldMemberApprove.disabled=false;return}alert(data?.message||"Aktivasi anggota lama berhasil disetujui.");await loadNewApplications();await loadAdmin();return}const approve=e.target.closest("[data-app-approve]");if(approve){if(!confirm("Setujui pendaftaran ini? Data akan disinkronkan ke profil anggota."))return;approve.disabled=true;const {data,error}=await db.rpc("gspmii_setujui_pendaftaran",{p_pendaftaran_id:approve.dataset.appApprove});if(error){alert("Gagal menyetujui: "+error.message);approve.disabled=false;return}alert(data?.message||"Pendaftaran disetujui.");await loadNewApplications();await loadAdmin();return}const reject=e.target.closest("[data-app-reject]");if(reject){const note=prompt("Alasan penolakan (wajib diisi):");if(note===null)return;if(!note.trim()){alert("Alasan penolakan wajib diisi.");return}const {data,error}=await db.rpc("gspmii_tolak_pendaftaran",{p_pendaftaran_id:reject.dataset.appReject,p_alasan:note.trim()});if(error){alert("Gagal menolak: "+error.message);return}alert(data?.message||"Pendaftaran ditolak.");await loadNewApplications();return}});
 $("verifyRows").onclick=async e=>{let id=e.target.dataset.approve||e.target.dataset.reject;if(!id)return;let st=e.target.dataset.approve?"disetujui":"ditolak";if(!confirm(st==="disetujui"?"Aktifkan anggota ini?":"Tolak pendaftaran ini?"))return;let {error}=await db.rpc("gspmii_admin_verify_member",{p_member_id:id,p_status:st});if(error){message($("appMsg"),"Gagal mengubah status: "+error.message,true);return}await loadAdmin()};
 async function drawCard(){
   const box=$("card");

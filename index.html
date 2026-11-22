@@ -1673,7 +1673,7 @@ function ensureGspmiiIdleDialog(){
   el.id="gspmiiIdleDialog";el.className="gspmii-idle-dialog";
   el.innerHTML='<div class="gspmii-idle-card"><div class="gspmii-idle-icon">⌛</div><b>Tidak Ada Aktivitas</b><p>Anda tidak terdeteksi beraktivitas selama 45 detik. Demi keamanan, akun akan otomatis logout pada detik ke-60. Tekan “Tetap Masuk” atau lakukan aktivitas untuk melanjutkan sesi.</p><button type="button" id="gspmiiStayButton">Tetap Masuk</button></div>';
   document.body.appendChild(el);
-  document.getElementById("gspmiiStayButton").addEventListener("click",resetGspmiiIdleTimer);
+  document.getElementById("gspmiiStayButton").addEventListener("click",(e)=>{e.preventDefault();e.stopPropagation();resetGspmiiIdleTimer();});
 }
 function clearGspmiiIdleTimers(){
   if(gspmiiIdleTimer){clearTimeout(gspmiiIdleTimer);gspmiiIdleTimer=null;}
@@ -1722,7 +1722,7 @@ async function secureGspmiiSignOut(release=true){
   await db.auth.signOut();
   user=me=null;admin=false;auth();
 }
-["pointerdown","keydown","touchstart","scroll","click"].forEach(evt=>document.addEventListener(evt,()=>{if(user)resetGspmiiIdleTimer();},{passive:true}));
+["pointerdown","keydown","touchstart","scroll","click"].forEach(evt=>document.addEventListener(evt,(e)=>{if(!user)return;if(e.target?.closest?.("#gspmiiIdleDialog"))return;resetGspmiiIdleTimer();},{passive:true}));
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkGspmiiIdleOnResume()}); window.addEventListener("pageshow",()=>checkGspmiiIdleOnResume());
 // Jangan melepas sesi perangkat saat pagehide: browser HP dapat memicu pagehide ketika tab/aplikasi hanya berpindah ke latar belakang. Sesi dilepas saat logout resmi atau logout otomatis.
 

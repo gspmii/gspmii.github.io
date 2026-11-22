@@ -666,6 +666,17 @@ body.logged-in #gspmiiConfidentialRibbon{display:flex}
 }
 </style>
 
+
+<style id="gspmii-online-status-indicator">
+.gspmii-online-status{display:flex;align-items:center;gap:9px;width:max-content;max-width:100%;margin:0 0 10px;padding:5px 11px;border:1px solid rgba(226,190,112,.32);border-radius:999px;background:rgba(30,58,95,.42);color:#e5c783;font-size:11px;font-weight:800;letter-spacing:1.15px;line-height:1.2}
+.gspmii-online-traffic{display:flex;align-items:center;gap:4px;transform-origin:center}
+.gspmii-online-traffic i{display:block;width:8px;height:8px;border-radius:50%;background:#4fc3f7;box-shadow:0 0 7px rgba(79,195,247,.8);animation:gspmiiDotBlink 1.2s ease-in-out infinite}
+.gspmii-online-traffic i:nth-child(2){background:#258fe8;box-shadow:0 0 7px rgba(37,143,232,.8);animation-delay:.2s}
+.gspmii-online-traffic i:nth-child(3){background:#b8a2ff;box-shadow:0 0 7px rgba(184,162,255,.8);animation-delay:.4s}
+@keyframes gspmiiDotBlink{0%,80%,100%{opacity:.35;transform:scale(.78)}35%{opacity:1;transform:scale(1.15)}}
+@media(prefers-reduced-motion:reduce){.gspmii-online-traffic i{animation:none;opacity:1;transform:none}}
+</style>
+
 </head>
 <body>
 <header class="topbar">
@@ -791,7 +802,7 @@ body.logged-in #gspmiiConfidentialRibbon{display:flex}
 <p class="landing-note hidden" id="landingNote">Solidaritas, tertib administrasi, dan perlindungan hak pekerja melalui pengelolaan keanggotaan yang bertanggung jawab.</p>
 <section id="app" class="hidden">
   <div class="userbar">
-    <div><div class="userrole">RUANG KEANGGOTAAN DIGITAL</div><h2 id="welcome">Halo, Anggota</h2><div id="userEmail" class="muted"></div></div>
+    <div><div class="gspmii-online-status" role="status" aria-label="Status akun sedang online"><span class="gspmii-online-traffic" aria-hidden="true"><i></i><i></i><i></i></span><span>ANDA SEDANG ONLINE</span></div><div class="userrole">RUANG KEANGGOTAAN DIGITAL</div><h2 id="welcome">Halo, Anggota</h2><div id="userEmail" class="muted"></div></div>
     <button id="logout" class="btn alt no-print">Logout</button>
     <div id="appMsg" class="message hidden span12"></div>
   </div>

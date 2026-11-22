@@ -1538,7 +1538,7 @@ async function secureGspmiiSignOut(release=true){
 }
 ["pointerdown","keydown","touchstart","scroll","click"].forEach(evt=>document.addEventListener(evt,()=>{if(user)resetGspmiiIdleTimer();},{passive:true}));
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&user)resetGspmiiIdleTimer()});
-window.addEventListener("pagehide",()=>{if(user&&gspmiiSessionClaimed){db.rpc("gspmii_release_device_session",{p_session_token:gspmiiDeviceToken});}});
+// Tidak melepas sesi saat pagehide: browser HP dapat memicu pagehide ketika tab berpindah/latar belakang. Sesi dilepas hanya melalui logout eksplisit atau Auto Logout.
 
 
 // === MFA WAJIB GSPMII: TOTP / Google Authenticator ===

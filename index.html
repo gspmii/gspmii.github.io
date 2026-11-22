@@ -576,6 +576,23 @@ body.logged-in #loginPromoBanner{display:none!important}
 @media(prefers-reduced-motion:reduce){.login-promo-glow,.login-promo-live i,.login-promo-slide,.login-promo-dots i{animation:none!important}.login-promo-slide{opacity:0;transform:none}.login-promo-slide.promo-one{opacity:1}}
 </style>
 
+<style id="sat-work-pulse-styles">
+.sat-work-pulse{position:relative;overflow:hidden;margin:22px 0 28px;padding:clamp(17px,3vw,28px);border:1px solid rgba(90,164,224,.22);border-radius:22px;background:radial-gradient(circle at 88% 8%,rgba(25,117,185,.25),transparent 32%),linear-gradient(130deg,#0c1b30 0%,#102b49 58%,#09172a 100%);box-shadow:0 18px 42px rgba(0,0,0,.18);color:#edf5ff}
+.sat-work-pulse:after{content:"";position:absolute;inset:auto -50px -115px auto;width:240px;height:240px;border:1px solid rgba(244,199,100,.13);border-radius:50%;box-shadow:0 0 0 24px rgba(244,199,100,.025),0 0 0 48px rgba(244,199,100,.02);pointer-events:none}
+.sat-pulse-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:18px;position:relative;z-index:1}
+.sat-pulse-kicker{font-size:10px;letter-spacing:1.5px;font-weight:800;color:#f1cb75}.sat-pulse-kicker i{display:inline-block;width:7px;height:7px;margin-right:7px;border-radius:50%;background:#35d49a;box-shadow:0 0 10px #35d49a;animation:satPulseBlink 1.8s infinite}
+.sat-pulse-head h2{margin:7px 0 5px;font-size:clamp(21px,3vw,29px);color:#fff}.sat-pulse-head h2 em{font-style:normal;color:#f2c86d}.sat-pulse-head p{margin:0;max-width:650px;color:#b8c9dc;font-size:13px;line-height:1.65}
+.sat-pulse-mark{flex:0 0 54px;width:54px;height:54px;display:grid;place-items:center;border-radius:17px;background:linear-gradient(145deg,#1d4770,#102844);border:1px solid rgba(242,200,109,.35);font-size:27px;box-shadow:0 8px 25px #06101f}
+.sat-pulse-track{position:relative;min-height:190px;z-index:1}.sat-pulse-slide{display:none;align-items:flex-start;gap:18px;min-height:190px;padding:clamp(17px,3vw,25px);border:1px solid rgba(255,255,255,.11);border-radius:17px;background:linear-gradient(110deg,rgba(255,255,255,.075),rgba(255,255,255,.025));animation:satPulseIn .55s ease both}.sat-pulse-slide.is-active{display:flex}
+.sat-pulse-icon{flex:0 0 54px;width:54px;height:54px;display:grid;place-items:center;border-radius:16px;background:rgba(242,200,109,.12);border:1px solid rgba(242,200,109,.27);font-size:27px}
+.sat-pulse-copy small{font-size:10px;letter-spacing:1.35px;font-weight:800;color:#f1cb75}.sat-pulse-copy h3{margin:7px 0 8px;font-size:clamp(17px,2.5vw,23px);color:#fff}.sat-pulse-copy p{margin:0;color:#c2d1e1;font-size:13px;line-height:1.75;max-width:850px}
+.sat-pulse-tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}.sat-pulse-tags span{padding:5px 9px;border-radius:99px;background:rgba(42,151,190,.15);border:1px solid rgba(94,190,219,.2);font-size:10px;color:#c9edfa}
+.sat-pulse-controls{position:relative;z-index:1;display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:14px}.sat-pulse-dots{display:flex;gap:7px}.sat-pulse-dots button{width:8px;height:8px;padding:0;border:0;border-radius:99px;background:#60748b;cursor:pointer;transition:all .25s}.sat-pulse-dots button.is-active{width:25px;background:#f2c86d}.sat-pulse-auto{font-size:9px;letter-spacing:1px;color:#9fb4ca}.sat-pulse-foot{position:relative;z-index:1;margin-top:17px;padding-top:13px;border-top:1px solid rgba(255,255,255,.1);font-size:10px;letter-spacing:1.2px;color:#f1cb75}.sat-pulse-foot b{color:#fff}
+@keyframes satPulseIn{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}@keyframes satPulseBlink{50%{opacity:.35;box-shadow:0 0 2px #35d49a}}
+@media(max-width:600px){.sat-work-pulse{border-radius:17px;margin:17px 0 22px}.sat-pulse-track,.sat-pulse-slide{min-height:230px}.sat-pulse-slide{gap:12px;padding:15px}.sat-pulse-icon{flex-basis:43px;width:43px;height:43px;font-size:22px}.sat-pulse-controls{align-items:flex-start;flex-direction:column}.sat-pulse-auto{font-size:8px}}
+@media(prefers-reduced-motion:reduce){.sat-pulse-kicker i{animation:none}.sat-pulse-slide{animation:none;transition:none}}
+</style>
+
 </head>
 <body>
 <header class="topbar">
@@ -744,6 +761,25 @@ body.logged-in #loginPromoBanner{display:none!important}
       <div class="card span6 education-home-card"><h3><span class="edu-kicker">PENGETAHUAN ANGGOTA</span>Edukasi Hak Pekerja</h3><div id="myStatus"></div></div>
       <div class="card span6"><h3>Siaran & Informasi Pengurus</h3><div id="latest">Informasi resmi akan tampil di sini setelah pengurus menerbitkan agenda atau pengumuman.</div></div>
     </div>
+
+    <section id="satWorkPulse" class="sat-work-pulse" aria-label="Sorotan dunia kerja ritel Alfamart">
+      <div class="sat-pulse-head">
+        <div><span class="sat-pulse-kicker"><i></i> RUANG EDUKASI PEKERJA RITEL</span><h2>Dunia Kerja SAT <em>Alfamart</em></h2>
+        <p>Informasi dan pengingat seputar kehidupan kerja di toko, kantor cabang, dan lingkungan operasional ritel.</p></div>
+        <span class="sat-pulse-mark" aria-hidden="true">✊</span>
+      </div>
+      <div class="sat-pulse-track" aria-live="polite">
+        <article class="sat-pulse-slide is-active" data-sat-slide="0"><div class="sat-pulse-icon">🕒</div><div class="sat-pulse-copy"><small>01 · WAKTU KERJA</small><h3>Shift, Absensi & Lembur</h3><p>Pahami jadwal kerja, pencatatan kehadiran, waktu istirahat, dan ketentuan lembur. Simpan bukti jadwal serta komunikasi terkait perubahan jam kerja.</p><div class="sat-pulse-tags"><span>Jadwal shift</span><span>Absensi</span><span>Lembur</span></div></div></article>
+        <article class="sat-pulse-slide" data-sat-slide="1"><div class="sat-pulse-icon">📦</div><div class="sat-pulse-copy"><small>02 · OPERASIONAL TOKO</small><h3>Stok Opname & Selisih Barang</h3><p>Catat kronologi dengan jelas, cocokkan dokumen dan hasil pemeriksaan, serta minta kesempatan memberi penjelasan sebelum mengambil kesimpulan.</p><div class="sat-pulse-tags"><span>Stok opname</span><span>NSB</span><span>Klarifikasi</span></div></div></article>
+        <article class="sat-pulse-slide" data-sat-slide="2"><div class="sat-pulse-icon">📋</div><div class="sat-pulse-copy"><small>03 · HAK DAN PROSEDUR</small><h3>SP, BAP & Pemanggilan Kerja</h3><p>Pahami isi dokumen sebelum menandatangani. Minta salinan, baca kronologi, dan sampaikan keberatan atau klarifikasi secara tertulis bila diperlukan.</p><div class="sat-pulse-tags"><span>Surat peringatan</span><span>BAP</span><span>Hak klarifikasi</span></div></div></article>
+        <article class="sat-pulse-slide" data-sat-slide="3"><div class="sat-pulse-icon">⚖️</div><div class="sat-pulse-copy"><small>04 · KESEJAHTERAAN</small><h3>Upah, THR, BPJS & Hak PHK</h3><p>Kenali komponen upah, hak istirahat, THR, jaminan sosial, dan hak akibat berakhirnya hubungan kerja. Periksa dokumen dan perhitungan secara cermat.</p><div class="sat-pulse-tags"><span>Upah & THR</span><span>BPJS</span><span>Hak PHK</span></div></div></article>
+        <article class="sat-pulse-slide" data-sat-slide="4"><div class="sat-pulse-icon">🤝</div><div class="sat-pulse-copy"><small>05 · SOLIDARITAS</small><h3>Berserikat, Saling Melindungi</h3><p>Pekerja berhak menyampaikan aspirasi dan membangun solidaritas. Gunakan jalur komunikasi organisasi untuk berdiskusi dan mencari pendampingan.</p><div class="sat-pulse-tags"><span>Perlindungan</span><span>Perlawanan</span><span>Kesejahteraan</span></div></div></article>
+      </div>
+      <div class="sat-pulse-controls"><div class="sat-pulse-dots" role="group" aria-label="Pilih topik edukasi">
+        <button type="button" class="is-active" data-sat-dot="0" aria-label="Topik 1"></button><button type="button" data-sat-dot="1" aria-label="Topik 2"></button><button type="button" data-sat-dot="2" aria-label="Topik 3"></button><button type="button" data-sat-dot="3" aria-label="Topik 4"></button><button type="button" data-sat-dot="4" aria-label="Topik 5"></button>
+      </div><span class="sat-pulse-auto">INFO PEKERJA · BERGANTI OTOMATIS</span></div>
+      <div class="sat-pulse-foot">PERLINDUNGAN. <b>PERLAWANAN.</b> KESEJAHTERAAN.</div>
+    </section>
 
     <section class="org-home" aria-label="Profil organisasi GSPMII">
       <div class="org-intro">
@@ -1762,5 +1798,29 @@ init().catch(e=>message($("authMsg"),e.message,true));
 
 <div id="gspmiiPageLoader" class="gspmii-page-loader" aria-hidden="true"><div class="loader-orbit"></div><b>Memuat halaman...</b><small>GSPMII · PUK SAT CIKOKOL RAYA</small></div>
 <script id="gspmii-nik-input-helper">document.addEventListener("input",e=>{if(e.target&&e.target.id==="myNik")e.target.value=e.target.value.replace(/\D/g,"").slice(0,16)});</script>
+<script id="sat-work-pulse-script">
+(function(){
+  const root=document.getElementById('satWorkPulse');
+  if(!root || root.dataset.ready==='1') return;
+  root.dataset.ready='1';
+  const slides=Array.from(root.querySelectorAll('[data-sat-slide]'));
+  const dots=Array.from(root.querySelectorAll('[data-sat-dot]'));
+  if(!slides.length) return;
+  let current=0, timer=null;
+  const show=(index)=>{
+    current=(index+slides.length)%slides.length;
+    slides.forEach((el,i)=>el.classList.toggle('is-active',i===current));
+    dots.forEach((el,i)=>{el.classList.toggle('is-active',i===current);el.setAttribute('aria-pressed',i===current?'true':'false');});
+  };
+  const stop=()=>{if(timer){clearInterval(timer);timer=null;}};
+  const start=()=>{stop();if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){timer=setInterval(()=>show(current+1),6500);}};
+  dots.forEach(dot=>dot.addEventListener('click',()=>{show(Number(dot.getAttribute('data-sat-dot')));start();}));
+  root.addEventListener('mouseenter',stop);root.addEventListener('mouseleave',start);
+  root.addEventListener('focusin',stop);root.addEventListener('focusout',start);
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();else start();});
+  show(0);start();
+})();
+</script>
+
 </body>
 </html>

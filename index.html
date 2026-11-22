@@ -593,6 +593,35 @@ body.logged-in #loginPromoBanner{display:none!important}
 @media(prefers-reduced-motion:reduce){.sat-pulse-kicker i{animation:none}.sat-pulse-slide{animation:none;transition:none}}
 </style>
 
+
+<style id="gspmii-watermark-style">
+/* Watermark identitas: hanya tampil setelah login, tanpa menangkap sentuhan atau klik */
+#gspmiiIdentityWatermark{display:none;position:fixed;inset:0;z-index:80;pointer-events:none;overflow:hidden;user-select:none}
+body.logged-in #gspmiiIdentityWatermark{display:block}
+#gspmiiIdentityWatermark .wm-repeat{position:absolute;inset:-12%;display:flex;flex-direction:column;justify-content:space-around;transform:rotate(-23deg);opacity:.105}
+#gspmiiIdentityWatermark .wm-line{display:flex;align-items:center;justify-content:space-around;gap:7vw;white-space:nowrap;color:#dceaff;font-weight:900;letter-spacing:1.4px;text-shadow:0 1px 3px #071326;font-size:clamp(12px,1.65vw,20px)}
+#gspmiiIdentityWatermark .wm-line span{display:inline-block}
+#gspmiiIdentityWatermark .wm-line .wm-seal{font-size:1.5em;color:#f3c65e}
+#gspmiiIdentityWatermark .wm-stamp{position:absolute;right:clamp(10px,3vw,34px);top:clamp(82px,12vh,135px);max-width:min(330px,72vw);padding:10px 13px;border:1px solid rgba(244,199,99,.3);border-radius:12px;background:rgba(5,17,35,.23);color:#f2f6ff;opacity:.22;text-align:right;line-height:1.55;transform:rotate(-7deg);font-size:10px;letter-spacing:.5px}
+#gspmiiIdentityWatermark .wm-stamp strong{display:block;color:#ffd36d;font-size:11px;letter-spacing:1px}
+#gspmiiIdentityWatermark .wm-stamp .wm-person{font-weight:900;font-size:12px;overflow-wrap:anywhere}
+#gspmiiIdentityWatermark .wm-stamp .wm-email{overflow-wrap:anywhere}
+#gspmiiConfidentialRibbon{display:none;position:fixed;z-index:79;left:10px;right:10px;bottom:10px;min-height:42px;align-items:center;gap:10px;padding:9px 14px;border:1px solid rgba(255,220,80,.55);border-radius:12px;background:linear-gradient(100deg,rgba(116,12,22,.96),rgba(156,20,31,.94));box-shadow:0 8px 25px rgba(0,0,0,.32);color:#fff;pointer-events:none}
+body.logged-in #gspmiiConfidentialRibbon{display:flex}
+#gspmiiConfidentialRibbon .wm-lock{font-size:19px;flex:0 0 auto}
+#gspmiiConfidentialRibbon strong{font-size:clamp(10px,1.4vw,13px);letter-spacing:.7px}
+#gspmiiConfidentialRibbon span{display:block;color:#ffe28a;font-size:clamp(8px,1.1vw,10px);font-weight:800;letter-spacing:.35px}
+@media(max-width:680px){
+ #gspmiiIdentityWatermark .wm-repeat{inset:-18%;opacity:.09}
+ #gspmiiIdentityWatermark .wm-line{font-size:11px;gap:24px}
+ #gspmiiIdentityWatermark .wm-stamp{top:86px;right:8px;padding:7px 9px;font-size:9px;max-width:75vw}
+ #gspmiiConfidentialRibbon{left:7px;right:7px;bottom:7px;min-height:38px;padding:7px 9px;gap:7px}
+ #gspmiiConfidentialRibbon strong{font-size:9px}
+ #gspmiiConfidentialRibbon span{font-size:7px}
+}
+@media print{#gspmiiIdentityWatermark,#gspmiiConfidentialRibbon{display:none!important}}
+</style>
+
 </head>
 <body>
 <header class="topbar">
@@ -1819,6 +1848,52 @@ init().catch(e=>message($("authMsg"),e.message,true));
   root.addEventListener('focusin',stop);root.addEventListener('focusout',start);
   document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();else start();});
   show(0);start();
+})();
+</script>
+
+
+<div id="gspmiiIdentityWatermark" aria-hidden="true">
+  <div class="wm-repeat">
+    <div class="wm-line"><span class="wm-seal">✺ GSPMII</span><span>DOKUMEN INTERNAL GSPMII</span><span class="wm-seal">✺ GSPMII</span></div>
+    <div class="wm-line"><span>DOKUMEN INTERNAL GSPMII</span><span>PUK SAT CIKOKOL RAYA</span></div>
+    <div class="wm-line"><span class="wm-seal">✺ GSPMII</span><span>DOKUMEN INTERNAL GSPMII</span><span class="wm-seal">✺ GSPMII</span></div>
+    <div class="wm-line"><span>PUK SAT CIKOKOL RAYA</span><span>DOKUMEN INTERNAL GSPMII</span></div>
+    <div class="wm-line"><span class="wm-seal">✺ GSPMII</span><span>DOKUMEN INTERNAL GSPMII</span><span class="wm-seal">✺ GSPMII</span></div>
+  </div>
+  <div class="wm-stamp">
+    <strong>DOKUMEN INTERNAL GSPMII</strong>
+    <div class="wm-person" id="gspmiiWmName">ANGGOTA GSPMII</div>
+    <div class="wm-email" id="gspmiiWmEmail">Akun terverifikasi</div>
+    <div id="gspmiiWmTime">Waktu akses</div>
+    <div>PUK SAT CIKOKOL RAYA</div>
+  </div>
+</div>
+<div id="gspmiiConfidentialRibbon" aria-hidden="true">
+  <div class="wm-lock">🔒</div>
+  <div><strong>DOKUMEN INTERNAL GSPMII</strong><span>DILARANG MENYEBARKAN, MENYALIN, ATAU MEMBAGIKAN TANPA IZIN ORGANISASI.</span></div>
+</div>
+
+
+<script id="gspmii-watermark-script">
+(function(){
+  const nameNode=document.getElementById('gspmiiWmName');
+  const emailNode=document.getElementById('gspmiiWmEmail');
+  const timeNode=document.getElementById('gspmiiWmTime');
+  if(!nameNode||!emailNode||!timeNode) return;
+  const update=()=>{
+    try{
+      const logged=document.body.classList.contains('logged-in');
+      if(!logged) return;
+      const person=(typeof me!=='undefined'&&me&&me.nama_lengkap)?me.nama_lengkap:'ANGGOTA GSPMII';
+      const email=(typeof user!=='undefined'&&user&&user.email)?user.email:'Akun terverifikasi';
+      nameNode.textContent=String(person).toLocaleUpperCase('id-ID');
+      emailNode.textContent=String(email);
+      timeNode.textContent=new Intl.DateTimeFormat('id-ID',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'Asia/Jakarta'}).format(new Date())+' WIB';
+    }catch(e){console.warn('Watermark identitas tidak dapat diperbarui:',e);}
+  };
+  update();
+  setInterval(update,30000);
+  new MutationObserver(update).observe(document.body,{attributes:true,attributeFilter:['class']});
 })();
 </script>
 

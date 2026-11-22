@@ -1682,8 +1682,8 @@ async function secureGspmiiSignOut(release=true){
   user=me=null;admin=false;auth();
 }
 ["pointerdown","keydown","touchstart","scroll","click"].forEach(evt=>document.addEventListener(evt,()=>{if(user)resetGspmiiIdleTimer();},{passive:true}));
-document.addEventListener("visibilitychange",()=>{if(!document.hidden&&user)resetGspmiiIdleTimer()});
-window.addEventListener("pagehide",()=>{if(user&&gspmiiSessionClaimed){db.rpc("gspmii_release_device_session",{p_session_token:gspmiiDeviceToken});}});
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&user)resetGspmiiIdleTimer()}); window.addEventListener("pageshow",()=>{if(user)resetGspmiiIdleTimer()});
+// Jangan melepas sesi perangkat saat pagehide: browser HP dapat memicu pagehide ketika tab/aplikasi hanya berpindah ke latar belakang. Sesi dilepas saat logout resmi atau logout otomatis.
 
 
 // === MFA WAJIB GSPMII: TOTP / Google Authenticator ===

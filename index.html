@@ -677,6 +677,19 @@ body.logged-in #gspmiiConfidentialRibbon{display:flex}
 @media(prefers-reduced-motion:reduce){.gspmii-online-traffic i{animation:none;opacity:1;transform:none}}
 </style>
 
+<style>
+
+/* GSPMII: animasi partikel 3D khusus di area sapaan, tanpa mengubah menu lain */
+.userbar{position:relative;overflow:hidden;}
+.gspmii-greeting-copy{position:relative;z-index:2;min-width:0;flex:1 1 250px;}
+.gspmii-particle-stage{position:relative;z-index:1;flex:0 0 clamp(112px,18vw,190px);width:clamp(112px,18vw,190px);height:clamp(96px,15vw,154px);display:grid;place-items:center;isolation:isolate;pointer-events:none;}
+#gspmiiParticleCanvas{display:block;width:100%;height:100%;filter:drop-shadow(0 0 9px rgba(37,190,255,.38));}
+.gspmii-particle-glow{position:absolute;width:46%;height:46%;border-radius:50%;background:radial-gradient(circle,rgba(65,191,255,.16),rgba(41,105,255,.07) 42%,transparent 72%);filter:blur(9px);z-index:-1;animation:gspmiiCorePulse 3.8s ease-in-out infinite;}
+@keyframes gspmiiCorePulse{0%,100%{transform:scale(.72);opacity:.48}50%{transform:scale(1.28);opacity:.95}}
+@media(max-width:560px){.userbar{gap:8px;padding:15px 13px}.gspmii-greeting-copy{flex:1 1 calc(100% - 112px)}.gspmii-particle-stage{flex-basis:108px;width:108px;height:100px;margin-left:auto;margin-right:auto}.userbar>#logout{margin-left:auto}}
+@media(prefers-reduced-motion:reduce){.gspmii-particle-glow{animation:none}}
+
+</style>
 </head>
 <body>
 <header class="topbar">
@@ -802,7 +815,8 @@ body.logged-in #gspmiiConfidentialRibbon{display:flex}
 <p class="landing-note hidden" id="landingNote">Solidaritas, tertib administrasi, dan perlindungan hak pekerja melalui pengelolaan keanggotaan yang bertanggung jawab.</p>
 <section id="app" class="hidden">
   <div class="userbar">
-    <div><div class="gspmii-online-status" role="status" aria-label="Status akun sedang online"><span class="gspmii-online-traffic" aria-hidden="true"><i></i><i></i><i></i></span><span>ANDA SEDANG ONLINE</span></div><div class="userrole">RUANG KEANGGOTAAN DIGITAL</div><h2 id="welcome">Halo, Anggota</h2><div id="userEmail" class="muted"></div></div>
+    <div class="gspmii-greeting-copy"><div class="gspmii-online-status" role="status" aria-label="Status akun sedang online"><span class="gspmii-online-traffic" aria-hidden="true"><i></i><i></i><i></i></span><span>ANDA SEDANG ONLINE</span></div><div class="userrole">RUANG KEANGGOTAAN DIGITAL</div><h2 id="welcome">Halo, Anggota</h2><div id="userEmail" class="muted"></div></div>
+    <div class="gspmii-particle-stage" aria-label="Animasi bola partikel cahaya bergerak" role="img"><canvas id="gspmiiParticleCanvas"></canvas><span class="gspmii-particle-glow" aria-hidden="true"></span></div>
     <button id="logout" class="btn alt no-print">Logout</button>
     <div id="appMsg" class="message hidden span12"></div>
   </div>
@@ -1494,6 +1508,9 @@ if ("serviceWorker" in navigator) {
 
 
 
+
+
+
 </body></html>`);
   w.document.close();
 }
@@ -1988,5 +2005,86 @@ init().catch(e=>message($("authMsg"),e.message,true));
 })();
 </script>
 
+<script>
+// GSPMII particle sphere: 3D-like cyan light spikes, continuous pulse, burst and regroup.
+(()=>{
+  const canvas=document.getElementById('gspmiiParticleCanvas');
+  if(!canvas || canvas.dataset.ready==='1') return;
+  canvas.dataset.ready='1';
+  const ctx=canvas.getContext('2d',{alpha:true});
+  if(!ctx) return;
+  const reduced=window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const points=[];
+  const count=560;
+  const golden=Math.PI*(3-Math.sqrt(5));
+  for(let i=0;i<count;i++){
+    const y=1-(i/(count-1))*2;
+    const r=Math.sqrt(1-y*y),a=golden*i;
+    const jitter=(Math.random()-.5)*.045;
+    points.push({x:Math.cos(a)*r,y:y,z:Math.sin(a)*r,phase:Math.random()*Math.PI*2,spike:.65+Math.random()*.85,jitter});
+  }
+  let w=0,h=0,dpr=1,raf=0,last=0,elapsed=0;
+  const resize=()=>{
+    const box=canvas.getBoundingClientRect();
+    dpr=Math.min(window.devicePixelRatio||1,1.7);
+    w=Math.max(1,box.width);h=Math.max(1,box.height);
+    canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  };
+  if('ResizeObserver' in window)new ResizeObserver(resize).observe(canvas);else window.addEventListener('resize',resize,{passive:true});
+  resize();
+  const draw=(stamp)=>{
+    if(!canvas.isConnected)return;
+    if(!last)last=stamp;
+    const dt=Math.min(40,stamp-last);last=stamp;
+    if(!reduced)elapsed+=dt*.001;
+    ctx.clearRect(0,0,w,h);
+    const cx=w*.5,cy=h*.5,base=Math.min(w,h)*.285;
+    const cycle=(elapsed%8.4)/8.4;
+    // Slowly expands, bursts outward, then gathers into a dense sphere again.
+    const burst=Math.pow(Math.max(0,Math.sin(cycle*Math.PI*2-.85)),5);
+    const pulse=1+.075*Math.sin(elapsed*1.7);
+    const rot=elapsed*.34;
+    const cos=Math.cos(rot),sin=Math.sin(rot);
+    const glow=ctx.createRadialGradient(cx,cy,1,cx,cy,base*(1.65+burst*.7));
+    glow.addColorStop(0,'rgba(27,145,255,.16)');glow.addColorStop(.48,'rgba(20,105,235,.07)');glow.addColorStop(1,'rgba(5,20,50,0)');
+    ctx.fillStyle=glow;ctx.beginPath();ctx.arc(cx,cy,base*(1.7+burst*.65),0,Math.PI*2);ctx.fill();
+    for(let i=0;i<points.length;i++){
+      const p=points[i];
+      const wave=1+.045*Math.sin(elapsed*2.2+p.phase);
+      const x0=p.x*cos-p.z*sin;
+      const z0=p.x*sin+p.z*cos;
+      const y0=p.y*Math.cos(elapsed*.16)-z0*Math.sin(elapsed*.16);
+      const z1=p.y*Math.sin(elapsed*.16)+z0*Math.cos(elapsed*.16);
+      const depth=2.65/(2.65+z1*.72);
+      const scatter=burst*(.45+((Math.sin(p.phase*2.3)+1)*.24));
+      const radius=base*pulse*wave*(1+scatter)*depth;
+      const px=cx+x0*radius+(x0*base*burst*.45);
+      const py=cy+y0*radius+(y0*base*burst*.45);
+      const size=(.72+(1-depth)*1.25)*p.spike;
+      const len=size*(1.6+burst*4.6);
+      const alpha=Math.min(1,(.46+(1-depth)*.5)*(1-burst*.18));
+      const hue=188+(i%7)*3+(1-depth)*22;
+      ctx.strokeStyle=`hsla(${hue},100%,${65+(1-depth)*20}%,${alpha})`;
+      ctx.lineWidth=.65+(1-depth)*.55;
+      ctx.beginPath();ctx.moveTo(px-x0*len*.22,py-y0*len*.22);ctx.lineTo(px+x0*len,py+y0*len);ctx.stroke();
+      ctx.fillStyle=`hsla(${hue},100%,82%,${alpha})`;
+      ctx.beginPath();ctx.arc(px,py,.65+(1-depth)*.75,0,Math.PI*2);ctx.fill();
+    }
+    // Subtle orbiting glints, not a separate logo or interface element.
+    for(let k=0;k<3;k++){
+      const a=elapsed*(.48+k*.11)+k*2.1;
+      const rx=base*(.96+k*.09),ry=base*(.25+k*.045);
+      const ox=cx+Math.cos(a)*rx,oy=cy+Math.sin(a)*ry;
+      ctx.fillStyle=k===1?'rgba(255,211,111,.9)':'rgba(112,224,255,.88)';
+      ctx.shadowColor=ctx.fillStyle;ctx.shadowBlur=9;
+      ctx.beginPath();ctx.arc(ox,oy,1.3+(k===1?1:0),0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
+    }
+    if(!reduced)raf=requestAnimationFrame(draw);
+  };
+  if(reduced)draw(0);else raf=requestAnimationFrame(draw);
+  document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelAnimationFrame(raf);last=0;}else if(!reduced){last=0;raf=requestAnimationFrame(draw);}});
+})();
+</script>
 </body>
 </html>

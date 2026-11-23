@@ -1704,10 +1704,20 @@ function checkGspmiiIdleOnResume(){
   if(Date.now()-gspmiiLastActivity>=GSPMII_IDLE_LOGOUT_MS){expireGspmiiIdleSession();return;}
   scheduleGspmiiIdleFromLastActivity();
 }
+// Pengawas cadangan untuk browser HP yang menunda setTimeout saat tab di latar belakang.
+let gspmiiIdleWatchdog=null;
+function startGspmiiIdleWatchdog(){
+  if(gspmiiIdleWatchdog)clearInterval(gspmiiIdleWatchdog);
+  gspmiiIdleWatchdog=setInterval(()=>{
+    if(!user||gspmiiIdleLogoutStarted)return;
+    if(Date.now()-gspmiiLastActivity>=GSPMII_IDLE_LOGOUT_MS)expireGspmiiIdleSession();
+  },5000);
+}
 async function secureGspmiiSignOut(release=true){
   if(gspmiiIdleTimer)clearTimeout(gspmiiIdleTimer);
   if(gspmiiWarningTimer)clearTimeout(gspmiiWarningTimer);
   if(gspmiiHeartbeat){clearInterval(gspmiiHeartbeat);gspmiiHeartbeat=null;}
+  if(gspmiiIdleWatchdog){clearInterval(gspmiiIdleWatchdog);gspmiiIdleWatchdog=null;}
   stopNotifRealtime();
   if(release)await releaseGspmiiDeviceSession();
   gspmiiSessionClaimed=false;
@@ -1820,7 +1830,7 @@ async function enter(){
   await db.auth.signOut();user=me=null;admin=false;financeAccess=false;auth();
   message($("authMsg"),authGateError.message||"Akses belum dapat diberikan.",true);return;
  }
- resetGspmiiIdleTimer();$("publicIntro").classList.add("hidden");$("landingNote").classList.add("hidden");$("auth").classList.add("hidden");$("app").classList.remove("hidden");document.body.classList.add("logged-in");$("mobileDock").classList.remove("hidden");
+ gspmiiLastActivity=Date.now();startGspmiiIdleWatchdog();resetGspmiiIdleTimer();$("publicIntro").classList.add("hidden");$("landingNote").classList.add("hidden");$("auth").classList.add("hidden");$("app").classList.remove("hidden");document.body.classList.add("logged-in");$("mobileDock").classList.remove("hidden");
  try{document.querySelectorAll(".admin").forEach(x=>x.classList.toggle("hidden",!admin));document.querySelectorAll(".owner-only").forEach(x=>x.classList.toggle("hidden",user.id!==GSPMII_OWNER_UID));document.querySelectorAll(".finance-access").forEach(x=>x.classList.toggle("hidden",!financeAccess));document.querySelectorAll(".member-only").forEach(x=>x.classList.toggle("hidden",admin));await renderProfile();await drawCard();await loadAgenda();await loadPublicStats();try{await loadNotifications()}catch(ne){console.warn("Notifikasi belum dapat dimuat:",ne)}startNotifRealtime();if(admin)await loadAdmin();page("home")}catch(e){message($("appMsg"),"Gagal memuat data: "+e.message,true)}
 }
 $("loginForm").onsubmit=async e=>{

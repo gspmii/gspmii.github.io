@@ -2039,7 +2039,10 @@ init().catch(e=>message($("authMsg"),e.message,true));
     const dt=Math.min(40,stamp-last);last=stamp;
     if(!reduced)elapsed+=dt*.001;
     ctx.clearRect(0,0,w,h);
-    const cx=w*.5,cy=h*.5,base=Math.min(w,h)*.285;
+    const base=Math.min(w,h)*.18;
+    // Gerakkan bola dari sisi kiri ke kanan dan kembali, tetap di dalam stage.
+    const travel=Math.max(0,w*.5-base*2.05-2);
+    const cx=w*.5+Math.sin(elapsed*.72)*travel,cy=h*.5;
     const cycle=(elapsed%8.4)/8.4;
     // Slowly expands, bursts outward, then gathers into a dense sphere again.
     const burst=Math.pow(Math.max(0,Math.sin(cycle*Math.PI*2-.85)),5);

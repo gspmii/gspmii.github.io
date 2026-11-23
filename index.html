@@ -2015,7 +2015,7 @@ init().catch(e=>message($("authMsg"),e.message,true));
   if(!ctx) return;
   const reduced=window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const points=[];
-  const count=560;
+  const count=2500;
   const golden=Math.PI*(3-Math.sqrt(5));
   for(let i=0;i<count;i++){
     const y=1-(i/(count-1))*2;
@@ -2041,7 +2041,7 @@ init().catch(e=>message($("authMsg"),e.message,true));
     ctx.clearRect(0,0,w,h);
     const base=Math.min(w,h)*.18;
     // Gerakkan bola dari sisi kiri ke kanan dan kembali, tetap di dalam stage.
-    const travel=Math.max(0,w*.5-base*2.05-2);
+    const travel=Math.min(10,w*.07);
     const cx=w*.5+Math.sin(elapsed*.72)*travel,cy=h*.5;
     const cycle=(elapsed%8.4)/8.4;
     // Slowly expands, bursts outward, then gathers into a dense sphere again.

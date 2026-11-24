@@ -2039,26 +2039,35 @@ init().catch(e=>message($("authMsg"),e.message,true));
     const dt=Math.min(40,stamp-last);last=stamp;
     if(!reduced)elapsed+=dt*.001;
     ctx.clearRect(0,0,w,h);
-    const base=Math.min(w,h)*.16;
-    // Lintasan memanjang dari dekat sapaan hingga dekat tombol Logout, tetap di dalam kotak.
-    const travel=Math.max(0,w*.5-base-6);
-    const cx=w*.5+Math.sin(elapsed*.72)*travel,cy=h*.5;
+    const base=Math.min(w*.105,h*.34);
+    // Orbit Galaxy memenuhi koridor sapaan hingga Logout, tanpa keluar dari kotak.
+    const travelX=Math.max(0,w*.5-base*1.7-5);
+    const travelY=Math.max(0,h*.5-base*1.7-2);
+    const cx=w*.5+Math.sin(elapsed*.48)*travelX;
+    const cy=h*.5+Math.sin(elapsed*.91+0.8)*travelY;
     const cycle=(elapsed%8.4)/8.4;
-    // Slowly expands, bursts outward, then gathers into a dense sphere again.
+    // Membesar, mekar seperti ledakan bintang, lalu mengecil dan berkumpul kembali.
     const burst=Math.pow(Math.max(0,Math.sin(cycle*Math.PI*2-.85)),5);
-    const pulse=1+.075*Math.sin(elapsed*1.7);
-    const rot=elapsed*.34;
-    const cos=Math.cos(rot),sin=Math.sin(rot);
+    const pulse=1+.22*Math.sin(elapsed*1.35)+.10*Math.sin(elapsed*.57);
+    // Rotasi tiga sumbu memberi efek bola Galaxy yang terus miring dan berputar.
+    const rotY=elapsed*.52, rotX=Math.sin(elapsed*.39)*.72, rotZ=Math.sin(elapsed*.31)*.48;
+    const cyY=Math.cos(rotY),syY=Math.sin(rotY);
+    const cxX=Math.cos(rotX),sxX=Math.sin(rotX);
+    const czZ=Math.cos(rotZ),szZ=Math.sin(rotZ);
     const glow=ctx.createRadialGradient(cx,cy,1,cx,cy,base*(1.65+burst*.7));
     glow.addColorStop(0,'rgba(27,145,255,.16)');glow.addColorStop(.48,'rgba(20,105,235,.07)');glow.addColorStop(1,'rgba(5,20,50,0)');
     ctx.fillStyle=glow;ctx.beginPath();ctx.arc(cx,cy,base*(1.7+burst*.65),0,Math.PI*2);ctx.fill();
     for(let i=0;i<points.length;i++){
       const p=points[i];
       const wave=1+.045*Math.sin(elapsed*2.2+p.phase);
-      const x0=p.x*cos-p.z*sin;
-      const z0=p.x*sin+p.z*cos;
-      const y0=p.y*Math.cos(elapsed*.16)-z0*Math.sin(elapsed*.16);
-      const z1=p.y*Math.sin(elapsed*.16)+z0*Math.cos(elapsed*.16);
+      // Putar titik pada sumbu Y, X, lalu Z untuk gerak 3D penuh.
+      const xY=p.x*cyY-p.z*syY;
+      const zY=p.x*syY+p.z*cyY;
+      const yX=p.y*cxX-zY*sxX;
+      const zX=p.y*sxX+zY*cxX;
+      const x0=xY*czZ-yX*szZ;
+      const y0=xY*szZ+yX*czZ;
+      const z1=zX;
       const depth=2.65/(2.65+z1*.72);
       const scatter=burst*(.45+((Math.sin(p.phase*2.3)+1)*.24));
       const radius=base*pulse*wave*(1+scatter)*depth;

@@ -1205,7 +1205,8 @@ async function loadDirectory(){
       const initials=String(m.nama_lengkap||"?").trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase();
       const avatar=photo?`<img class="directory-avatar" src="${esc(photo)}" alt="Foto ${esc(m.nama_lengkap||"anggota")}" loading="lazy">`:`<div class="directory-avatar directory-initials">${esc(initials||"?")}</div>`;
       const online=!!m.is_online;
-      return `<tr><td><div class="directory-person"><span class="directory-avatar-wrap">${avatar}<i class="directory-online-dot ${online?"":"offline"}" title="${online?"Sedang online":"Offline"}" aria-label="${online?"Sedang online":"Offline"}"></i></span><div><b>${esc(m.nama_lengkap||"Tanpa nama")}</b></div></div></td><td>${esc(m.nomor_anggota||"Belum diterbitkan")}</td><td>${esc(m.unit_kerja||"-")}</td><td>${esc(m.jabatan||"Anggota")}</td><td>${esc(m.status_keanggotaan||"Aktif")}</td></tr>`;
+      const onlineIndicator=user?.id===GSPMII_OWNER_UID?`<i class="directory-online-dot ${online?"":"offline"}" title="${online?"Sedang online":"Offline"}" aria-label="${online?"Sedang online":"Offline"}"></i>`:"";
+      return `<tr><td><div class="directory-person"><span class="directory-avatar-wrap">${avatar}${onlineIndicator}</span><div><b>${esc(m.nama_lengkap||"Tanpa nama")}</b></div></div></td><td>${esc(m.nomor_anggota||"Belum diterbitkan")}</td><td>${esc(m.unit_kerja||"-")}</td><td>${esc(m.jabatan||"Anggota")}</td><td>${esc(m.status_keanggotaan||"Aktif")}</td></tr>`;
     }));
     $("directoryRows").innerHTML=a.length?`<div class="tablewrap"><table><tr><th>Nama Anggota</th><th>Nomor Anggota</th><th>Unit Kerja</th><th>Jabatan</th><th>Status</th></tr>${cards.join("")}</table></div>`:'<div class="empty">Belum ada anggota aktif.</div>';
   }finally{gspmiiDirectoryLoading=false}

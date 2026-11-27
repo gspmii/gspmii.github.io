@@ -996,6 +996,30 @@ body.logged-in #gspmiiConfidentialRibbon{display:flex}
       <div id="iuranMemberRows"><div class="empty">Pilih bulan untuk melihat daftar anggota.</div></div>
       <p class="iuran-note" id="iuranPermissionNote">Anggota hanya dapat melihat status pembayaran.</p>
     </div>
+  
+    <div class="card keuangan-transparansi-card">
+      <div class="userrole">TRANSPARANSI ORGANISASI</div>
+      <h2>Ringkasan Kas Organisasi</h2>
+      <p class="sub">Seluruh anggota yang disetujui dapat melihat arus kas masuk dan keluar. Riwayat transaksi ditampilkan tanpa membuka data pribadi pembayar.</p>
+      <div class="stats-row"><div class="stat"><b id="kasMasuk">Rp0</b><span>Total Dana Masuk</span></div><div class="stat"><b id="kasKeluar">Rp0</b><span>Total Dana Keluar</span></div><div class="stat"><b id="kasSaldo">Rp0</b><span>Saldo Kas Saat Ini</span></div></div>
+      <div class="notice" id="kasOpeningInfo">Saldo awal: Rp0</div>
+      <div class="kas-chart-card"><div class="kas-chart-head"><div><h3>Grafik Arus Kas 6 Bulan</h3><p class="sub">Perbandingan dana masuk dan dana keluar per bulan.</p></div><span class="kas-legend"><i class="in"></i> Masuk <i class="out"></i> Keluar</span></div><div id="kasChart" class="kas-chart" role="img" aria-label="Grafik pemasukan dan pengeluaran enam bulan terakhir"><div class="empty">Grafik akan tampil setelah data dimuat.</div></div></div>
+      <div class="kas-chart-card"><h3>Ringkasan Kategori</h3><div id="kasCategorySummary" class="kas-category-summary">Belum ada data transaksi.</div></div>
+      <h3 style="margin-top:18px">Riwayat Arus Kas</h3><div id="duesRows">Memuat...</div>
+    </div>
+    <div class="card keuangan-kelola-card finance-manager-only" id="kasManagePanel">
+      <div class="userrole">KHUSUS BENDAHARA & PEMILIK PORTAL</div><h3>Pengelolaan Keuangan</h3>
+      <p class="sub">Catat dana masuk atau keluar. Koreksi dilakukan melalui transaksi penyesuaian agar riwayat tetap transparan.</p>
+      <form id="duesForm">
+        <div class="row"><div class="field"><label>Jenis transaksi</label><select id="kasJenis" required><option value="masuk">Dana Masuk</option><option value="keluar">Dana Keluar</option></select></div><div class="field"><label>Kategori</label><select id="kasKategori"><option>Iuran Anggota</option><option>Donasi</option><option>Kas Organisasi</option><option>Kegiatan</option><option>Operasional</option><option>Bantuan Anggota</option><option>Administrasi</option><option>Penyesuaian</option><option>Lainnya</option></select></div></div>
+        <div class="field"><label>Uraian transaksi</label><input id="kasUraian" required maxlength="180" placeholder="Contoh: Iuran anggota November 2026 / konsumsi rapat"></div>
+        <div class="row"><div class="field"><label>Nominal (Rp)</label><input id="duesAmount" type="number" min="1" step="1" required></div><div class="field"><label>Tanggal transaksi</label><input id="duesDate" type="date" required></div></div>
+        <div class="field"><label>Metode</label><select id="duesMethod"><option>Tunai</option><option>Transfer</option><option>QRIS</option><option>Lainnya</option></select></div>
+        <button class="btn" type="submit">Simpan Transaksi</button>
+      </form>
+    </div>
+    <div class="card keuangan-kelola-card finance-owner-only hidden" id="kasOwnerPanel"><h3>Pengaturan Saldo Awal</h3><p class="sub">Hanya Pemilik Portal yang dapat mengatur saldo awal. Pengaturan ini tidak menghapus transaksi yang sudah tercatat.</p><form id="kasOpeningForm"><div class="field"><label>Saldo awal (Rp)</label><input id="kasOpeningAmount" type="number" min="0" step="1" required></div><button class="btn alt" type="submit">Simpan Saldo Awal</button></form></div>
+
   </section>
   <section id="p-forum" class="page hidden"><div class="grid"><div class="card span6"><h2>Mulai Diskusi</h2><form id="forumForm"><div class="field"><label>Topik diskusi</label><input id="fTitle" required maxlength="160"></div><div class="field"><label>Isi diskusi</label><textarea id="fBody" required minlength="5" rows="5"></textarea></div><button class="btn">Terbitkan Diskusi</button></form></div><div class="card span12"><h2>Forum Diskusi Anggota</h2><p class="sub">Ruang bertukar gagasan dengan saling menghormati dan menjaga kerahasiaan informasi.</p><div id="forumRows">Memuat...</div></div></div></section>
   <section id="p-news" class="page hidden"><div class="grid"><div class="card span6 admin"><h2>Terbitkan Berita / Dokumentasi</h2><form id="newsForm"><div class="field"><label>Judul</label><input id="nTitle" required></div><div class="field"><label>Ringkasan</label><textarea id="nSummary"></textarea></div><div class="field"><label>Isi berita</label><textarea id="nBody" rows="5"></textarea></div><div class="field"><label>Tautan foto / dokumentasi (opsional)</label><input id="nImage" type="url"></div><button class="btn">Terbitkan</button></form></div><div class="card span12"><h2>Berita & Dokumentasi</h2><div id="newsRows">Memuat...</div></div></div></section>
@@ -1127,7 +1151,7 @@ function auth(mode="loginForm"){$("loginSolidarity").classList.toggle("hidden",m
 $("settingTheme").onclick=()=>{setTheme(document.documentElement.dataset.theme==="dark"?"light":"dark");$("themeDescription").textContent=document.documentElement.dataset.theme==="dark"?"Mode gelap aktif":"Mode terang aktif"};
 $("settingPassword").onclick=async()=>{const pw=prompt("Masukkan kata sandi baru (minimal 8 karakter):");if(!pw)return;if(pw.length<8){alert("Kata sandi minimal 8 karakter.");return}const {error}=await db.auth.updateUser({password:pw});if(error)alert("Gagal mengubah kata sandi: "+error.message);else alert("Kata sandi berhasil diperbarui.")};
 if($("loginTab"))$("loginTab").onclick=()=>auth();$("registerTab").onclick=()=>auth("registerForm");$("forgot").onclick=()=>{$("resetEmail").value=$("email").value;auth("resetForm")};$("backLogin").onclick=()=>auth();
-function _pageNow(p){if(p==="dues"&&!financeAccess){alert("Akses Keuangan khusus Pemilik Portal, Pengurus, dan Bendahara.");p="home"}document.body.dataset.page=p;if(p==="notifications"){loadNotifications().catch(e=>featureError("notificationRows",e));}if(p==="access"){if(user?.id!==GSPMII_OWNER_UID){alert("Akses khusus pemilik portal.");page("home");return}loadAccessMembers().catch(e=>message($("accessMsg"),"Gagal memuat data anggota: "+e.message,true));}document.querySelectorAll(".page").forEach(x=>x.classList.toggle("hidden",x.id!=="p-"+p));document.querySelectorAll("[data-p]").forEach(x=>x.classList.toggle("active",x.dataset.p===p));$("mobileMenu").classList.add("hidden");if(p==="directory"){loadDirectory().catch(e=>message($("appMsg"),"Direktori belum dapat dimuat: "+e.message,true));startDirectoryLiveRefresh()}else{stopDirectoryLiveRefresh()}if(p==="card"){drawCard().then(()=>renderMemberQr()).catch(e=>message($("appMsg"),"Gagal memuat E-KTA: "+e.message,true))}if(p==="complaints")loadComplaints().catch(e=>featureError("complaintRows",e));if(p==="documents")loadDocuments().catch(e=>featureError("documentRows",e));if(p==="dues")loadDues().catch(e=>featureError("duesRows",e));if(p==="forum")loadForum().catch(e=>featureError("forumRows",e));if(p==="news")loadNews().catch(e=>featureError("newsRows",e));if(p==="notifications")loadNotifications().catch(e=>featureError("notificationRows",e));const activePage=document.getElementById("p-"+p);if(activePage&&p!=="home"&&!activePage.querySelector(".page-backbar")){const bar=document.createElement("div");bar.className="page-backbar";bar.innerHTML='<button type="button" class="page-back-button" data-page-back>← Kembali</button><span>GSPMII · Portal Anggota</span>';activePage.insertBefore(bar,activePage.firstChild);}}
+function _pageNow(p){if(p==="dues"&&!financeAccess){alert("Akses Keuangan hanya untuk Pemilik Portal dan Bendahara.");p="home"}document.body.dataset.page=p;if(p==="notifications"){loadNotifications().catch(e=>featureError("notificationRows",e));}if(p==="access"){if(user?.id!==GSPMII_OWNER_UID){alert("Akses khusus pemilik portal.");page("home");return}loadAccessMembers().catch(e=>message($("accessMsg"),"Gagal memuat data anggota: "+e.message,true));}document.querySelectorAll(".page").forEach(x=>x.classList.toggle("hidden",x.id!=="p-"+p));document.querySelectorAll("[data-p]").forEach(x=>x.classList.toggle("active",x.dataset.p===p));$("mobileMenu").classList.add("hidden");if(p==="directory"){loadDirectory().catch(e=>message($("appMsg"),"Direktori belum dapat dimuat: "+e.message,true));startDirectoryLiveRefresh()}else{stopDirectoryLiveRefresh()}if(p==="card"){drawCard().then(()=>renderMemberQr()).catch(e=>message($("appMsg"),"Gagal memuat E-KTA: "+e.message,true))}if(p==="complaints")loadComplaints().catch(e=>featureError("complaintRows",e));if(p==="documents")loadDocuments().catch(e=>featureError("documentRows",e));if(p==="dues")loadDues().catch(e=>featureError("duesRows",e));if(p==="forum")loadForum().catch(e=>featureError("forumRows",e));if(p==="news")loadNews().catch(e=>featureError("newsRows",e));if(p==="notifications")loadNotifications().catch(e=>featureError("notificationRows",e));const activePage=document.getElementById("p-"+p);if(activePage&&p!=="home"&&!activePage.querySelector(".page-backbar")){const bar=document.createElement("div");bar.className="page-backbar";bar.innerHTML='<button type="button" class="page-back-button" data-page-back>← Kembali</button><span>GSPMII · Portal Anggota</span>';activePage.insertBefore(bar,activePage.firstChild);}}
 
 let gspmiiPageHistory=[];
 function page(p,fromBack=false){
@@ -1139,7 +1163,7 @@ function page(p,fromBack=false){
 }
 document.addEventListener("click",e=>{const back=e.target.closest("[data-page-back]");if(!back)return;const previous=gspmiiPageHistory.pop()||"home";page(previous,true);});
 
-document.querySelectorAll("[data-p],[data-go]").forEach(b=>b.onclick=()=>{let p=b.dataset.p||b.dataset.go;if(["members","form","verify","export"].includes(p)&&!admin)return;if(p==="dues"&&!financeAccess){alert("Menu Keuangan hanya untuk Pemilik Portal, Pengurus, dan Bendahara yang disetujui.");return}if(p==="access"&&user?.id!==GSPMII_OWNER_UID)return;page(p)});
+document.querySelectorAll("[data-p],[data-go]").forEach(b=>b.onclick=()=>{let p=b.dataset.p||b.dataset.go;if(["members","form","verify","export"].includes(p)&&!admin)return;if(p==="dues"&&!financeAccess){alert("Menu Keuangan hanya untuk Pemilik Portal dan Bendahara.");return}if(p==="access"&&user?.id!==GSPMII_OWNER_UID)return;page(p)});
 async function loadAccessMembers(){
   if(user?.id!==GSPMII_OWNER_UID)throw new Error("Akses khusus pemilik portal.");
   const box=$("accessRows"); if(!box)return;
@@ -1186,7 +1210,7 @@ $("accessRows")?.addEventListener("click",async e=>{
 });
 
 const badge=s=>`<span class="pill ${s==="menunggu"?"pending":s==="ditolak"?"rejected":""}">${s==="disetujui"?"Aktif":s==="ditolak"?"Ditolak":"Menunggu"}</span>`;
-async function getMe(){let {data,error}=await db.from("anggota_gspmii").select("*").eq("user_id",user.id).maybeSingle();if(error)throw error;if(!data)throw new Error("Profil anggota belum terbentuk. Hubungi pengurus; jangan membuat profil manual dari browser.");me=data;window.gspmiiWatermarkIdentity={name:me.nama_lengkap||"ANGGOTA GSPMII",email:user.email||"",memberNo:me.nomor_anggota||""};admin=me.peran==="pengurus"&&me.status_verifikasi==="disetujui";financeAccess=(user.id===GSPMII_OWNER_UID)||(me.status_verifikasi==="disetujui")}
+async function getMe(){let {data,error}=await db.from("anggota_gspmii").select("*").eq("user_id",user.id).maybeSingle();if(error)throw error;if(!data)throw new Error("Profil anggota belum terbentuk. Hubungi pengurus; jangan membuat profil manual dari browser.");me=data;window.gspmiiWatermarkIdentity={name:me.nama_lengkap||"ANGGOTA GSPMII",email:user.email||"",memberNo:me.nomor_anggota||""};admin=me.peran==="pengurus"&&me.status_verifikasi==="disetujui";financeAccess=(user.id===GSPMII_OWNER_UID)||(me.status_verifikasi==="disetujui"&&String(me.peran||"").trim().toLowerCase()==="bendahara")}
 async function signedPhoto(path){if(!path)return "";const {data,error}=await db.storage.from("foto_anggota").createSignedUrl(path,3600);if(error){console.warn("Foto profil tidak dapat dimuat:",error.message);return ""}return data?.signedUrl||""}
 async function renderProfile(){
   $("welcome").textContent="Halo, "+me.nama_lengkap;$("userEmail").textContent=user.email;
@@ -1615,7 +1639,7 @@ function shortRupiah(n){n=Number(n||0);if(n>=1000000)return (n/1000000).toLocale
 const IURAN_NOMINAL=54000;
 let iuranMembers=[],iuranPayments=[],iuranSelectedKey="2026-11";
 const iuranMonthsId=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
-function iuranCanManage(){return !!user&&(user.id===GSPMII_OWNER_UID||(String(me?.nama_lengkap||"").trim().toUpperCase()==="RIZKY HAKIM"&&me?.status_verifikasi==="disetujui"))}
+function iuranCanManage(){return !!user&&(user.id===GSPMII_OWNER_UID||(me?.status_verifikasi==="disetujui"&&String(me?.peran||"").trim().toLowerCase()==="bendahara"))}
 function iuranTodayLocal(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function iuranMonthKeys(){const start=new Date(2026,9,1),now=new Date(),end=new Date(now.getFullYear(),now.getMonth()+2,1),out=[];for(let d=new Date(start);d<=end;d.setMonth(d.getMonth()+1))out.push(d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0"));return out}
 function iuranFormatMonth(key){const [y,m]=key.split("-").map(Number);return iuranMonthsId[m-1]+" "+y}
@@ -1626,7 +1650,7 @@ function iuranRender(){
  $("iuranMonthGrid").innerHTML=keys.map(k=>{const paid=paidFor(k),total=iuranMembers.length,pct=total?Math.round(paid/total*100):0;return `<button type="button" class="iuran-month-card ${k===active?"active":""}" data-iuran-month="${k}"><b>${iuranFormatMonth(k)}</b><small>${paid} dari ${total} anggota · ${pct}%</small><div class="iuran-progress"><span style="width:${pct}%"></span></div></button>`}).join("");
  const paid=paidFor(active),total=iuranMembers.length,received=paid*IURAN_NOMINAL;
  $("iuranSummary").innerHTML=`<div><b>${total}</b><small>Total Anggota</small></div><div><b class="iuran-paid">${paid}</b><small>Sudah Bayar</small></div><div><b class="iuran-unpaid">${Math.max(0,total-paid)}</b><small>Belum Bayar</small></div><div><b>${rupiah(received)}</b><small>Total Diterima</small></div>`;
- $("iuranSelectedTitle").textContent=iuranFormatMonth(active);$("iuranAccessLabel").textContent=manager?"Bendahara / Pemilik":"Hanya lihat";
+ $("iuranSelectedTitle").textContent=iuranFormatMonth(active);$("iuranAccessLabel").textContent=manager?"Bendahara / Pemilik Portal":"Hanya lihat";
  $("iuranPermissionNote").textContent=manager?"Anda dapat mencentang atau membatalkan status pembayaran. Perubahan tersimpan ke database.":"Anggota hanya dapat melihat status pembayaran. Hubungi Bendahara jika ada pembayaran yang belum tercatat.";
  const rows=iuranMembers.map((m,i)=>{const rec=map.get(m.user_id+"|"+active),isPaid=rec?.status==="lunas",date=rec?.tanggal_bayar?new Date(rec.tanggal_bayar+"T00:00:00").toLocaleDateString("id-ID"):"-";return `<tr><td>${i+1}</td><td><b>${esc(m.nama_lengkap||"Tanpa nama")}</b><br><small>${esc(m.nomor_anggota||"Belum ada nomor")}</small></td><td>${esc(m.peran||"anggota")}</td><td class="${isPaid?"iuran-paid":"iuran-unpaid"}">${isPaid?"✓ Sudah bayar":"Belum bayar"}</td><td>${date}</td><td>${rupiah(isPaid?IURAN_NOMINAL:0)}</td>${manager?`<td><input class="iuran-check" type="checkbox" data-iuran-user="${esc(m.user_id)}" ${isPaid?"checked":""} aria-label="Tandai iuran ${esc(m.nama_lengkap)}"></td>`:""}</tr>`}).join("");
  $("iuranMemberRows").innerHTML=iuranMembers.length?`<div class="iuran-table-wrap"><table class="iuran-table"><thead><tr><th>No</th><th>Nama Anggota</th><th>Peran</th><th>Status</th><th>Tanggal Bayar</th><th>Nominal</th>${manager?"<th>Bayar</th>":""}</tr></thead><tbody>${rows}</tbody></table></div>`:'<div class="iuran-empty">Belum ada anggota yang disetujui.</div>';
@@ -1639,13 +1663,14 @@ async function loadDues(){
  ]);
  if(memberError)throw memberError;if(paymentError)throw paymentError;
  iuranMembers=members||[];iuranPayments=payments||[];
+ try{await loadKasTransparansi()}catch(kasError){console.error("Gagal memuat transparansi kas:",kasError);const rows=$("duesRows");if(rows)rows.innerHTML="<div class=empty>Data transparansi kas belum dapat dimuat. Periksa koneksi dan kebijakan akses database.</div>"}
  if(!iuranMonthKeys().includes(iuranSelectedKey)){const now=new Date();iuranSelectedKey=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0");if(!iuranMonthKeys().includes(iuranSelectedKey))iuranSelectedKey="2026-10"}
  iuranRender();
 }
 $("iuranMonthGrid")?.addEventListener("click",e=>{const b=e.target.closest("[data-iuran-month]");if(!b)return;iuranSelectedKey=b.dataset.iuranMonth;iuranRender()});
 $("iuranMemberRows")?.addEventListener("change",async e=>{
  const cb=e.target.closest("[data-iuran-user]");if(!cb)return;
- if(!iuranCanManage()){cb.checked=!cb.checked;alert("Hanya Bendahara dan Pemilik Website yang dapat mengubah pembayaran.");return}
+ if(!iuranCanManage()){cb.checked=!cb.checked;alert("Hanya Bendahara dan Pemilik Portal yang dapat mengubah pembayaran.");return}
  const userId=cb.dataset.iuranUser,[year,month]=iuranSelectedKey.split("-").map(Number),paid=cb.checked;
  cb.disabled=true;
  const payload={anggota_user_id:userId,bulan:month,tahun:year,status:paid?"lunas":"belum_bayar",nominal:paid?IURAN_NOMINAL:0,tanggal_bayar:paid?iuranTodayLocal():null,created_by:user.id};
@@ -1653,6 +1678,28 @@ $("iuranMemberRows")?.addEventListener("change",async e=>{
  if(error){cb.checked=!paid;cb.disabled=false;alert("Gagal menyimpan status iuran: "+error.message);return}
  await loadDues();
 });
+
+async function loadKasTransparansi(){
+  $("kasManagePanel").classList.toggle("hidden",!financeAccess);
+  const [{data:tx,error:txErr},{data:opening,error:opErr}]=await Promise.all([
+    db.from("gspmii_kas_transaksi").select("id,jenis,kategori,uraian,nominal,tanggal,metode,created_at").order("tanggal",{ascending:false}).order("created_at",{ascending:false}),
+    db.from("gspmii_kas_pengaturan").select("saldo_awal").eq("id",1).maybeSingle()
+  ]);
+  if(txErr)throw txErr;if(opErr)throw opErr;
+  const arr=tx||[],saldoAwal=Number(opening?.saldo_awal||0);
+  const masuk=arr.filter(x=>x.jenis==="masuk").reduce((n,x)=>n+Number(x.nominal||0),0);
+  const keluar=arr.filter(x=>x.jenis==="keluar").reduce((n,x)=>n+Number(x.nominal||0),0);
+  $("kasMasuk").textContent=rupiah(masuk);$("kasKeluar").textContent=rupiah(keluar);$("kasSaldo").textContent=rupiah(saldoAwal+masuk-keluar);
+  $("kasOpeningInfo").textContent="Saldo awal: "+rupiah(saldoAwal)+" · Total transaksi: "+arr.length+" · Saldo dihitung dari seluruh transaksi tercatat.";
+  drawKasChart(arr);
+  $("duesRows").innerHTML=arr.map(x=>itemCard((x.jenis==="masuk"?"🟢 Dana Masuk":"🔴 Dana Keluar")+" · "+x.kategori,x.uraian,rupiah(x.nominal)+" · "+new Date(x.tanggal+"T00:00:00").toLocaleDateString("id-ID")+" · "+x.metode)).join("")||'<div class="empty">Belum ada transaksi kas.</div>';
+  const owner=!!user&&user.id===GSPMII_OWNER_UID;
+  $("kasOwnerPanel").classList.toggle("hidden",!owner);
+  if(owner&&$("kasOpeningAmount"))$("kasOpeningAmount").value=String(saldoAwal);
+}
+
+$("duesForm").onsubmit=async e=>{e.preventDefault();if(!financeAccess){alert("Hanya Bendahara dan Pemilik Portal yang dapat mencatat transaksi.");return}const payload={jenis:$("kasJenis").value,kategori:$("kasKategori").value,uraian:$("kasUraian").value.trim(),nominal:Number($("duesAmount").value),tanggal:$("duesDate").value,metode:$("duesMethod").value,created_by:user.id};const {error}=await db.from("gspmii_kas_transaksi").insert(payload);if(error){alert("Gagal menyimpan: "+error.message);return}e.target.reset();await loadDues();alert("Transaksi kas berhasil dicatat.")};
+$("kasOpeningForm").onsubmit=async e=>{e.preventDefault();if(user.id!==GSPMII_OWNER_UID){alert("Hanya admin pemilik portal yang dapat mengatur saldo awal.");return}const amount=Number($("kasOpeningAmount").value);if(!Number.isFinite(amount)||amount<0){alert("Saldo awal tidak valid.");return}if(!confirm("Atur saldo awal menjadi "+rupiah(amount)+"? Riwayat transaksi tidak akan dihapus."))return;const {error}=await db.rpc("gspmii_owner_set_saldo_awal",{p_saldo_awal:amount});if(error){alert("Gagal mengatur saldo: "+error.message);return}await loadDues();alert("Saldo awal berhasil diperbarui.")};
 
 async function loadForum(){
   const {data,error}=await db.from("gspmii_forum").select("*").order("created_at",{ascending:false});

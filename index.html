@@ -398,17 +398,19 @@ body:not(.logged-in) #settingsShortcut{display:none!important}
 .dues-summary>div{padding:13px;border:1px solid var(--line);border-radius:13px;background:var(--surface2);min-width:0}
 .dues-summary small{display:block;color:var(--muted);font-size:11px}.dues-summary b{display:block;font-size:20px;margin-top:4px;color:var(--text)}
 .dues-summary .paid b{color:#35d39c}.dues-summary .unpaid b{color:#ff727c}.dues-table{min-width:760px}.dues-status{display:inline-block;padding:5px 9px;border-radius:99px;font-size:11px;font-weight:800}.dues-status.paid{background:#0c563f;color:#a5f3d0}.dues-status.unpaid{background:#641e2b;color:#ffc2c8}.dues-row-actions{display:flex;gap:6px;flex-wrap:wrap}.dues-note{font-size:11px;color:var(--muted);margin-top:10px}
-/* Tampilan kotak ceklis anggota */
-.dues-check-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:12px}
-.dues-check-card{display:flex;align-items:center;gap:10px;min-width:0;padding:12px;border:1px solid var(--line);border-radius:13px;background:var(--surface2);cursor:pointer;transition:border-color .15s,background .15s}
-.dues-check-card.is-paid{border-color:rgba(53,211,156,.55);background:rgba(12,86,63,.22)}
-.dues-check-card input{width:22px;height:22px;min-width:22px;accent-color:#22c58b;cursor:pointer}
-.dues-check-copy{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
-.dues-check-copy b{font-size:13px;overflow-wrap:anywhere;color:var(--text)}
+/* Monitoring iuran: daftar lurus; checkbox kecil hanya untuk Bendahara dan Owner */
+.dues-check-grid{display:flex;flex-direction:column;gap:0;margin-top:12px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface2)}
+.dues-check-card{display:grid;grid-template-columns:30px minmax(0,1fr) 76px;align-items:center;gap:10px;min-width:0;padding:11px 13px;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;cursor:default;transition:background .15s}
+.dues-check-card:last-child{border-bottom:0}
+.dues-check-card.is-paid{background:rgba(12,86,63,.16)}
+.dues-check-card input{width:19px;height:19px;margin:0;accent-color:#22c58b;cursor:pointer;justify-self:center}
+.dues-status{width:19px;height:19px;display:inline-flex;align-items:center;justify-content:center;padding:0;border-radius:50%;font-size:11px;justify-self:center}
+.dues-check-copy{display:flex;flex-direction:row;align-items:center;gap:8px;min-width:0;flex-wrap:wrap}
+.dues-check-copy b{font-size:13px;overflow-wrap:anywhere;color:var(--text);font-weight:600}
 .dues-check-copy small{font-size:10px;color:var(--muted)}
-.dues-check-state{font-size:10px;font-weight:800;white-space:nowrap;color:#ff858e}
+.dues-check-state{font-size:10px;font-weight:800;text-align:right;white-space:nowrap;color:#ff858e}
 .dues-check-card.is-paid .dues-check-state{color:#35d39c}
-@media(max-width:650px){.dues-filter{grid-template-columns:1fr 1fr}.dues-filter .dues-search{grid-column:1/-1}.dues-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.dues-summary b{font-size:17px}.dues-check-grid{grid-template-columns:1fr}.dues-check-card{padding:11px}}
+@media(max-width:650px){.dues-filter{grid-template-columns:1fr 1fr}.dues-filter .dues-search{grid-column:1/-1}.dues-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.dues-summary b{font-size:17px}.dues-check-card{grid-template-columns:28px minmax(0,1fr) 62px;padding:10px 9px}.dues-check-copy{gap:4px}.dues-check-copy b{font-size:12px}.dues-check-copy small{font-size:9px}}
 </style>
 <style>
 
@@ -1676,7 +1678,7 @@ function renderMemberDues(){
   const p=effective(m.user_id),checked=p.status==="lunas";
   const role=m.peran==="pengurus"?"Pengurus":m.peran==="bendahara"?"Bendahara":"Anggota";
   const date=p.tanggal_bayar?new Date(p.tanggal_bayar+"T00:00:00").toLocaleDateString("id-ID"):"Tanggal belum dicatat";
-  return `<label class="dues-check-card ${checked?"is-paid":""}">${canEdit?`<input type="checkbox" data-dues-check="${esc(m.user_id)}" ${checked?"checked":""} aria-label="Tandai ${esc(m.nama_lengkap||"anggota")} sudah membayar">`:`<span class="dues-status ${checked?"paid":"unpaid"}">${checked?"✓":"✕"}</span>`}<span class="dues-check-copy"><b>${esc(m.nama_lengkap||"Tanpa nama")}</b><small>${esc(role)} · ${esc(m.nomor_anggota||"Belum ada nomor")}</small>${checked?`<small>${date} · Rp54.000</small>`:""}</span><span class="dues-check-state">${checked?"LUNAS":"BELUM"}</span></label>`;
+  return `<div class="dues-check-card ${checked?"is-paid":""}">${canEdit?`<input type="checkbox" data-dues-check="${esc(m.user_id)}" ${checked?"checked":""} aria-label="Tandai ${esc(m.nama_lengkap||"anggota")} sudah membayar">`:`<span class="dues-status ${checked?"paid":"unpaid"}">${checked?"✓":"✕"}</span>`}<span class="dues-check-copy"><b>${esc(m.nama_lengkap||"Tanpa nama")}</b><small>${esc(role)} · ${esc(m.nomor_anggota||"Belum ada nomor")}</small>${checked?`<small>${date} · Rp54.000</small>`:""}</span><span class="dues-check-state">${checked?"LUNAS":"BELUM"}</span></div>`;
  }).join("")}</div>`;
  if(canEdit)box.querySelectorAll("[data-dues-check]").forEach(input=>input.addEventListener("change",async()=>{
   const uid=input.dataset.duesCheck,previousDraft=memberDuesDraft[uid],previousPayment=payMap.get(uid);

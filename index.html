@@ -728,6 +728,52 @@ body.logged-in #gspmiiConfidentialRibbon{display:flex}
 @media(prefers-reduced-motion:reduce){.gspmii-particle-glow{animation:none}}
 
 </style>
+
+<style id="mobile-dues-checkbox-visibility-fix">
+/* Perbaikan khusus HP: seluruh kolom monitoring iuran termasuk ceklis muat di layar. */
+@media (max-width:650px) {
+  .dues-list-wrap {
+    width:100%;
+    min-width:0;
+    overflow-x:auto;
+    overflow-y:hidden;
+    -webkit-overflow-scrolling:touch;
+  }
+  .dues-list-head,
+  .dues-list-row {
+    width:100%;
+    min-width:0;
+    grid-template-columns:20px minmax(0,1fr) 48px 55px 30px;
+    gap:3px;
+    padding:10px 5px;
+  }
+  .dues-list-head > *,
+  .dues-list-row > * {
+    min-width:0;
+  }
+  .dues-name {
+    min-width:0;
+    overflow-wrap:anywhere;
+  }
+  .dues-role,
+  .dues-kta {
+    min-width:0;
+    overflow-wrap:anywhere;
+    font-size:9px;
+  }
+  .dues-check-cell {
+    min-width:30px;
+    justify-content:center;
+  }
+  .dues-check-cell input {
+    width:18px;
+    height:18px;
+    min-width:18px;
+    padding:0;
+  }
+}
+</style>
+
 </head>
 <body>
 <header class="topbar">
